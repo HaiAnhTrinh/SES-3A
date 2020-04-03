@@ -1,0 +1,13 @@
+.outerDiv {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.header {
+    text-align: center;
+    color: indianred;
+}
+
+.username {
+    margin-outside: 100px;
+}

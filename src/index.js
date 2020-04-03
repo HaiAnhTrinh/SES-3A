@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import VendorLoginPage from './VendorLoginPage';
-import * as serviceWorker from './serviceWorker';
+import LoginRouter from './frontend/js/LoginRouter';
+import * as serviceWorker from './frontend/js/serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
-    <VendorLoginPage />
+    <LoginRouter />
   </React.StrictMode>,
   document.getElementById('root')
 );
