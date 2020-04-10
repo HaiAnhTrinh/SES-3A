@@ -32,6 +32,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme, createStyles } from '@material-ui/core/styles';
+import * as firebase from "firebase";
 
 const drawerWidth = 240;
 
@@ -94,14 +95,22 @@ export default function SupplierHomePage(props) {
         setAnchorEl(null);
     };
 
+    const handleLogout = () => {
+        firebase.auth().signOut()
+            .then( () => {
+                props.history.push("/");
+            })
+            .catch( (error) => console.log(error));
+    };
+
     const drawer = (
         <div>
             <div className={classes.toolbar} />
             <Divider />
             <List>
-                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+                {['Home', 'My Products', 'Products Sold', 'Graph', 'Account'].map((text, index) => (
                     <ListItem button key={text}>
-                        <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+                        {/*<ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>*/}
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
@@ -153,6 +162,7 @@ export default function SupplierHomePage(props) {
                         >
                             <MenuItem onClick={handleClose}>Profile</MenuItem>
                             <MenuItem onClick={handleClose}>My account</MenuItem>
+                            <MenuItem onClick={handleLogout}>Logout</MenuItem>
                         </Menu>
                     </div>
                 </Toolbar>

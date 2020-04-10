@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import {BrowserRouter, Route, Redirect, Switch} from 'react-router-dom';
-import '../css/LoginPage.css';
-import VendorLoginPage from "./vendor/VendorLoginPage"
-import SupplierLoginPage from "./supplier/SupplierLoginPage";
-import SupplierHomePage from "./supplier/SupplierHomePage";
-import VendorHomePage from "./vendor/VendorHomePage";
-import CreateNewUser from "./common/CreateNewUser";
+import '../../css/LoginPage.css';
+import VendorLoginPage from "../vendor/VendorLoginPage"
+import SupplierLoginPage from "../supplier/SupplierLoginPage";
+import SupplierHomePage from "../supplier/SupplierHomePage";
+import VendorHomePage from "../vendor/VendorHomePage";
+import CreateNewUser from "./CreateNewUser";
 import * as firebase from "firebase/app";
 
-export default function LoginRouter() {
+export default function AppRouter() {
 
     const firebaseConfig = {
         apiKey: "AIzaSyDecNHLnCMMSlD-XlJ9HKCH474AMdv9CLs",
@@ -29,7 +29,10 @@ export default function LoginRouter() {
         console.log("onAUthStateChange", user);
         setIsLoggedIn(true);
     });
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+    //initialize this variable as 'true' during development stage
+    //change to 'false' during production to enable authentication
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     return (
         <BrowserRouter>
@@ -37,12 +40,14 @@ export default function LoginRouter() {
                 <Route path="/" exact strict render={ (props) => <VendorLoginPage {...props} />} />
                 <Route path="/VendorLogin" exact strict render={ (props) => <VendorLoginPage {...props} />} />
                 <Route path="/SupplierLogin" exact strict render={ (props) => <SupplierLoginPage {...props} />} />
-                <Route path="/Vendor/HomePage" exact strict >
-                    { isLoggedIn ? <VendorHomePage/> : <Redirect to="/"/>}
-                </Route>
-                <Route path="/Supplier/HomePage" exact strict >
-                    { isLoggedIn ? <SupplierHomePage/> : <Redirect to="/"/>}
-                </Route>
+                <Route path="/Vendor/HomePage" exact strict
+                       render={ (props) =>
+                           isLoggedIn ? <VendorHomePage {...props}/> : <Redirect to="/"/>}
+                />
+                <Route path="/Supplier/HomePage" exact strict
+                       render={ (props) =>
+                           isLoggedIn ? <SupplierHomePage {...props}/> : <Redirect to="/"/>}
+                />
                 <Route path="/CreateNewUser" exact strict component={CreateNewUser} />
             </Switch>
         </BrowserRouter>

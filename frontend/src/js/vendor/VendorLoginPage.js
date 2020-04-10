@@ -28,7 +28,6 @@ function VendorLoginPage(props) {
                     else{
                         setLoginMessage("Email not verified");
                     }
-                    console.log(res);
                 })
                 .catch((error) => setLoginMessage(error.message));
         }
