@@ -12,3 +12,8 @@
     color: indianred;
     font-size: larger;
 }
+
+.selectRole {
+    margin: 100px;
+    min-width: 1200px;
+}
