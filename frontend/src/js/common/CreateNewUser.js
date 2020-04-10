@@ -62,7 +62,8 @@ export default function CreateNewUser() {
         else{
             firebase.auth().createUserWithEmailAndPassword(email, password)
                 .then(() => {
-                    firebase.auth().currentUser.sendEmailVerification()
+                    const user = firebase.auth().currentUser;
+                    user.sendEmailVerification()
                         .then(() => {
                             setRegisterMessage("Register successful");
                             setIsSuccess(true);
@@ -71,7 +72,9 @@ export default function CreateNewUser() {
                         })
                         .catch((error) => {
                             setRegisterMessage(error.message);
-                        })
+                        });
+                    user.updateProfile({displayName: username})
+                        .catch((error) => console.log(error));
                 })
                 .catch((error) => {
                     console.log(error);

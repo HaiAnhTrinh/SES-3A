@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Route, Redirect } from 'react-router-dom';
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -120,7 +119,7 @@ export default function VendorHomePage(props) {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap>
-                        Responsive drawer
+                        { firebase.auth().currentUser.displayName}
                     </Typography>
                     <div>
                         <IconButton

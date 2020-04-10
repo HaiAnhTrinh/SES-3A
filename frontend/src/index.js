@@ -4,9 +4,13 @@ import './index.css';
 import AppRouter from './js/common/AppRouter';
 import * as serviceWorker from './js/serviceWorker/serviceWorker';
 
+const ThemeContext = React.createContext('light');
+
 ReactDOM.render(
   <React.StrictMode>
-    <AppRouter />
+      <ThemeContext.Provider value="blue">
+          <AppRouter />
+      </ThemeContext.Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
