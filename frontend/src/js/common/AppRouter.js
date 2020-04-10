@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {BrowserRouter, Route, Redirect, Switch} from 'react-router-dom';
 import '../../css/LoginPage.css';
 import VendorLoginPage from "../vendor/VendorLoginPage"
@@ -25,14 +25,14 @@ export default function AppRouter() {
         firebase.initializeApp(firebaseConfig);
     }
 
-    firebase.auth().onAuthStateChanged( (user) => {
-        console.log("onAUthStateChange", user);
-        setIsLoggedIn(true);
-    });
-
     //initialize this variable as 'true' during development stage
     //change to 'false' during production to enable authentication
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        setIsLoggedIn(true);
+        console.log("CURRENT USER:" ,firebase.auth().currentUser);
+    }, [firebase.auth().currentUser]);
 
     return (
         <BrowserRouter>
