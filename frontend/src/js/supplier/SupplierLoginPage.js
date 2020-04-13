@@ -4,7 +4,6 @@ import TextField from "@material-ui/core/TextField";
 import { Link } from 'react-router-dom';
 import LoginIcon from '../../image/LoginIcon.png';
 import '../../css/LoginPage.css';
-import Axios from "axios";
 import * as firebase from "firebase";
 
 function SupplierLoginPage(props) {
@@ -24,12 +23,11 @@ function SupplierLoginPage(props) {
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then((res) => {
                     if(res.user.emailVerified){
-                        props.history.push("/Supplier/HomePage");
+                        props.history.push("/Supplier/" + email);
                     }
                     else{
                         setLoginMessage("Email not verified");
                     }
-                    console.log(res);
                 })
                 .catch((error) => setLoginMessage(error.message));
             // Axios.get("http://localhost:8080/Login",
@@ -39,7 +37,7 @@ function SupplierLoginPage(props) {
             //         const status = res.data.status;
             //         if(status === "Success"){
             //             props.handleLogin(status);
-            //             props.history.push("/SupplierHomePage");
+            //             props.history.push("/SupplierLayout");
             //         }
             //         else{
             //             setLoginMessage("Incorrect username or password");
