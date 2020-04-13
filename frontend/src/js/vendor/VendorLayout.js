@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
 import { Link, Route } from "react-router-dom";
-import {layoutStyles, logout} from "../common/LayoutStyle";
+import {drawer, layoutStyles, logout} from "../common/Layout";
 import Home from "./VendorHome";
 import MyStock from "./VendorMyStock";
 import MyPurchase from "./VendorMyPurchase";
@@ -77,19 +77,7 @@ export default function VendorLayout(props) {
         //TODO: handle drawer item click vendor
     };
 
-    const drawer = (
-        <div>
-            <div className={classes.toolbar} />
-            <Divider />
-            <List>
-                {drawerListObject.map((object, index) => (
-                    <ListItem button key={object.text} component={Link} to={object.path} onClick={onItemClick}>
-                        <ListItemText primary={object.text} />
-                    </ListItem>
-                ))}
-            </List>
-        </div>
-    );
+    const vendorDrawer = () => drawer(classes, drawerListObject, onItemClick);
 
     return (
         <React.Fragment>
@@ -157,7 +145,7 @@ export default function VendorLayout(props) {
                                 keepMounted: true, // Better open performance on mobile.
                             }}
                         >
-                            {drawer}
+                            {vendorDrawer()}
                         </Drawer>
                     </Hidden>
                     <Hidden xsDown implementation="css">
@@ -168,7 +156,7 @@ export default function VendorLayout(props) {
                             variant="permanent"
                             open
                         >
-                            {drawer}
+                            {vendorDrawer()}
                         </Drawer>
                     </Hidden>
                 </nav>

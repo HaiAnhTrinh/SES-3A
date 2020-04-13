@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
 import { Link, Route } from "react-router-dom";
-import {layoutStyles, logout} from "../common/LayoutStyle";
+import {drawer, layoutStyles, logout} from "../common/Layout";
 import Home from "./SupplierHome";
 import MyProduct from "./SupplierMyProduct";
 import ProductSold from "./SupplierProductSold";
@@ -74,19 +74,7 @@ export default function SupplierLayout(props) {
         //TODO: handle drawer item click
     };
 
-    const drawer = (
-        <div>
-            <div className={classes.toolbar} />
-            <Divider />
-            <List>
-                {drawerListObject.map((object, index) => (
-                    <ListItem button key={object.text} component={Link} to={object.path} onClick={onItemClick}>
-                        <ListItemText primary={object.text} />
-                    </ListItem>
-                ))}
-            </List>
-        </div>
-    );
+    const supplierDrawer = () => drawer(classes, drawerListObject, onItemClick);
 
     return (
         <React.Fragment>
@@ -154,7 +142,7 @@ export default function SupplierLayout(props) {
                                 keepMounted: true, // Better open performance on mobile.
                             }}
                         >
-                            {drawer}
+                            {supplierDrawer()}
                         </Drawer>
                     </Hidden>
                     <Hidden xsDown implementation="css">
@@ -165,7 +153,7 @@ export default function SupplierLayout(props) {
                             variant="permanent"
                             open
                         >
-                            {drawer}
+                            {supplierDrawer()}
                         </Drawer>
                     </Hidden>
                 </nav>
