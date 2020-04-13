@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
 import { Link, Route } from "react-router-dom";
-import { layoutStyles } from "../common/LayoutStyle";
+import {layoutStyles, logout} from "../common/LayoutStyle";
 import Home from "./SupplierHome";
 import MyProduct from "./SupplierMyProduct";
 import ProductSold from "./SupplierProductSold";
@@ -68,13 +68,7 @@ export default function SupplierLayout(props) {
         setAnchorEl(null);
     };
 
-    const handleLogout = () => {
-        firebase.auth().signOut()
-            .then( () => {
-                props.history.push("/");
-            })
-            .catch( (error) => console.log(error));
-    };
+    const handleLogout = () => logout(props);
 
     const onItemClick = () => {
         //TODO: handle drawer item click

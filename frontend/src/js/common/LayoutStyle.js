@@ -1,4 +1,5 @@
 import {makeStyles} from "@material-ui/core/styles";
+import * as firebase from "firebase";
 
 const drawerWidth = 240;
 
@@ -34,3 +35,11 @@ export const layoutStyles = makeStyles((theme) => ({
         padding: theme.spacing(3),
     },
 }));
+
+export const logout = (props) => {
+    firebase.auth().signOut()
+        .then( () => {
+            props.history.push("/");
+        })
+        .catch( (error) => console.log(error));
+};
