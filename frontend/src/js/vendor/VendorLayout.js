@@ -28,6 +28,8 @@ export default function VendorLayout(props) {
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [baseUrl, setBaseUrl] = useState("");
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
     const drawerListObject = [{
         'text': 'Home',
         'path': baseUrl + '/Home'
@@ -50,15 +52,13 @@ export default function VendorLayout(props) {
 
     useEffect( () => {
         setBaseUrl(window.location.pathname);
-        console.log(baseUrl);
+        // console.log(baseUrl);
     }, [currentUser]);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
 
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
     };

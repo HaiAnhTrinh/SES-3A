@@ -25,9 +25,9 @@ export default function AppRouter() {
         firebase.initializeApp(firebaseConfig);
     }
 
+    //TODO: configure this variable to false in the production stage
     //initialize this variable as 'true' during development stage
-    //change to 'false' during production to enable authentication
-    // const [isLoggedIn, setIsLoggedIn] = useState(false);
+    //really login to test firebase related functions
     const [isLoggedIn, setIsLoggedIn] = useState(true);
     const currentUser = firebase.auth().currentUser;
 

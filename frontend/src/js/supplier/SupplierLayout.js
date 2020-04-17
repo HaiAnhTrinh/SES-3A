@@ -27,6 +27,8 @@ export default function SupplierLayout(props) {
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [baseUrl, setBaseUrl] = useState("");
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
     const drawerListObject = [{
         'text': 'Home',
         'path': baseUrl + '/Home'
@@ -47,15 +49,13 @@ export default function SupplierLayout(props) {
     useEffect( () => {
         setBaseUrl(window.location.pathname);
         console.log(baseUrl);
+        console.log(currentUser);
     }, [currentUser]);
 
     const handleDrawerToggle = () => {
         // console.log("handleDrawerToggle", mobileOpen);
         setMobileOpen(!mobileOpen);
     };
-
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -68,8 +68,10 @@ export default function SupplierLayout(props) {
 
     const handleLogout = () => logout(props);
 
-    const onItemClick = () => {
-        handleDrawerToggle();
+    const onItemClick = (variant) => {
+        if(variant === "temporary"){
+            handleDrawerToggle();
+        }
     };
 
     const supplierDrawer = () => drawer(classes, drawerListObject, onItemClick);
@@ -140,7 +142,7 @@ export default function SupplierLayout(props) {
                                 keepMounted: true, // Better open performance on mobile.
                             }}
                         >
-                            {supplierDrawer()}
+                            {supplierDrawer("temporary")}
                         </Drawer>
                     </Hidden>
                     <Hidden xsDown implementation="css">
