@@ -2,13 +2,9 @@ import React, {useEffect, useState} from 'react';
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import Menu from "@material-ui/core/Menu";
 import MenuIcon from '@material-ui/icons/Menu';
 import MenuItem from "@material-ui/core/MenuItem";
@@ -16,7 +12,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
-import { Link, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 import {drawer, layoutStyles, logout} from "../common/Layout";
 import Home from "./VendorHome";
 import MyStock from "./VendorMyStock";
@@ -73,8 +69,10 @@ export default function VendorLayout(props) {
 
     const handleLogout = () => logout(props);
 
-    const onItemClick = () => {
-        //TODO: handle drawer item click vendor
+    const onItemClick = (variant) => {
+        if(variant === "temporary"){
+            handleDrawerToggle();
+        }
     };
 
     const vendorDrawer = () => drawer(classes, drawerListObject, onItemClick);
@@ -145,7 +143,7 @@ export default function VendorLayout(props) {
                                 keepMounted: true, // Better open performance on mobile.
                             }}
                         >
-                            {vendorDrawer()}
+                            {vendorDrawer("temporary")}
                         </Drawer>
                     </Hidden>
                     <Hidden xsDown implementation="css">
@@ -156,7 +154,7 @@ export default function VendorLayout(props) {
                             variant="permanent"
                             open
                         >
-                            {vendorDrawer()}
+                            {vendorDrawer("permanent")}
                         </Drawer>
                     </Hidden>
                 </nav>

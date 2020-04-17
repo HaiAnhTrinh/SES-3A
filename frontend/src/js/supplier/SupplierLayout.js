@@ -54,6 +54,7 @@ export default function SupplierLayout(props) {
     }, [currentUser]);
 
     const handleDrawerToggle = () => {
+        // console.log("handleDrawerToggle", mobileOpen);
         setMobileOpen(!mobileOpen);
     };
 
@@ -65,13 +66,14 @@ export default function SupplierLayout(props) {
     };
 
     const handleClose = () => {
+        // console.log("handle close");
         setAnchorEl(null);
     };
 
     const handleLogout = () => logout(props);
 
     const onItemClick = () => {
-        //TODO: handle drawer item click
+        handleDrawerToggle();
     };
 
     const supplierDrawer = () => drawer(classes, drawerListObject, onItemClick);
