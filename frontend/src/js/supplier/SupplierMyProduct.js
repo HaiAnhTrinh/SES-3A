@@ -6,5 +6,7 @@ export default function MyProduct(){
         <div>
             MY PRODUCT
         </div>
+
+        // Hoang
     );
 }
