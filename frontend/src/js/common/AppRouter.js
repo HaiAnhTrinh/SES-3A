@@ -49,7 +49,7 @@ export default function AppRouter() {
                        render={ (props) =>
                            isLoggedIn ? <SupplierLayout {...props}/> : <Redirect to="/"/>}
                 />
-                <Route path="/Vendor/CreateNewUser" exact strict component={CreateNewUser} />
+                <Route path="/CreateNewUser" exact strict component={CreateNewUser} />
             </Switch>
         </BrowserRouter>
     );

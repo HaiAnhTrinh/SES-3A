@@ -50,10 +50,11 @@ export default function VendorLayout(props) {
         'path': baseUrl + '/MyAccount'
     }];
 
-    useEffect( () => {
-        setBaseUrl(window.location.pathname);
-        // console.log(baseUrl);
-    }, [currentUser]);
+    useEffect(() => {
+        firebase.auth().onAuthStateChanged( (user) => {
+            setBaseUrl("/Vendor/" + user.email);
+        });
+    }, []);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);

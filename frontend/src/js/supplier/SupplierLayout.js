@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState } from 'react';
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -46,11 +46,11 @@ export default function SupplierLayout(props) {
         'path': baseUrl + '/Account'
     }];
 
-    useEffect( () => {
-        setBaseUrl(window.location.pathname);
-        console.log(baseUrl);
-        console.log(currentUser);
-    }, [currentUser]);
+    useEffect(() => {
+        firebase.auth().onAuthStateChanged( (user) => {
+            setBaseUrl("/Supplier/" + user.email);
+        });
+    });
 
     const handleDrawerToggle = () => {
         // console.log("handleDrawerToggle", mobileOpen);
