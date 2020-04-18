@@ -1,0 +1,18 @@
+Index: backend/src/test/java/com/ses3a/backend/BackendApplicationTests.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.ses3a.backend;\n\nimport org.junit.jupiter.api.Test;\nimport org.springframework.boot.test.context.SpringBootTest;\n\n@SpringBootTest\nclass BackendApplicationTests {\n\n\n\n    @Test\n    void contextLoads() {\n    }\n\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World\");\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- backend/src/test/java/com/ses3a/backend/BackendApplicationTests.java	(revision 867675468511a1ac8c7abc5b07d678ec9b4e9500)
++++ backend/src/test/java/com/ses3a/backend/BackendApplicationTests.java	(date 1586791005403)
+@@ -13,7 +13,7 @@
+     }
+ 
+     public static void main(String[] args) {
+-        System.out.println("Hello, World");
++        System.out.println("Hello, ml");
+     }
+ 
+ }

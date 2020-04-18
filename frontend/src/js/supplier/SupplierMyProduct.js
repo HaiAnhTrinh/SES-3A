@@ -7,6 +7,7 @@ export default function MyProduct(){
             MY PRODUCT
         </div>
 
-        // Hoang
+        // Hoang Nguyen
+
     );
 }
