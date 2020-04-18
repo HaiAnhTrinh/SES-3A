@@ -1,14 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState } from 'react';
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import Menu from "@material-ui/core/Menu";
 import MenuIcon from '@material-ui/icons/Menu';
 import MenuItem from "@material-ui/core/MenuItem";
@@ -16,8 +12,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
-import { Link, Route } from "react-router-dom";
-import { layoutStyles } from "../common/LayoutStyle";
+import { Route } from "react-router-dom";
+import {drawer, layoutStyles, logout} from "../common/Layout";
 import Home from "./SupplierHome";
 import MyProduct from "./SupplierMyProduct";
 import ProductSold from "./SupplierProductSold";
@@ -31,6 +27,8 @@ export default function SupplierLayout(props) {
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [baseUrl, setBaseUrl] = useState("");
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
     const drawerListObject = [{
         'text': 'Home',
         'path': baseUrl + '/Home'
@@ -48,51 +46,35 @@ export default function SupplierLayout(props) {
         'path': baseUrl + '/Account'
     }];
 
-    useEffect( () => {
-        setBaseUrl(window.location.pathname);
-        console.log(baseUrl);
-    }, [currentUser]);
+    useEffect(() => {
+        firebase.auth().onAuthStateChanged( (user) => {
+            setBaseUrl("/Supplier/" + user.email);
+        });
+    });
 
     const handleDrawerToggle = () => {
+        // console.log("handleDrawerToggle", mobileOpen);
         setMobileOpen(!mobileOpen);
     };
-
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
     const handleClose = () => {
+        // console.log("handle close");
         setAnchorEl(null);
     };
 
-    const handleLogout = () => {
-        firebase.auth().signOut()
-            .then( () => {
-                props.history.push("/");
-            })
-            .catch( (error) => console.log(error));
+    const handleLogout = () => logout(props);
+
+    const onItemClick = (variant) => {
+        if(variant === "temporary"){
+            handleDrawerToggle();
+        }
     };
 
-    const onItemClick = () => {
-        //TODO: handle drawer item click
-    };
-
-    const drawer = (
-        <div>
-            <div className={classes.toolbar} />
-            <Divider />
-            <List>
-                {drawerListObject.map((object, index) => (
-                    <ListItem button key={object.text} component={Link} to={object.path} onClick={onItemClick}>
-                        <ListItemText primary={object.text} />
-                    </ListItem>
-                ))}
-            </List>
-        </div>
-    );
+    const supplierDrawer = () => drawer(classes, drawerListObject, onItemClick);
 
     return (
         <React.Fragment>
@@ -160,7 +142,7 @@ export default function SupplierLayout(props) {
                                 keepMounted: true, // Better open performance on mobile.
                             }}
                         >
-                            {drawer}
+                            {supplierDrawer("temporary")}
                         </Drawer>
                     </Hidden>
                     <Hidden xsDown implementation="css">
@@ -171,7 +153,7 @@ export default function SupplierLayout(props) {
                             variant="permanent"
                             open
                         >
-                            {drawer}
+                            {supplierDrawer()}
                         </Drawer>
                     </Hidden>
                 </nav>

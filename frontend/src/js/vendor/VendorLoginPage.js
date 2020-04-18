@@ -23,7 +23,7 @@ function VendorLoginPage(props) {
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then((res) => {
                     if(res.user.emailVerified){
-                        props.history.push("/Vendor/"+ email);
+                        props.history.push("/Vendor/"+ email + "/Home");
                     }
                     else{
                         setLoginMessage("Email not verified");

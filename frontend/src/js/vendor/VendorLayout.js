@@ -2,13 +2,9 @@ import React, {useEffect, useState} from 'react';
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import Menu from "@material-ui/core/Menu";
 import MenuIcon from '@material-ui/icons/Menu';
 import MenuItem from "@material-ui/core/MenuItem";
@@ -16,8 +12,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
-import { Link, Route } from "react-router-dom";
-import { layoutStyles } from "../common/LayoutStyle";
+import { Route } from "react-router-dom";
+import {drawer, layoutStyles, logout} from "../common/Layout";
 import Home from "./VendorHome";
 import MyStock from "./VendorMyStock";
 import MyPurchase from "./VendorMyPurchase";
@@ -32,6 +28,8 @@ export default function VendorLayout(props) {
     const theme = useTheme();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [baseUrl, setBaseUrl] = useState("");
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
     const drawerListObject = [{
         'text': 'Home',
         'path': baseUrl + '/Home'
@@ -52,17 +50,16 @@ export default function VendorLayout(props) {
         'path': baseUrl + '/MyAccount'
     }];
 
-    useEffect( () => {
-        setBaseUrl(window.location.pathname);
-        console.log(baseUrl);
-    }, [currentUser]);
+    useEffect(() => {
+        firebase.auth().onAuthStateChanged( (user) => {
+            setBaseUrl("/Vendor/" + user.email);
+        });
+    }, []);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
 
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -71,31 +68,15 @@ export default function VendorLayout(props) {
         setAnchorEl(null);
     };
 
-    const handleLogout = () => {
-        firebase.auth().signOut()
-            .then( () => {
-                props.history.push("/");
-            })
-            .catch( (error) => console.log(error));
+    const handleLogout = () => logout(props);
+
+    const onItemClick = (variant) => {
+        if(variant === "temporary"){
+            handleDrawerToggle();
+        }
     };
 
-    const onItemClick = () => {
-        //TODO: handle drawer item click vendor
-    };
-
-    const drawer = (
-        <div>
-            <div className={classes.toolbar} />
-            <Divider />
-            <List>
-                {drawerListObject.map((object, index) => (
-                    <ListItem button key={object.text} component={Link} to={object.path} onClick={onItemClick}>
-                        <ListItemText primary={object.text} />
-                    </ListItem>
-                ))}
-            </List>
-        </div>
-    );
+    const vendorDrawer = () => drawer(classes, drawerListObject, onItemClick);
 
     return (
         <React.Fragment>
@@ -163,7 +144,7 @@ export default function VendorLayout(props) {
                                 keepMounted: true, // Better open performance on mobile.
                             }}
                         >
-                            {drawer}
+                            {vendorDrawer("temporary")}
                         </Drawer>
                     </Hidden>
                     <Hidden xsDown implementation="css">
@@ -174,7 +155,7 @@ export default function VendorLayout(props) {
                             variant="permanent"
                             open
                         >
-                            {drawer}
+                            {vendorDrawer("permanent")}
                         </Drawer>
                     </Hidden>
                 </nav>
