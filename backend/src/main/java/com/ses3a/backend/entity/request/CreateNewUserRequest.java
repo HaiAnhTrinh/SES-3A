@@ -1,4 +1,4 @@
-package com.ses3a.backend.entity;
+package com.ses3a.backend.entity.request;
 
 public class CreateNewUserRequest {
     private String username;
