@@ -1,4 +1,5 @@
 import React from 'react';
+import * as moment from 'moment';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -21,27 +22,28 @@ import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 
-function createData(product, amount, dop) {
-    const value = amount * 6;
+
+
+function createData(product, amount) {
+    const value = amount * 4;
+    const dop = moment("2018-05-18T04:00:00.000Z").format('DD MMM, YYYY');
     return { product, amount, value, dop };
 }
 
 const rows = [
-    createData('Rice', '2', 1324171354, 3287263),
-    createData('Old Rice', '2', 1403500365, 9596961),
-    createData('New Rice', '2', 60483973, 301340),
-    createData('Some Rice', '55', 327167434, 9833520),
-    createData('Fried Rice', '4', 37602103, 9984670),
-    createData('Broken Rice', '69', 25475400, 7692024),
-    createData('Expensive Rice', '69', 83019200, 357578),
-    createData('Sticky Rice', '69', 4857000, 70273),
-    createData('Other Rice', '69', 126577691, 1972550),
-    createData('Another Rice', '69', 126317000, 377973),
-    createData('Some other Rice', '365', 67022000, 640679),
-    createData('Good Rice', '542', 67545757, 242495),
-    createData('Better Rice', '420', 146793744, 17098246),
-    createData('Best Rice', '420', 200962417, 923768),
-    createData('Worst Rice', '420', 210147125, 8515767),
+    createData('Rice', 305),
+    createData('Old Rice', 452),
+    createData('New Rice', 262),
+    createData('Some Rice', 159),
+    createData('Fried Rice', 356),
+    createData('Broken Rice', 408),
+    createData('Expensive Rice', 237),
+    createData('Sticky Rice', 375),
+    createData('Other Rice', 518),
+    createData('Another Rice', 392),
+    createData('Good Rice', 318),
+    createData('Better Rice', 360),
+    createData('Best Rice', 437),
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -71,9 +73,9 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-    { id: 'product', numeric: false, disablePadding: true, label: 'Product Name' },
+    { id: 'product', numeric: false, disablePadding: true, label: 'Product' },
     { id: 'amount', numeric: true, disablePadding: false, label: 'Amount' },
-    { id: 'value', numeric: true, disablePadding: false, label: 'Total Value' },
+    { id: 'value', numeric: true, disablePadding: false, label: 'Value' },
     { id: 'dop', numeric: true, disablePadding: false, label: 'Date of Purchase' },
 ];
 
@@ -196,11 +198,11 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
     },
     paper: {
-        width: '100%',
+        width: '75%',
         marginBottom: theme.spacing(2),
     },
     table: {
-        minWidth: 750,
+        minWidth: 500,
     },
     visuallyHidden: {
         border: 0,
@@ -216,6 +218,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function EnhancedTable() {
+
     const classes = useStyles();
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('amount');
@@ -232,19 +235,19 @@ export default function EnhancedTable() {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.name);
+            const newSelecteds = rows.map((n) => n.product);
             setSelected(newSelecteds);
             return;
         }
         setSelected([]);
     };
 
-    const handleClick = (event, name) => {
-        const selectedIndex = selected.indexOf(name);
+    const handleClick = (event, product) => {
+        const selectedIndex = selected.indexOf(product);
         let newSelected = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, product);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -272,7 +275,7 @@ export default function EnhancedTable() {
         setDense(event.target.checked);
     };
 
-    const isSelected = (name) => selected.indexOf(name) !== -1;
+    const isSelected = (product) => selected.indexOf(product) !== -1;
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
