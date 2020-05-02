@@ -1,13 +1,8 @@
-package com.ses3a.backend.entity;
+package com.ses3a.backend.entity.response;
 
-public class CreateNewUserResponse {
+public class BaseResponse {
     private String status;
     private String message;
-
-    public CreateNewUserResponse(String status,String message) {
-        this.status = status;
-        this.message = message;
-    }
 
     public String getMessage() {
         return message;
