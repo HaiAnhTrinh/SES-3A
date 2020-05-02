@@ -128,7 +128,7 @@ export default function VendorLayout(props) {
                         </div>
                     </Toolbar>
                 </AppBar>
-                <nav className={classes.drawer} aria-label="mailbox folders">
+                <nav className={classes.drawer}>
                     {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
                     <Hidden smUp implementation="css">
                         <Drawer
