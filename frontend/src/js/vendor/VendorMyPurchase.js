@@ -24,17 +24,17 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 
 
 
-function createData(product, amount) {
+function createData(product, amount, dop) {
     const value = amount * 4;
-    const dop = moment("2018-05-18T04:00:00.000Z").format('DD MMM, YYYY');
+    //moment("2018-05-18T04:00:00.000Z").format('DD MMM, YYYY');
     return { product, amount, value, dop };
 }
 
 const rows = [
-    createData('Rice', 305),
-    createData('Old Rice', 452),
-    createData('New Rice', 262),
-    createData('Some Rice', 159),
+    createData('Rice', 305, moment("2018-05-18T04:00:00.000Z").format('DD MMM, YYYY')),
+    createData('Old Rice', 452, moment("2018-05-19T04:00:00.000Z").format('DD MMM, YYYY')),
+    createData('New Rice', 262, moment("2019-05-18T04:00:00.000Z").format('DD MMM, YYYY')),
+    createData('Some Rice', 159, moment("2018-05-20T04:00:00.000Z").format('DD MMM, YYYY')),
     createData('Fried Rice', 356),
     createData('Broken Rice', 408),
     createData('Expensive Rice', 237),
