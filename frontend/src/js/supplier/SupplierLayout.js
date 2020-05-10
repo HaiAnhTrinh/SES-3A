@@ -91,7 +91,7 @@ export default function SupplierLayout(props) {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="h6" noWrap>
+                        <Typography variant="h6" className={classes.title}>
                             { currentUser ? currentUser.displayName : ""}
                         </Typography>
                         <div>
@@ -126,6 +126,7 @@ export default function SupplierLayout(props) {
                         </div>
                     </Toolbar>
                 </AppBar>
+
                 <nav className={classes.drawer}>
                     {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
                     <Hidden smUp implementation="css">

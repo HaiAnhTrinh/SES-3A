@@ -7,6 +7,8 @@ import com.ses3a.backend.firebase.FirebaseServices;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +30,17 @@ public class RestApiController {
         firebaseServices.createNewUser(createNewUserRequest);
         Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
         responseEntity.getBody().setMessage("Register successful. Please verify your email.");
+        return responseEntity;
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/Login")
+    public ResponseEntity<Map<String, Boolean>> Login(@RequestHeader String email, @RequestHeader String role){
+        System.out.println("RECEIVED LOGIN REQUEST");
+        Map<String, Boolean> data = new HashMap<>();
+        data.put("isAuthorized", firebaseServices.authorize(email, role));
+        ResponseEntity<Map<String, Boolean>> responseEntity =
+                new ResponseEntity<>( data, HttpStatus.OK);
         return responseEntity;
     }
 
@@ -111,7 +124,7 @@ public class RestApiController {
     @CrossOrigin(origins = "*")
     @PostMapping("/AddProduct")
     public ResponseEntity<AddProductResponse>
-    editUserInfo(@RequestBody AddProductRequest addProductRequest){
+    addProduct(@RequestBody AddProductRequest addProductRequest){
         System.out.println("RECEIVED ADD PRODUCT REQUEST");
         ResponseEntity<AddProductResponse> responseEntity =
                 new ResponseEntity<>(new AddProductResponse(), HttpStatus.OK);
@@ -125,14 +138,27 @@ public class RestApiController {
     @CrossOrigin(origins = "*")
     @PostMapping("/EditProduct")
     public ResponseEntity<EditProductResponse>
-    editUserInfo(@RequestBody EditProductRequest editProductRequest){
+    editProduct(@RequestBody EditProductRequest editProductRequest){
         System.out.println("RECEIVED EDIT PRODUCT REQUEST");
         ResponseEntity<EditProductResponse> responseEntity =
                 new ResponseEntity<>(new EditProductResponse(), HttpStatus.OK);
-        firebaseServices.editProducts(editProductRequest);
+        firebaseServices.editProduct(editProductRequest);
         Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
         responseEntity.getBody().setMessage("Product info has been edited");
         return responseEntity;
     }
 
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/DeleteProduct")
+    public ResponseEntity<DeleteProductResponse>
+    deleteProduct(@RequestBody DeleteProductRequest deleteProductRequest){
+        System.out.println("RECEIVED DELETE PRODUCT REQUEST");
+        ResponseEntity<DeleteProductResponse> responseEntity =
+                new ResponseEntity<>(new DeleteProductResponse(), HttpStatus.OK);
+        firebaseServices.deleteProduct(deleteProductRequest);
+        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        responseEntity.getBody().setMessage("Product    has been deleted");
+        return responseEntity;
+    }
 }
