@@ -36,6 +36,23 @@ public class FirebaseServices {
                 .set(data);
     }
 
+
+    //Authorisation layer
+    //Return true if the account belongs to that user type
+    public Boolean authorize(String email, String role) {
+
+        Firestore firestore = FirestoreClient.getFirestore();
+        String userType = convertToUserType(role);
+        try{
+            System.out.println("LOGIN: " + FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty());
+            return !FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /*******************************************prototype functions****************************************************/
     //Get user info from Firestore
     public Map<String, Object> getUserInfo(@NotNull GetUserInfoRequest request)
@@ -223,4 +240,5 @@ public class FirebaseServices {
         }
 
     }
+
 }

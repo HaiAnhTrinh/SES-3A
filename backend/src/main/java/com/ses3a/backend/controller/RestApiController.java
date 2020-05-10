@@ -7,6 +7,8 @@ import com.ses3a.backend.firebase.FirebaseServices;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +30,17 @@ public class RestApiController {
         firebaseServices.createNewUser(createNewUserRequest);
         Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
         responseEntity.getBody().setMessage("Register successful. Please verify your email.");
+        return responseEntity;
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/Login")
+    public ResponseEntity<Map<String, Boolean>> Login(@RequestHeader String email, @RequestHeader String role){
+        System.out.println("RECEIVED LOGIN REQUEST");
+        Map<String, Boolean> data = new HashMap<>();
+        data.put("isAuthorized", firebaseServices.authorize(email, role));
+        ResponseEntity<Map<String, Boolean>> responseEntity =
+                new ResponseEntity<>( data, HttpStatus.OK);
         return responseEntity;
     }
 
@@ -145,7 +158,7 @@ public class RestApiController {
                 new ResponseEntity<>(new DeleteProductResponse(), HttpStatus.OK);
         firebaseServices.deleteProduct(deleteProductRequest);
         Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
-        responseEntity.getBody().setMessage("Product has been deleted");
+        responseEntity.getBody().setMessage("Product    has been deleted");
         return responseEntity;
     }
 }
