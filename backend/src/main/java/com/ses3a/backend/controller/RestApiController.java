@@ -111,7 +111,7 @@ public class RestApiController {
     @CrossOrigin(origins = "*")
     @PostMapping("/AddProduct")
     public ResponseEntity<AddProductResponse>
-    editUserInfo(@RequestBody AddProductRequest addProductRequest){
+    addProduct(@RequestBody AddProductRequest addProductRequest){
         System.out.println("RECEIVED ADD PRODUCT REQUEST");
         ResponseEntity<AddProductResponse> responseEntity =
                 new ResponseEntity<>(new AddProductResponse(), HttpStatus.OK);
@@ -125,14 +125,27 @@ public class RestApiController {
     @CrossOrigin(origins = "*")
     @PostMapping("/EditProduct")
     public ResponseEntity<EditProductResponse>
-    editUserInfo(@RequestBody EditProductRequest editProductRequest){
+    editProduct(@RequestBody EditProductRequest editProductRequest){
         System.out.println("RECEIVED EDIT PRODUCT REQUEST");
         ResponseEntity<EditProductResponse> responseEntity =
                 new ResponseEntity<>(new EditProductResponse(), HttpStatus.OK);
-        firebaseServices.editProducts(editProductRequest);
+        firebaseServices.editProduct(editProductRequest);
         Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
         responseEntity.getBody().setMessage("Product info has been edited");
         return responseEntity;
     }
 
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/DeleteProduct")
+    public ResponseEntity<DeleteProductResponse>
+    deleteProduct(@RequestBody DeleteProductRequest deleteProductRequest){
+        System.out.println("RECEIVED DELETE PRODUCT REQUEST");
+        ResponseEntity<DeleteProductResponse> responseEntity =
+                new ResponseEntity<>(new DeleteProductResponse(), HttpStatus.OK);
+        firebaseServices.deleteProduct(deleteProductRequest);
+        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        responseEntity.getBody().setMessage("Product has been deleted");
+        return responseEntity;
+    }
 }
