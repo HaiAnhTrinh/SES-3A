@@ -120,13 +120,14 @@ export default function SupplierLayout(props) {
                                 onClose={handleClose}
                             >
                                 <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>Supplier account</MenuItem>
+                                <MenuItem onClick={handleClose}>My account</MenuItem>
                                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
                             </Menu>
                         </div>
                     </Toolbar>
                 </AppBar>
-                <nav className={classes.drawer} >
+
+                <nav className={classes.drawer}>
                     {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
                     <Hidden smUp implementation="css">
                         <Drawer
