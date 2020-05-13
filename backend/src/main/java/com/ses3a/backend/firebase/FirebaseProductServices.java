@@ -8,78 +8,16 @@ import com.ses3a.backend.entity.object.VendorProduct;
 import com.ses3a.backend.entity.request.*;
 import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static com.ses3a.backend.firebase.FirebaseUtils.convertToUserType;
 
 @Service
-public class FirebaseServices {
-
-    //Add newly registered user to Firestore
-    public void createNewUser(@NotNull CreateNewUserRequest request){
-        Firestore firestore = FirestoreClient.getFirestore();
-        Map<String, Object> data = new HashMap<>();
-        data.put("email", request.getEmail());
-        data.put("username", request.getUsername());
-        String userType = convertToUserType(request.getRole());
-
-        if(userType.equals("vendors")){
-            FirestoreInitNewUser.initVendor(firestore, request);
-        }
-        else{
-            FirestoreInitNewUser.initSupplier(firestore, request);
-        }
-
-        FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                .document("userInfo")
-                .set(data);
-    }
-
-
-    //Authorisation layer
-    //Return true if the account belongs to that user type
-    public Boolean authorize(String email, String role) {
-
-        Firestore firestore = FirestoreClient.getFirestore();
-        String userType = convertToUserType(role);
-        try{
-            System.out.println("LOGIN: " + FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty());
-            return !FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    /*******************************************prototype functions****************************************************/
-    //Get user info from Firestore
-    public Map<String, Object> getUserInfo(@NotNull GetUserInfoRequest request)
-            throws ExecutionException, InterruptedException {
-        Firestore firestore = FirestoreClient.getFirestore();
-        String userType = convertToUserType(request.getRole());
-
-        return FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                .document("userInfo")
-                .get()
-                .get()
-                .getData();
-    }
-
-
-    //Edit user info in Firestore
-    public void editUserInfo(@NotNull EditUserInfoRequest request) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        Map<String, Object> data = new HashMap<>();
-        data.put("username", request.getUsername());
-        String userType = convertToUserType(request.getRole());
-
-        FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                .document("userInfo")
-                .set(data, SetOptions.merge());
-    }
-
+public class FirebaseProductServices {
 
     //Get products by category in Firestore
     public List<SupplierProduct> getProductByCategory(@NotNull GetProductByCategoryRequest request)
@@ -151,7 +89,7 @@ public class FirebaseServices {
     //1. Need to edit to 'products/categories/email' and 'users/suppliers/email/products' for supplier
     //2. Suppliers can change any info except for name and category
     //3. BO can change everything they manually added
-    //4. BO can only change the quantity if they got the products from the website
+    //4. BO can not change the quantity if they got the products from the website
     public void editProduct(@NotNull EditProductRequest request){
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
@@ -236,9 +174,8 @@ public class FirebaseServices {
             }
         }
         catch (Exception e) {
-            System.err.println("Error deleting collection : " + e.getMessage());
+            e.printStackTrace();
         }
-
     }
 
 }
