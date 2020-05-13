@@ -1,9 +1,7 @@
 package com.ses3a.backend.firebase;
 
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.SetOptions;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.ses3a.backend.entity.object.SupplierProduct;
 import com.ses3a.backend.entity.object.VendorProduct;
@@ -33,11 +31,26 @@ public class FirebaseServices {
             FirestoreInitNewUser.initSupplier(firestore, request);
         }
 
-        firestore.collection("users")
-                .document(userType)
-                .collection(request.getEmail())
+        FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
                 .document("userInfo")
                 .set(data);
+    }
+
+
+    //Authorisation layer
+    //Return true if the account belongs to that user type
+    public Boolean authorize(String email, String role) {
+
+        Firestore firestore = FirestoreClient.getFirestore();
+        String userType = convertToUserType(role);
+        try{
+            System.out.println("LOGIN: " + FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty());
+            return !FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /*******************************************prototype functions****************************************************/
@@ -47,8 +60,7 @@ public class FirebaseServices {
         Firestore firestore = FirestoreClient.getFirestore();
         String userType = convertToUserType(request.getRole());
 
-        return firestore.collection("users").document(userType)
-                .collection(request.getEmail())
+        return FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
                 .document("userInfo")
                 .get()
                 .get()
@@ -63,9 +75,7 @@ public class FirebaseServices {
         data.put("username", request.getUsername());
         String userType = convertToUserType(request.getRole());
 
-        firestore.collection("users")
-                .document(userType)
-                .collection(request.getEmail())
+        FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
                 .document("userInfo")
                 .set(data, SetOptions.merge());
     }
@@ -99,16 +109,14 @@ public class FirebaseServices {
     }
 
 
-    //Get user products from Firestore
+    //Get the products belong to a user from Firestore
     public List<Object> getUserProducts(@NotNull GetUserProductRequest request)
             throws ExecutionException, InterruptedException {
         Firestore firestore = FirestoreClient.getFirestore();
         String userType = convertToUserType(request.getRole());
 
         Iterable<CollectionReference> collectionRefs =
-                firestore.collection("users")
-                        .document(userType)
-                        .collection(request.getEmail())
+                FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
                         .document("products")
                         .listCollections();
         List<Object> products = new ArrayList<>();
@@ -138,9 +146,13 @@ public class FirebaseServices {
     }
 
 
+    //TODO: improve editProduct 2,3,4
     //Edit products in Firestore
-    //Need to edit to 'products/categories/email' and 'users/suppliers/email/products'
-    public void editProducts(@NotNull EditProductRequest request){
+    //1. Need to edit to 'products/categories/email' and 'users/suppliers/email/products' for supplier
+    //2. Suppliers can change any info except for name and category
+    //3. BO can change everything they manually added
+    //4. BO can only change the quantity if they got the products from the website
+    public void editProduct(@NotNull EditProductRequest request){
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
         String userType = convertToUserType(request.getRole());
@@ -161,18 +173,15 @@ public class FirebaseServices {
                     .set(data, SetOptions.merge());
         }
 
-        firestore.collection("users")
-                .document(userType)
-                .collection(request.getEmail())
-                .document("products")
-                .collection(request.getName())
+        FirebaseUtils.getOneProduct(firestore, userType, request.getEmail(), request.getName())
                 .document("info")
                 .set(data, SetOptions.merge());
     }
 
 
     //Add products in Firestore
-    //Need to add to 'products/categories/email' and 'users/suppliers/email/products' for suppliers only
+    //Vendors: add to node 'users'
+    //Suppliers: add to node 'users' and 'products'
     public void addProduct(@NotNull AddProductRequest request){
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
@@ -183,7 +192,7 @@ public class FirebaseServices {
             data.put("price", request.getPrice());
             data.put("quantity", request.getQuantity());
 
-            //products branch is only for suppliers' products
+            //add to node 'products'
             firestore.collection("products")
                     .document(request.getCategory())
                     .collection(request.getEmail())
@@ -195,14 +204,41 @@ public class FirebaseServices {
             data.put("quantity", request.getQuantity());
         }
 
-        //common case for both user types
-        firestore.collection("users")
-                .document(userType)
-                .collection(request.getEmail())
-                .document("products")
-                .collection(request.getName())
+        //add to node 'users'
+        FirebaseUtils.getOneProduct(firestore, userType, request.getEmail(), request.getName())
                 .document("info")
                 .set(data, SetOptions.merge());
+    }
+
+
+    //Delete the product of a user
+    //For suppliers: delete the product in node 'users' and 'products'
+    //For vendors: delete the product in node 'users'
+    public void deleteProduct(@NotNull DeleteProductRequest request) {
+        Firestore firestore = FirestoreClient.getFirestore();
+        String userType = convertToUserType(request.getRole());
+
+        if(userType.equals("suppliers")){
+            firestore.collection("products")
+                    .document(request.getCategory())
+                    .collection(request.getEmail())
+                    .document(request.getName())
+                    .delete();
+        }
+
+        try{
+            ApiFuture<QuerySnapshot> future =
+                    FirebaseUtils.getOneProduct(firestore, userType, request.getEmail(), request.getName()).get();
+            // future.get() blocks on document retrieval
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            for (QueryDocumentSnapshot document : documents) {
+                document.getReference().delete();
+            }
+        }
+        catch (Exception e) {
+            System.err.println("Error deleting collection : " + e.getMessage());
+        }
+
     }
 
 }

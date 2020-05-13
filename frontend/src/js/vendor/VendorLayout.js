@@ -14,6 +14,7 @@ import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
 import { Route } from "react-router-dom";
 import {drawer, layoutStyles, logout} from "../common/Layout";
+import Logo from '../../image/Logo.png';
 import Home from "./VendorHome";
 import MyStock from "./VendorMyStock";
 import MyPurchase from "./VendorMyPurchase";
@@ -93,7 +94,7 @@ export default function VendorLayout(props) {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="h6" noWrap>
+                        <Typography variant="h6" className={classes.title}>
                             { currentUser ? currentUser.displayName : ""}
                         </Typography>
                         <div>
@@ -128,7 +129,8 @@ export default function VendorLayout(props) {
                         </div>
                     </Toolbar>
                 </AppBar>
-                <nav className={classes.drawer} aria-label="mailbox folders">
+
+                <nav className={classes.drawer}>
                     {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
                     <Hidden smUp implementation="css">
                         <Drawer
