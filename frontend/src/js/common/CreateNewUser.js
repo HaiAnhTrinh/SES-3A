@@ -40,10 +40,10 @@ export default function CreateNewUser() {
             "email": email,
             "role": role
         };
-        // Axios.interceptors.request.use(request => {
-        //     console.log('Starting Request', request)
-        //     return request
-        // });
+        Axios.interceptors.request.use(request => {
+            console.log('Starting Request', request)
+            return request
+        });
         Axios.post("http://localhost:8080/CreateNewUser",
             data,
             { headers: {'Content-Type': 'application/json'}})
