@@ -1,5 +1,6 @@
 import React from 'react';
 import MaterialTable from 'material-table';
+import Axios from "axios";
 
 
 export default function MaterialTableDemo() {
@@ -51,17 +52,35 @@ export default function MaterialTableDemo() {
                             }
                         }, 600);
                     }),
-                onRowDelete: (oldData) =>
-                    new Promise((resolve) => {
-                        setTimeout(() => {
-                            resolve();
-                            setState((prevState) => {
-                                const data = [...prevState.data];
-                                data.splice(data.indexOf(oldData), 1);
-                                return { ...prevState, data };
-                            });
-                        }, 600);
-                    }),
+                onRowDelete: (oldData) => {
+                    Axios.interceptors.request.use(request => {
+                        console.log('Starting Request', request)
+                        return request
+                    });
+                    console.log("QUAN");
+                    Axios.get("http://localhost:8080/GetUserInfo",
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'email': 'currentUser.email',
+                                'role': 'Business owners'
+                            }
+                        })
+                        .then(response => response.json())
+                        // .then(result => {
+                        //     resolve({
+                        //         data: result.data,
+                        //         page: result.page - 1,
+                        //         totalCount: result.total,
+                        //     })
+                        // })
+                        .catch((err) => {
+                                console.log("Error", err);
+                            }
+                        )
+                }
+
+
             }}
         />
     );
