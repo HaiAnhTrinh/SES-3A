@@ -13,18 +13,19 @@ public class FirestoreInitNewUser {
     protected static void initVendor(Firestore firestore, CreateNewUserRequest request){
         System.out.println("INIT VENDORS CALLED");
         Map<String, Object> emptyData = new HashMap<>();
-        emptyData.put("empty", true);
         firestore.collection("users")
                 .document(FirebaseUtils.convertToUserType(request.getRole()))
                 .collection(request.getEmail())
                 .document("products")
+                .create(emptyData);
+        firestore.collection("carts")
+                .document(request.getEmail())
                 .create(emptyData);
     }
 
     protected static void initSupplier(Firestore firestore, CreateNewUserRequest request){
         System.out.println("INIT SUPPLIERS CALLED");
         Map<String, Object> emptyData = new HashMap<>();
-        emptyData.put("empty", true);
         firestore.collection("users")
                 .document(FirebaseUtils.convertToUserType(request.getRole()))
                 .collection(request.getEmail())
