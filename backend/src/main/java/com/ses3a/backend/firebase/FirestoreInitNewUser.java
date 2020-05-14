@@ -18,6 +18,11 @@ public class FirestoreInitNewUser {
                 .collection(request.getEmail())
                 .document("products")
                 .create(emptyData);
+        firestore.collection("users")
+                .document(FirebaseUtils.convertToUserType(request.getRole()))
+                .collection(request.getEmail())
+                .document("onlineProducts")
+                .create(emptyData);
         firestore.collection("carts")
                 .document(request.getEmail())
                 .create(emptyData);

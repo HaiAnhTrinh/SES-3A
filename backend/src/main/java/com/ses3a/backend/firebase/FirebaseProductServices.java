@@ -53,34 +53,38 @@ public class FirebaseProductServices {
         Firestore firestore = FirestoreClient.getFirestore();
         String userType = convertToUserType(request.getRole());
 
-        Iterable<CollectionReference> collectionRefs =
+        Iterable<CollectionReference> productRefs =
                 FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
                         .document("products")
+                        .listCollections();
+        Iterable<CollectionReference> onlineProductRefs =
+                FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
+                        .document("onlineProducts")
                         .listCollections();
         List<Object> products = new ArrayList<>();
 
         if(userType.equals("vendors")){
-            //Iterate through all vendors' products
-            for(CollectionReference ref : collectionRefs){
-                Map<String, Object> data = ref.document("info").get().get().getData();
-                VendorProduct product = new VendorProduct();
-                product.setProductName(data.get("name").toString());
-                product.setProductQuantity(data.get("quantity").toString());
-                products.add(product);
-            }
+            initGetUserProductResponse(onlineProductRefs, products);
         }
-        else {
-            //Iterate through all suppliers' products
-            for(CollectionReference ref : collectionRefs){
-                Map<String, Object> data = ref.document("info").get().get().getData();
-                SupplierProduct product = new SupplierProduct();
-                product.setProductName(data.get("name").toString());
-                product.setProductPrice(data.get("price").toString());
-                product.setProductQuantity(data.get("quantity").toString());
-                products.add(product);
-            }
-        }
+
+        initGetUserProductResponse(productRefs, products);
+
         return products;
+    }
+
+    //support getUserProducts
+    private void initGetUserProductResponse(Iterable<CollectionReference> onlineProductRefs, List<Object> products)
+            throws InterruptedException, ExecutionException {
+        for(CollectionReference ref : onlineProductRefs){
+            Map<String, Object> data = ref.document("info").get().get().getData();
+            SupplierProduct product = new SupplierProduct();
+            product.setSupplierEmail(data.get("supplier").toString());
+            product.setProductName(data.get("name").toString());
+            product.setProductPrice(data.get("price").toString());
+            product.setProductQuantity(data.get("quantity").toString());
+            product.setProductCategory(data.get("category").toString());
+            products.add(product);
+        }
     }
 
 
@@ -89,31 +93,36 @@ public class FirebaseProductServices {
     //1. Need to edit to 'products/categories/email' and 'users/suppliers/email/products' for supplier
     //2. Suppliers can change any info except for name and category
     //3. BO can change everything they manually added
-    //4. BO can not change the quantity if they got the products from the website
+    //4. BO can only change the quantity if they got the products from the website
     public void editProduct(@NotNull EditProductRequest request){
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
         String userType = convertToUserType(request.getRole());
 
+        data.put("name", request.getName());
+        data.put("quantity", request.getQuantity());
+        data.put("supplier", request.getSupplier());
+        data.put("price", request.getPrice());
+
         if(userType.equals("vendors")){
-            data.put("name", request.getName());
-            data.put("quantity", request.getQuantity());
+
+            FirebaseUtils.getOneVendorProduct(firestore, request.getEmail(), request.getName(), request.getSupplier())
+                    .document("info")
+                    .set(data, SetOptions.merge());
         }
         else {
-            data.put("name", request.getName());
-            data.put("price", request.getPrice());
-            data.put("quantity", request.getQuantity());
-
+            //edit in the market
             firestore.collection("products")
                     .document(request.getCategory())
                     .collection(request.getEmail())
                     .document(request.getName())
                     .set(data, SetOptions.merge());
-        }
 
-        FirebaseUtils.getOneProduct(firestore, userType, request.getEmail(), request.getName())
-                .document("info")
-                .set(data, SetOptions.merge());
+            //edit in supplier's stock
+            FirebaseUtils.getOneSupplierProduct(firestore, request.getEmail(), request.getName())
+                    .document("info")
+                    .set(data, SetOptions.merge());
+        }
     }
 
 
@@ -125,27 +134,31 @@ public class FirebaseProductServices {
         Map<String, Object> data = new HashMap<>();
         String userType = convertToUserType(request.getRole());
 
-        if(userType.equals("suppliers")){
-            data.put("name", request.getName());
-            data.put("price", request.getPrice());
-            data.put("quantity", request.getQuantity());
+        data.put("name", request.getName());
+        data.put("price", request.getPrice());
+        data.put("quantity", request.getQuantity());
+        data.put("supplier", request.getSupplier());
+        data.put("category", request.getCategory());
 
-            //add to node 'products'
+        if(userType.equals("suppliers")){
+            //add to market
             firestore.collection("products")
                     .document(request.getCategory())
                     .collection(request.getEmail())
                     .document(request.getName())
-                    .set(data, SetOptions.merge());
+                    .set(data);
+
+            //add to supplier's stock
+            FirebaseUtils.getOneSupplierProduct(firestore, request.getEmail(), request.getName())
+                    .document("info")
+                    .set(data);
         }
         else {
-            data.put("name", request.getName());
-            data.put("quantity", request.getQuantity());
+            //add to vendor's stock
+            FirebaseUtils.getOneVendorProduct(firestore, request.getEmail(), request.getName(), request.getSupplier())
+                    .document("info")
+                    .set(data);
         }
-
-        //add to node 'users'
-        FirebaseUtils.getOneProduct(firestore, userType, request.getEmail(), request.getName())
-                .document("info")
-                .set(data, SetOptions.merge());
     }
 
 
@@ -155,6 +168,7 @@ public class FirebaseProductServices {
     public void deleteProduct(@NotNull DeleteProductRequest request) {
         Firestore firestore = FirestoreClient.getFirestore();
         String userType = convertToUserType(request.getRole());
+        ApiFuture<QuerySnapshot> future;
 
         if(userType.equals("suppliers")){
             firestore.collection("products")
@@ -162,11 +176,15 @@ public class FirebaseProductServices {
                     .collection(request.getEmail())
                     .document(request.getName())
                     .delete();
+            future = FirebaseUtils.getOneSupplierProduct(firestore, request.getEmail(), request.getName()).get();
+        }
+        else{
+            future = FirebaseUtils
+                    .getOneVendorProduct(firestore, request.getEmail(), request.getName(), request.getSupplier())
+                    .get();
         }
 
         try{
-            ApiFuture<QuerySnapshot> future =
-                    FirebaseUtils.getOneProduct(firestore, userType, request.getEmail(), request.getName()).get();
             // future.get() blocks on document retrieval
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
             for (QueryDocumentSnapshot document : documents) {
