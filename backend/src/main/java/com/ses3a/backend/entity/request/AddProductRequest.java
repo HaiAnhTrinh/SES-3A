@@ -6,19 +6,22 @@ public class AddProductRequest extends BaseRequest{
     private String price;
     private String quantity;
     private String category;
+    private String supplier;
 
     public AddProductRequest(String email,
                              String role,
                              String name,
                              String price,
                              String quantity,
-                             String category) {
+                             String category,
+                             String supplier) {
         this.setEmail(email);
         this.setRole(role);
         this.setName(name);
         this.setPrice(price);
         this.setQuantity(quantity);
         this.setCategory(category);
+        this.setSupplier(supplier);
     }
 
     public String getName() {
@@ -51,5 +54,13 @@ public class AddProductRequest extends BaseRequest{
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
     }
 }
