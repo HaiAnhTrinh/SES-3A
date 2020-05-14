@@ -4,10 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.ses3a.backend.entity.object.CartProduct;
-import com.ses3a.backend.entity.request.AddToCartRequest;
-import com.ses3a.backend.entity.request.GetCartRequest;
-import com.ses3a.backend.entity.request.PurchaseRequest;
-import com.ses3a.backend.entity.request.RemoveFromCartRequest;
+import com.ses3a.backend.entity.request.*;
 import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -28,6 +25,7 @@ public class FirebaseCartServices {
 
         data.put("name", request.getProduct().getProductName());
         data.put("price", request.getProduct().getProductPrice());
+        data.put("category", request.getProduct().getProductCategory());
         data.put("supplier", request.getProduct().getSupplierEmail());
         data.put("quantity", request.getQuantity());
 
@@ -60,11 +58,14 @@ public class FirebaseCartServices {
             CartProduct product = new CartProduct();
             String price = data.get("price").toString();
             String quantity = data.get("quantity").toString();
+
+            //calculate the cost
             double cost = Double.parseDouble(price) * Integer.parseInt(quantity);
 
             product.setName(data.get("name").toString());
             product.setPrice(price);
             product.setQuantity(quantity);
+            product.setCategory(data.get("category").toString());
             product.setSupplier(data.get("supplier").toString());
             product.setCost(String.valueOf(cost));
 
@@ -110,75 +111,54 @@ public class FirebaseCartServices {
     public boolean purchase(PurchaseRequest request) {
         Firestore firestore = FirestoreClient.getFirestore();
         AtomicBoolean flag = new AtomicBoolean(true);
+        WriteBatch batch = firestore.batch();
 
-        //init the transaction
-        ApiFuture<String> futureTransaction = firestore.runTransaction(transaction -> {
-            List<Map<String, Object>> transactionList = new LinkedList<>();
+        for (CartProduct cartProduct: request.getCartProducts()){
+            ApiFuture<String> futureTransaction = firestore.runTransaction(transaction -> {
 
-            //init the purchase details
-            for (CartProduct cartProduct: request.getCartProducts()) {
-
-                //ref to the product in node 'users'
-                DocumentReference usersProductRef = FirebaseUtils
-                        .getOneProduct(
-                                firestore, "suppliers",
-                                cartProduct.getSupplier(), cartProduct.getName()
-                        )
+                //ref to the supplier product in node 'users'
+                DocumentReference supplierProductRef = FirebaseUtils
+                        .getOneSupplierProduct( firestore, cartProduct.getSupplier(), cartProduct.getName())
                         .document("info");
-                DocumentSnapshot snapshot = transaction.get(usersProductRef).get();
+                DocumentSnapshot supplierProductSnapshot = transaction.get(supplierProductRef).get();
+
                 //ref to the product in node 'products'
                 DocumentReference productsProductRef =
                         firestore.collection("products")
                                 .document(cartProduct.getCategory())
                                 .collection(cartProduct.getSupplier())
                                 .document(cartProduct.getName());
+//                DocumentSnapshot marketProductSnapshot = transaction.get(productsProductRef).get();
 
                 Map<String, Object> transactionDetail = new HashMap<>();
-                int supplierQuantity = Integer.parseInt(Objects.requireNonNull(snapshot.get("quantity")).toString());
+                int supplierQuantity = Integer.parseInt(Objects.requireNonNull(supplierProductSnapshot.get("quantity")).toString());
                 int requestQuantity = Integer.parseInt(cartProduct.getQuantity());
                 int result =  supplierQuantity - requestQuantity;
 
+                //if sufficient, update the supplier stock and the market
                 if(result >= 0){
-                    transactionDetail.put("usersProductRef", usersProductRef);
-                    transactionDetail.put("productsProductRef", productsProductRef);
-                    transactionDetail.put("field", "quantity");
-                    transactionDetail.put("result", String.valueOf(result));
+                    transaction.update(supplierProductRef, "quantity", String.valueOf(result));
+                    transaction.update(productsProductRef, "quantity", String.valueOf(result));
                 }
                 else{
                     flag.set(false);
                     return "Fail";
                 }
-                transactionList.add(transactionDetail);
-            }
 
-            //loop through all products in the transaction
-            for (int i = 0; i < transactionList.size(); i++) {
-                //update the market
-                transaction.update(
-                        (DocumentReference) transactionList.get(i).get("cartProductRef"),
-                        transactionList.get(i).get("field").toString(),
-                        transactionList.get(i).get("result")
-                );
-                //update the supplier stock
-                transaction.update(
-                        (DocumentReference) transactionList.get(i).get("usersProductRef"),
-                        transactionList.get(i).get("field").toString(),
-                        transactionList.get(i).get("result")
-                );
-            }
-
-            //clear the cart
-            System.out.println("request email: " + request.getEmail());
-            for(CartProduct cartProduct: request.getCartProducts()){
+                //clear the cart, add to vendor stock
+                FirebaseProductServices firebaseProductServices = new FirebaseProductServices();
                 RemoveFromCartRequest removeRequest =
                         new RemoveFromCartRequest(request.getEmail(), cartProduct.getName(), cartProduct.getSupplier());
+                AddProductRequest addRequest =
+                        new AddProductRequest(request.getEmail(), "Business owner", cartProduct.getName(), cartProduct.getPrice(),
+                                cartProduct.getQuantity(), cartProduct.getCategory(), cartProduct.getSupplier());
                 removeFromCart(removeRequest);
-            }
+                firebaseProductServices.addProduct(addRequest);
 
+                return "Success";
+            });
+        }
 
-            return "Success";
-        });
-        System.out.println("futureTransaction: " + futureTransaction);
         return flag.compareAndSet(true, true);
     }
 }
