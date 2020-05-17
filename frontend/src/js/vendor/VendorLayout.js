@@ -13,14 +13,15 @@ import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
 import { Route } from "react-router-dom";
+
 import {drawer, layoutStyles, logout} from "../common/Layout";
-import Logo from '../../image/Logo.png';
 import Home from "./VendorHome";
 import MyStock from "./VendorMyStock";
 import MyPurchase from "./VendorMyPurchase";
 import MyCart from "./VendorMyCart";
 import Graph from "./VendorGraph";
 import Account from "./VendorAccount";
+import Axios from "axios";
 
 export default function VendorLayout(props) {
     const currentUser = firebase.auth().currentUser;
@@ -30,6 +31,7 @@ export default function VendorLayout(props) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [baseUrl, setBaseUrl] = useState("");
     const [anchorEl, setAnchorEl] = useState(null);
+
     const open = Boolean(anchorEl);
     const drawerListObject = [{
         'text': 'Home',
@@ -46,9 +48,6 @@ export default function VendorLayout(props) {
     }, {
         'text': 'Graph',
         'path': baseUrl + '/Graph'
-    }, {
-        'text': 'Account',
-        'path': baseUrl + '/MyAccount'
     }];
 
     useEffect(() => {
@@ -70,6 +69,11 @@ export default function VendorLayout(props) {
     };
 
     const handleLogout = () => logout(props);
+
+    const handleMyAccount = () => {
+        props.history.push(baseUrl + "/MyAccount");
+        handleClose();
+    };
 
     const onItemClick = (variant) => {
         if(variant === "temporary"){
@@ -110,20 +114,13 @@ export default function VendorLayout(props) {
                             <Menu
                                 id="menu-appbar"
                                 anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                anchorOrigin={classes.anchorOrigin}
                                 keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                transformOrigin={classes.transformOrigin}
                                 open={open}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleMyAccount}>My account</MenuItem>
                                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
                             </Menu>
                         </div>

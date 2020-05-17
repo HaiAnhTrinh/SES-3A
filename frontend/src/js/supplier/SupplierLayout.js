@@ -74,6 +74,11 @@ export default function SupplierLayout(props) {
         }
     };
 
+    const handleMyAccount = () => {
+        props.history.push(baseUrl + "/MyAccount");
+        handleClose();
+    };
+
     const supplierDrawer = () => drawer(classes, drawerListObject, onItemClick);
 
     return (
@@ -107,20 +112,13 @@ export default function SupplierLayout(props) {
                             <Menu
                                 id="menu-appbar"
                                 anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                anchorOrigin={classes.anchorOrigin}
                                 keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                transformOrigin={classes.transformOrigin}
                                 open={open}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleMyAccount}>My account</MenuItem>
                                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
                             </Menu>
                         </div>
