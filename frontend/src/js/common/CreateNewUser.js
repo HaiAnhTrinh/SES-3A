@@ -12,10 +12,10 @@ import { Link } from 'react-router-dom';
 import * as firebase from "firebase";
 
 export default function CreateNewUser() {
-    const [username, setUsername] = useState();
-    const [password, setPassword] = useState();
-    const [confirmPassword, setConfirmPassword] = useState();
-    const [email, setEmail] = useState();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [email, setEmail] = useState("");
     const [role, setRole] = useState("");
     const [registerMessage, setRegisterMessage] = useState("");
     const [isSuccess, setIsSuccess] = useState(false);
@@ -40,6 +40,10 @@ export default function CreateNewUser() {
             "email": email,
             "role": role
         };
+        Axios.interceptors.request.use(request => {
+            console.log('Starting Request', request)
+            return request
+        });
         Axios.post("http://localhost:8080/CreateNewUser",
             data,
             { headers: {'Content-Type': 'application/json'}})
@@ -50,7 +54,8 @@ export default function CreateNewUser() {
 
     const onRegisterButtonClick = (e) => {
         e.preventDefault();
-        if( username == null || password == null || confirmPassword == null || email == null || role === ""){
+        console.log(username , password, confirmPassword, email, role);
+        if( username === "" || password === "" || confirmPassword === "" || email === "" || role === ""){
             setRegisterMessage("All fields must be filled");
         }
         else if( password.length < 6){
