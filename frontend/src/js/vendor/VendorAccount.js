@@ -1,200 +1,164 @@
-// import React, {useEffect, useState} from "react";
-// import {makeStyles} from "@material-ui/core/styles";
-// import TextField from "@material-ui/core/TextField";
-// import Typography from '@material-ui/core/Typography';
-// import Axios from "axios";
-//
-// export default function Account(props) {
-//
-//     const [email, setEmail] = useState(props.match.params.email);
-//     const [username, setUsername] = useState("");
-//     const [address, setAddress] = useState("");
-//     const [phoneNumber, setPhoneNumber] = useState("");
-//
-//     const getData = () => {
-//         Axios.get("http://localhost:8080/GetUserInfo",
-//             { headers: {'Content-Type': 'application/json', 'email': email, 'role': 'Business owner'}})
-//             .then(response => setUsername(response.data.username))
-//             .catch(error => console.log(error));
-//     }
-//
-//     useEffect( () => {
-//         console.log("useEffect");
-//         getData();
-//
-//     }, []);
-//
-//     const styles = makeStyles( (theme) => ({
-//
-//         title: {
-//             flexGrow: 1,
-//         },
-//
-//     }));
-//
-//     return(
-//       <div>
-//           <Typography variant="h6" classes={styles.title}>
-//               ACCOUNT PROFILE
-//           </Typography>
-//           <br/><br/>
-//           <div id="info">
-//               <TextField label="Email"
-//                          variant="filled"
-//                          InputProps={{
-//                             readOnly: true,
-//                          }}
-//                          value={email}
-//               />
-//               <br/>
-//               <TextField label="Username"
-//                          variant="filled"
-//                          value={username} />
-//           </div>
-//       </div>
-//     );
-// }
-import React, {useEffect, useMemo} from 'react';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-import Grid from '@material-ui/core/Grid';
+import React, {useEffect, useState} from "react";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import {makeStyles} from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import parse from 'autosuggest-highlight/parse';
-import throttle from 'lodash/throttle';
+import Axios from "axios";
 
-function loadScript(src, position, id) {
-    if (!position) {
-        return;
-    }
+export default function Account(props) {
 
-    const script = document.createElement('script');
-    script.setAttribute('async', '');
-    script.setAttribute('id', id);
-    script.src = src;
-    position.appendChild(script);
-}
+    const useStyles = makeStyles( (theme) => ({
 
-const autocompleteService = { current: null };
-
-const useStyles = makeStyles((theme) => ({
-    icon: {
-        color: theme.palette.text.secondary,
-        marginRight: theme.spacing(2),
-    },
-}));
-
-export default function GoogleMaps() {
+        title: {
+            flexGrow: 1,
+        },
+        updateMessage: {
+            color: "InfoText",
+        },
+        errorMessage: {
+            color: "indianred",
+        }
+    }));
     const classes = useStyles();
-    const [value, setValue] = React.useState(null);
-    const [inputValue, setInputValue] = React.useState('');
-    const [options, setOptions] = React.useState([]);
-    const loaded = React.useRef(false);
 
-    if (typeof window !== 'undefined' && !loaded.current) {
-        if (!document.querySelector('#google-maps')) {
-            loadScript(
-                'https://maps.googleapis.com/maps/api/js?key=AIzaSyBwRp1e12ec1vOTtGiA4fcCt2sCUS78UYc&libraries=places',
-                document.querySelector('head'),
-                'google-maps',
-            );
-        }
+    const [email, setEmail] = useState(props.match.params.email);
+    const [username, setUsername] = useState("");
+    const [address, setAddress] = useState("");
+    const [phone, setPhone] = useState("");
+    const [updateMessage, setUpdateMessage] = useState(String);
+    const [errorMessage, setErrorMessage] = useState(String);
+    const [updateStatus, setUpdateStatus] = useState(Boolean);
+    const onUsernameChange = (event) => setUsername(event.target.value);
+    const onAddressChange = (event) => setAddress(event.target.value);
+    const onPhoneChange = (event) => setPhone(event.target.value);
 
-        loaded.current = true;
+    const getData = () => {
+        Axios.get("http://localhost:8080/GetUserInfo",
+            { headers: {'Content-Type': 'application/json', 'email': email, 'role': 'Business owner'}})
+            .then(response => {
+                initData(response.data.username, response.data.address, response.data.phone);
+            })
+            .catch(error => console.log(error));
     }
 
-    const fetch = useMemo(
-        () =>
-            throttle((request, callback) => {
-                autocompleteService.current.getPlacePredictions(request, callback);
-            }, 200),
-        [],
-    );
+    const initData = (username, address, phoneNumber) => {
+        setUsername(username);
+        setAddress(address);
+        setPhone(phoneNumber);
+    }
 
-    useEffect(() => {
-        let active = true;
+    const updateButtonClick = () => {
+        console.log("EDIT BUTTON CLICKED");
 
-        if (!autocompleteService.current && window.google) {
-            autocompleteService.current = new window.google.maps.places.AutocompleteService();
-        }
-        if (!autocompleteService.current) {
-            return undefined;
-        }
-
-        if (inputValue === '') {
-            setOptions(value ? [value] : []);
-            return undefined;
+        const data = {
+            "email": email,
+            "role": "Business owner",
+            "username": username,
+            "address": address,
+            "phone": phone,
         }
 
-        fetch({ input: inputValue }, (results) => {
-            if (active) {
-                let newOptions = [];
-
-                if (value) {
-                    newOptions = [value];
+        Axios.post("http://localhost:8080/EditUserInfo",
+            data,
+            { headers: {'Content-Type': 'application/json'}})
+            .then((response) => {
+                if(response.data.status === "Success"){
+                    setUpdateStatus(true);
+                    setUpdateMessage(response.data.message);
                 }
+            })
+            .catch((err) => {
+                console.log("Error: ", err);
+                setUpdateStatus(false);
+                setErrorMessage(err.toString());
+            });
+    }
 
-                if (results) {
-                    newOptions = [...newOptions, ...results];
-                }
+    useEffect( () => {
+        console.log("useEffect");
+        getData();
 
-                setOptions(newOptions);
-            }
-        });
+    }, []);
 
-        return () => {
-            active = false;
-        };
-    }, [value, inputValue, fetch]);
-
-    return (
-        <Autocomplete
-            id="google-map-demo"
-            style={{ width: 300 }}
-            getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
-            filterOptions={(x) => x}
-            options={options}
-            autoComplete
-            includeInputInList
-            filterSelectedOptions
-            value={value}
-            onChange={(event, newValue) => {
-                setOptions(newValue ? [newValue, ...options] : options);
-                setValue(newValue);
-            }}
-            onInputChange={(event, newInputValue) => {
-                setInputValue(newInputValue);
-            }}
-            renderInput={(params) => (
-                <TextField {...params} label="Add a location" variant="outlined" fullWidth />
-            )}
-            renderOption={(option) => {
-                const matches = option.structured_formatting.main_text_matched_substrings;
-                const parts = parse(
-                    option.structured_formatting.main_text,
-                    matches.map((match) => [match.offset, match.offset + match.length]),
-                );
-
-                return (
-                    <Grid container alignItems="center">
-                        <Grid item>
-                            <LocationOnIcon className={classes.icon} />
-                        </Grid>
-                        <Grid item xs>
-                            {parts.map((part, index) => (
-                                <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
-                  {part.text}
-                </span>
-                            ))}
-
-                            <Typography variant="body2" color="textSecondary">
-                                {option.structured_formatting.secondary_text}
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                );
-            }}
-        />
+    return(
+      <div>
+          <Typography variant="h6" className={classes.title}>
+              ACCOUNT PROFILE
+          </Typography>
+          <br/><br/>
+          <div id="info">
+              <Grid container spacing={3} alignItems="flex-end">
+                      <Grid item xs={2}>
+                          <Typography>
+                              Email
+                          </Typography>
+                      </Grid>
+                      <Grid item>
+                          <TextField variant="standard"
+                                     InputProps={{
+                                         readOnly: true,
+                                     }}
+                                     value={email}
+                          />
+                      </Grid>
+              </Grid>
+              <Grid container spacing={3} alignItems="flex-end">
+                  <Grid item xs={2}>
+                      <Typography>
+                          Username
+                      </Typography>
+                  </Grid>
+                  <Grid item>
+                      <TextField variant="standard"
+                                 value={username}
+                                 onChange={onUsernameChange}
+                      />
+                  </Grid>
+              </Grid>
+              <Grid container spacing={3} alignItems="flex-end">
+                  <Grid item xs={2}>
+                      <Typography>
+                          Address
+                      </Typography>
+                  </Grid>
+                  <Grid item>
+                      <TextField variant="standard"
+                                 value={address}
+                                 onChange={onAddressChange}
+                      />
+                  </Grid>
+              </Grid>
+              <Grid container spacing={3} alignItems="flex-end">
+                  <Grid item xs={2}>
+                      <Typography>
+                          Phone
+                      </Typography>
+                  </Grid>
+                  <Grid item>
+                      <TextField variant="standard"
+                                 value={phone}
+                                 onChange={onPhoneChange}
+                      />
+                  </Grid>
+              </Grid>
+          </div>
+          <div>
+              <br/>
+              <Button variant="outlined" color="primary" size="large" onClick={updateButtonClick}>
+                  Update
+              </Button>
+          </div>
+          {
+              updateStatus ?
+                  <div className={classes.updateMessage}>
+                      {updateMessage}
+                  </div>
+                  :
+                  <div className={classes.errorMessage}>
+                      {errorMessage}
+                  </div>
+          }
+      </div>
     );
 }
