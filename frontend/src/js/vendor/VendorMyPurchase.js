@@ -1,4 +1,4 @@
-import React, {useState}  from "react";
+import React, {useRef, useLayoutEffect, useEffect, useState} from 'react';
 import { forwardRef } from 'react';
 import MaterialTable from "material-table";
 import AddBox from '@material-ui/icons/AddBox';
@@ -16,6 +16,13 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import Axios from "axios";
+import * as firebase from "firebase";
+import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import Hidden from '@material-ui/core/Hidden';
+import withWidth from '@material-ui/core/withWidth';
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -39,29 +46,54 @@ const tableIcons = {
 
 
 
-export default class purchaseHistory extends React.Component{
-    state = {
+export default function MaterialTableDemo(props) {
+    /*state = {
         purchases: [],
         isPhone: false,
     };
 
     handleInputChange(value) {
         this.setState({ isPhone: !this.state.isPhone });
+    }*/
+    const targetRef = useRef();
+    const [dimensions, setDimensions] = useState({ width:0, height: 0 });
+
+    useLayoutEffect(() => {
+        if (targetRef.current) {
+            setDimensions({
+                width: targetRef.current.offsetWidth,
+                height: targetRef.current.offsetHeight
+            });
+        }
+    }, []);
+
+    function isPhone() {
+        if(dimensions.width < 541){
+            return true;
+        }else {
+            return false;
+        }
     }
 
-    render() {
-        const { isPhone } = this.state;
+    const currentUser = firebase.auth().currentUser;
+    const email = props.match.params.email;
+    const [get, setGet] = React.useState([]);
+    // const test = () =>setGet("Quan");
+    // console.log("GetStart:", get);
+    console.log("PRops: ", props);
+    console.log("Email: ", email);
+
+
+
+        /*const { isPhone } = this.state;*/
 
         return (
             <div>
-                <div>
-                    <label>Phone View</label>
-                    <input
-                        name="firstName"
-                        type="checkbox"
-                        checked={this.state.isPhone}
-                        onChange={this.handleInputChange.bind(this)}
-                    />
+                <div ref={targetRef}>
+
+                    <p>{dimensions.width}</p>
+                    <p>{dimensions.height}</p>
+
                 </div>
 
             <MaterialTable
@@ -69,7 +101,8 @@ export default class purchaseHistory extends React.Component{
                 icons={tableIcons}
                 title="Purchase History"
                 columns={[
-                    { title: 'Product', field: 'prod',
+                    {
+                        title: 'Product', field: 'prod',
                         cellStyle: {
                             width: 20,
                             maxWidth: 20
@@ -78,7 +111,7 @@ export default class purchaseHistory extends React.Component{
                             width:20,
                             maxWidth: 20
                         }},
-                    { title: 'Amount', field: 'amount', type: 'numeric', hidden: isPhone,
+                    { title: 'Amount', field: 'amount', type: 'numeric', hidden: isPhone(),
                         cellStyle: {
                             width: 20,
                             maxWidth: 20
@@ -87,7 +120,7 @@ export default class purchaseHistory extends React.Component{
                             width:20,
                             maxWidth: 20
                         }},
-                    { title: 'Price', field: 'value' , type: 'numeric', hidden: isPhone,
+                    { title: 'Price', field: 'value' , type: 'numeric', hidden: isPhone(),
                         cellStyle: {
                             width: 20,
                             maxWidth: 20
@@ -124,7 +157,7 @@ export default class purchaseHistory extends React.Component{
                             maxWidth: 20
                         }}
                 ]}
-                data={[
+                /*data={[
                     {prod: 'Dio', amount: '1554', value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
                     {prod: 'Quan', amount: '1554', value: '$ 1616' , dop: 1997, sup: 'Richboi', cate: 'food'},
                     {prod: 'Rice', amount: 305, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
@@ -140,12 +173,48 @@ export default class purchaseHistory extends React.Component{
                     {prod: 'Good Rice', amount: 318, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
                     {prod: 'Better Rice', amount: 360, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
                     {prod: 'Best Rice', amount: 437, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'}
-                    ]}
+                    ]}*/
+
+                data={() =>
+                    new Promise((resolve) => {
+                        setTimeout(() => {
+                            Axios.interceptors.request.use(request => {
+                                console.log('Starting Request', request)
+                                return request
+                            });
+
+                            Axios.get("http://localhost:8080/GetUserProduct", {
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'email': email,
+                                        'role': 'Supplier'
+                                    }
+                                }
+                            )
+                                .then(result => {
+                                    console.log("Result: ", result)
+                                    console.log("Result data", result.data.products)
+                                    resolve({
+                                        data: result.data.products,
+                                        page: 0,
+                                        totalCount: 0,
+                                    })
+                                })
+                                .catch((err) => {
+                                        console.log("Error", err);
+                                    }
+                                )
+                        },6000)
+
+                    })
+                }
 
             />
+
+
             </div>
         )
-    }
+
 
 
 }
