@@ -4,18 +4,16 @@ import Axios from "axios";
 import * as firebase from "firebase";
 
 
-export default function MaterialTableDemo() {
+export default function MaterialTableDemo(props) {
     const currentUser = firebase.auth().currentUser;
-
+    const email = props.match.params.email;
     const [get, setGet] = React.useState([]);
-    const test = () =>setGet("Quan");
-    console.log("GetStart:", get);
+    // const test = () =>setGet("Quan");
+    // console.log("GetStart:", get);
+    console.log("PRops: ", props);
+    console.log("Email: ", email);
 
     return (
-        <div>
-            <button onClick={test}>
-                Test
-            </button>
             <MaterialTable
                 title="Current Stock"
                 columns={
@@ -24,17 +22,22 @@ export default function MaterialTableDemo() {
                         { title: 'Description', field: 'description' },
                         { title: 'Quantity', field: 'productQuantity', type: 'numeric' },
                         { title: 'Category', field: 'productCategory'},
-                        { title: 'Price (AUD)', field: 'productPrice', initialEditValue: '$ '},
+                        { title: 'Price', field: 'productPrice', initialEditValue: '$ '},
                         //{ title: 'Photo', field: 'photoUrl', render: rowData => <img src={rowData.photoURL} style={{width: 40, borderRadius: '50%'}}/> },
                     ]
                 }
                 data={() =>
                     new Promise((resolve) => {
-                        firebase.auth().onAuthStateChanged( (currentUser) =>{
+
+                            Axios.interceptors.request.use(request => {
+                                console.log('Starting Request', request)
+                                return request
+                            });
+
                             Axios.get("http://localhost:8080/GetUserProduct",{
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'email': currentUser.email,
+                                        'email': email,
                                         'role' : 'Supplier'
                                     }
                                 }
@@ -52,7 +55,7 @@ export default function MaterialTableDemo() {
                                         console.log("Error", err);
                                     }
                                 )
-                        })
+
                     })
                 }
                 editable={{
@@ -62,16 +65,14 @@ export default function MaterialTableDemo() {
                             setTimeout(() => {
                                 resolve();
                                 console.log("QUAN");
-                                Axios.interceptors.request.use(request => {
-                                    console.log('Add Request', request)
-                                    return request
-                                });
+                                console.log("EMAIL: ", email);
                                 Axios.post("http://localhost:8080/AddProduct",
                                     {
-                                        'email': currentUser.email,
+                                        'email': email,
                                         'role': 'Supplier',
                                         'name': newData.productName,
                                         'price': newData.productPrice,
+                                        'supplier': "",
                                         'quantity': newData.productQuantity,
                                         'category': newData.productCategory,
                                     },
@@ -106,25 +107,24 @@ export default function MaterialTableDemo() {
                         new Promise((resolve) =>{
                             setTimeout(() => {
                                 resolve();
-                                console.log("QUAN");
                                 Axios.interceptors.request.use(request => {
                                     console.log('Delete Request', request)
                                     return request
                                 });
-                                console.log("oldData: ",oldData)
                                 Axios.post("http://localhost:8080/DeleteProduct",
                                     {
-                                        'email': currentUser.email,
+                                        'email': email,
                                         'role': 'Supplier',
                                         'name': oldData.productName,
                                         'category': oldData.productCategory,
+                                        'supplier': ""
                                     },
                                     {
                                         headers: {
                                             'Content-Type': 'application/json',
                                         }
                                     })
-                                    .then(response => console.log(response))
+                                    .then(response => console.log("Delete Reponse", response))
                                     .catch((err) => {
                                             console.log("Error", err);
                                         }
@@ -135,7 +135,6 @@ export default function MaterialTableDemo() {
                         }),
                 }}
             />
-        </div>
 
 
 
