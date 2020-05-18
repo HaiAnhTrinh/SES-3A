@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import AccountCircle from "@material-ui/icons/AccountCircle";
+import Avatar from '@material-ui/core/Avatar';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -20,8 +21,7 @@ import MyStock from "./VendorMyStock";
 import MyPurchase from "./VendorMyPurchase";
 import MyCart from "./VendorMyCart";
 import Graph from "./VendorGraph";
-import Account from "./VendorAccount";
-import Axios from "axios";
+import Account from "../common/MyAccount";
 
 export default function VendorLayout(props) {
     const currentUser = firebase.auth().currentUser;
@@ -31,7 +31,6 @@ export default function VendorLayout(props) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [baseUrl, setBaseUrl] = useState("");
     const [anchorEl, setAnchorEl] = useState(null);
-
     const open = Boolean(anchorEl);
     const drawerListObject = [{
         'text': 'Home',
@@ -109,7 +108,11 @@ export default function VendorLayout(props) {
                                 onClick={handleMenu}
                                 color="inherit"
                             >
-                                <AccountCircle />
+                                { currentUser && currentUser.photoURL ?
+                                    <Avatar alt="avatar" src={currentUser.photoURL} />
+                                    :
+                                    <AccountCircle />
+                                }
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
@@ -166,7 +169,9 @@ export default function VendorLayout(props) {
                         <Route path="/Vendor/:email/MyPurchase" exact strict component={MyPurchase}/>
                         <Route path="/Vendor/:email/MyCart" exact strict component={MyCart}/>
                         <Route path="/Vendor/:email/Graph" exact strict component={Graph}/>
-                        <Route path="/Vendor/:email/MyAccount" exact strict component={Account}/>
+                        <Route path="/Vendor/:email/MyAccount" exact strict>
+                            <Account {...props} role="Business owner" />
+                        </Route>
                     </div>
 
                 </main>
