@@ -28,21 +28,21 @@ export default function MaterialTableDemo(props) {
                 }
                 data={() =>
                     new Promise((resolve) => {
-
+                        setTimeout(() => {
                             Axios.interceptors.request.use(request => {
                                 console.log('Starting Request', request)
                                 return request
                             });
 
-                            Axios.get("http://localhost:8080/GetUserProduct",{
+                            Axios.get("http://localhost:8080/GetUserProduct", {
                                     headers: {
                                         'Content-Type': 'application/json',
                                         'email': email,
-                                        'role' : 'Supplier'
+                                        'role': 'Supplier'
                                     }
                                 }
                             )
-                                .then(result =>{
+                                .then(result => {
                                     console.log("Result: ", result)
                                     console.log("Result data", result.data.products)
                                     resolve({
@@ -50,11 +50,12 @@ export default function MaterialTableDemo(props) {
                                         page: 0,
                                         totalCount: 0,
                                     })
-                                 })
+                                })
                                 .catch((err) => {
                                         console.log("Error", err);
                                     }
                                 )
+                        },6000)
 
                     })
                 }
@@ -87,21 +88,44 @@ export default function MaterialTableDemo(props) {
                                         }
                                     )
 
-                            }, 600)
+                            }, 6000)
 
                         }),
                     onRowUpdate: (newData, oldData) =>
-                        new Promise((resolve) => {
+                        new Promise((resolve) =>{
+                            console.log(newData);
                             setTimeout(() => {
                                 resolve();
-                                // if (oldData) {
-                                //     setState((prevState) => {
-                                //         const data = [...prevState.data];
-                                //         data[data.indexOf(oldData)] = newData;
-                                //         return { ...prevState, data };
-                                //     });
-                                // }
-                            }, 600);
+                                console.log("QUAN");
+                                console.log("EMAIL: ", email);
+                                Axios.interceptors.request.use(request => {
+                                    console.log('Edit Request', request)
+                                    return request
+                                });
+                                Axios.post("http://localhost:8080/EditProduct",
+                                    {
+                                        'email': email,
+                                        'role': 'Supplier',
+                                        'name': newData.productName,
+                                        'price': newData.productPrice,
+                                        'quantity': newData.productQuantity,
+                                        'category': newData.productCategory,
+                                        'supplier':""
+
+                                    },
+                                    {
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        }
+                                    })
+                                    .then(response => console.log(response))
+                                    .catch((err) => {
+                                            console.log("Error", err);
+                                        }
+                                    )
+
+                            }, 6000)
+
                         }),
                     onRowDelete: (oldData) =>
                         new Promise((resolve) =>{
@@ -117,7 +141,7 @@ export default function MaterialTableDemo(props) {
                                         'role': 'Supplier',
                                         'name': oldData.productName,
                                         'category': oldData.productCategory,
-                                        'supplier': ""
+
                                     },
                                     {
                                         headers: {
@@ -130,7 +154,7 @@ export default function MaterialTableDemo(props) {
                                         }
                                     )
 
-                            }, 600)
+                            }, 6000)
 
                         }),
                 }}
