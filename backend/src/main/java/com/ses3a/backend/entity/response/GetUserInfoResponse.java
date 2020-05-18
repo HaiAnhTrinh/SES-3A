@@ -1,27 +1,20 @@
 package com.ses3a.backend.entity.response;
 
+import com.ses3a.backend.entity.object.UserInfo;
+
 public class GetUserInfoResponse extends BaseResponse {
-    private String email;
-    private String username;
+
+    private UserInfo userInfo;
 
     public GetUserInfoResponse(){
-
     }
 
-    public String getEmail() {
-        return email;
+    public UserInfo getUserInfo() {
+        return userInfo;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 
 }
