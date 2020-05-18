@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState}  from "react";
 import { forwardRef } from 'react';
 import MaterialTable from "material-table";
 import AddBox from '@material-ui/icons/AddBox';
@@ -37,29 +37,113 @@ const tableIcons = {
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
-export default class purchasehistory extends React.Component{
+
+
+export default class purchaseHistory extends React.Component{
     state = {
-        purchases: []
+        purchases: [],
+        isPhone: false,
+    };
+
+    handleInputChange(value) {
+        this.setState({ isPhone: !this.state.isPhone });
     }
 
     render() {
+        const { isPhone } = this.state;
+
         return (
+            <div>
+                <div>
+                    <label>Phone View</label>
+                    <input
+                        name="firstName"
+                        type="checkbox"
+                        checked={this.state.isPhone}
+                        onChange={this.handleInputChange.bind(this)}
+                    />
+                </div>
 
             <MaterialTable
+                tableLayout = 'auto'
                 icons={tableIcons}
                 title="Purchase History"
                 columns={[
-                    { title: 'Product', field: 'prod' },
-                    { title: 'Quantity', field: 'amount', type: 'numeric'},
-                    { title: 'Price', field: 'value'},
-                    { title: 'Date of Purchase', field: 'dop', type: 'date' },
-                    { title: 'Supplier', field: 'sup'}
+                    { title: 'Product', field: 'prod',
+                        cellStyle: {
+                            width: 20,
+                            maxWidth: 20
+                        },
+                        headerStyle: {
+                            width:20,
+                            maxWidth: 20
+                        }},
+                    { title: 'Amount', field: 'amount', type: 'numeric', hidden: isPhone,
+                        cellStyle: {
+                            width: 20,
+                            maxWidth: 20
+                        },
+                        headerStyle: {
+                            width:20,
+                            maxWidth: 20
+                        }},
+                    { title: 'Price', field: 'value' , type: 'numeric', hidden: isPhone,
+                        cellStyle: {
+                            width: 20,
+                            maxWidth: 20
+                        },
+                        headerStyle: {
+                            width:20,
+                            maxWidth: 20
+                        }},
+                    { title: 'Category', field: 'cate',
+                        cellStyle: {
+                            width: 20,
+                            maxWidth: 20
+                        },
+                        headerStyle: {
+                            width:20,
+                            maxWidth: 20
+                        }},
+                    { title: 'Date of Purchase', field: 'dop', type: 'date',
+                        cellStyle: {
+                            width: 20,
+                            maxWidth: 20
+                        },
+                        headerStyle: {
+                            width:20,
+                            maxWidth: 20
+                        }},
+                    { title: 'Supplier', field: 'sup',
+                        cellStyle: {
+                            width: 20,
+                            maxWidth: 20
+                        },
+                        headerStyle: {
+                            width:20,
+                            maxWidth: 20
+                        }}
                 ]}
-                data={[ { prod: 'Dio', amount: '1554', value: '$ 1616' , dop: 1997, sup: 'Gotham' },
-                    { prod: 'Quan', amount: '1554', value: '$ 1616' , dop: 1997, sup: 'Richboi' }]}
+                data={[
+                    {prod: 'Dio', amount: '1554', value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Quan', amount: '1554', value: '$ 1616' , dop: 1997, sup: 'Richboi', cate: 'food'},
+                    {prod: 'Rice', amount: 305, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Old Rice', amount: 452,value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'New Rice', amount: 262, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Some Rice', amount: 159, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Fried Rice', amount: 356, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Broken Rice', amount: 408, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Expensive Rice', amount: 237, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Sticky Rice', amount: 375, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Other Rice', amount: 518, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Another Rice', amount: 392, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Good Rice', amount: 318, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Better Rice', amount: 360, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
+                    {prod: 'Best Rice', amount: 437, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'}
+                    ]}
 
             />
-
+            </div>
         )
     }
 
