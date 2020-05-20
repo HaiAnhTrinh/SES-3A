@@ -6,6 +6,7 @@ public class SupplierProduct {
     private String productPrice;
     private String productQuantity;
     private String productCategory;
+    private String productDescription;
 
     public SupplierProduct(){
     }
@@ -14,12 +15,14 @@ public class SupplierProduct {
                            String productName,
                            String productPrice,
                            String productQuantity,
+                           String productDescription,
                            String productCategory) {
         this.supplierEmail = supplierEmail;
         this.productName = productName;
         this.productPrice = productPrice;
         this.productQuantity = productQuantity;
         this.productCategory = productCategory;
+        this.productDescription = productDescription;
     }
 
     public String getSupplierEmail() {
@@ -60,5 +63,13 @@ public class SupplierProduct {
 
     public void setProductCategory(String productCategory) {
         this.productCategory = productCategory;
+    }
+
+    public String getProductDescription() {
+        return productDescription;
+    }
+
+    public void setProductDescription(String productDescription) {
+        this.productDescription = productDescription;
     }
 }

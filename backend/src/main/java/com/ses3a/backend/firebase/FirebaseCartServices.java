@@ -146,12 +146,15 @@ public class FirebaseCartServices {
                 }
 
                 //clear the cart, add to vendor stock
+                //TODO: if the product already exists on the vendors onlineProduct, do update instead of add
                 FirebaseProductServices firebaseProductServices = new FirebaseProductServices();
                 RemoveFromCartRequest removeRequest =
                         new RemoveFromCartRequest(request.getEmail(), cartProduct.getName(), cartProduct.getSupplier());
                 AddProductRequest addRequest =
-                        new AddProductRequest(request.getEmail(), "Business owner", cartProduct.getName(), cartProduct.getPrice(),
-                                cartProduct.getQuantity(), cartProduct.getCategory(), cartProduct.getSupplier());
+                        new AddProductRequest(request.getEmail(), "Business owner",
+                                cartProduct.getName(), cartProduct.getPrice(),
+                                cartProduct.getQuantity(), cartProduct.getDescription(),
+                                cartProduct.getCategory(), cartProduct.getSupplier());
                 removeFromCart(removeRequest);
                 firebaseProductServices.addProduct(addRequest);
 

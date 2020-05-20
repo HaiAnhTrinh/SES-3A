@@ -4,7 +4,6 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.ses3a.backend.entity.object.SupplierProduct;
-import com.ses3a.backend.entity.object.VendorProduct;
 import com.ses3a.backend.entity.request.*;
 import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
@@ -40,6 +39,7 @@ public class FirebaseProductServices {
                 product.setProductName(document.getString("name"));
                 product.setProductPrice(document.getString("price"));
                 product.setProductQuantity(document.getString("quantity"));
+                product.setProductDescription(document.getString("description"));
                 products.add(product);
             }
         }
@@ -57,23 +57,31 @@ public class FirebaseProductServices {
                 FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
                         .document("products")
                         .listCollections();
-        Iterable<CollectionReference> onlineProductRefs =
-                FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                        .document("onlineProducts")
-                        .listCollections();
+
         List<Object> products = new ArrayList<>();
-
-        if(userType.equals("vendors")){
-            initGetUserProductResponse(onlineProductRefs, products);
-        }
-
-        initGetUserProductResponse(productRefs, products);
+        initGetUserProductsResponse(productRefs, products);
 
         return products;
     }
 
-    //support getUserProducts
-    private void initGetUserProductResponse(Iterable<CollectionReference> onlineProductRefs, List<Object> products)
+    //Get the online products belong to a user from Firestore
+    public List<Object> getUserOnlineProducts(@NotNull GetUserProductRequest request)
+            throws ExecutionException, InterruptedException {
+        Firestore firestore = FirestoreClient.getFirestore();
+        String userType = convertToUserType(request.getRole());
+
+        Iterable<CollectionReference> onlineProductRefs =
+                FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
+                        .document("onlineProducts")
+                        .listCollections();
+        List<Object> onlineProducts = new ArrayList<>();
+        initGetUserProductsResponse(onlineProductRefs, onlineProducts);
+
+        return onlineProducts;
+    }
+
+    //support getUserProducts and getUserOnlineProducts
+    private void initGetUserProductsResponse(Iterable<CollectionReference> onlineProductRefs, List<Object> products)
             throws InterruptedException, ExecutionException {
         for(CollectionReference ref : onlineProductRefs){
             Map<String, Object> data = ref.document("info").get().get().getData();
@@ -82,6 +90,7 @@ public class FirebaseProductServices {
             product.setProductName(data.get("name").toString());
             product.setProductPrice(data.get("price").toString());
             product.setProductQuantity(data.get("quantity").toString());
+            product.setProductDescription(data.get("description").toString());
             product.setProductCategory(data.get("category").toString());
             products.add(product);
         }
@@ -103,9 +112,10 @@ public class FirebaseProductServices {
         data.put("quantity", request.getQuantity());
         data.put("supplier", request.getSupplier());
         data.put("price", request.getPrice());
+        data.put("category", request.getCategory());
+        data.put("description", request.getDescription());
 
         if(userType.equals("vendors")){
-
             FirebaseUtils.getOneVendorProduct(firestore, request.getEmail(), request.getName(), request.getSupplier())
                     .document("info")
                     .set(data, SetOptions.merge());
@@ -129,7 +139,7 @@ public class FirebaseProductServices {
     //Add products in Firestore
     //Vendors: add to node 'users'
     //Suppliers: add to node 'users' and 'products'
-    public void addProduct(@NotNull AddProductRequest request){
+    public boolean addProduct(@NotNull AddProductRequest request){
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
         String userType = convertToUserType(request.getRole());
@@ -139,19 +149,28 @@ public class FirebaseProductServices {
         data.put("quantity", request.getQuantity());
         data.put("supplier", request.getSupplier());
         data.put("category", request.getCategory());
+        data.put("description", request.getDescription());
 
         if(userType.equals("suppliers")){
-            //add to market
-            firestore.collection("products")
-                    .document(request.getCategory())
-                    .collection(request.getEmail())
-                    .document(request.getName())
-                    .set(data);
-
-            //add to supplier's stock
-            FirebaseUtils.getOneSupplierProduct(firestore, request.getEmail(), request.getName())
-                    .document("info")
-                    .set(data);
+            try {
+                if(FirebaseUtils.supplierHasProduct(firestore, request.getEmail(), request.getName())){
+                    System.out.println("This product has already existed in the suppliers' stock");
+                    return false;
+                }
+                //add to market
+                firestore.collection("products")
+                        .document(request.getCategory())
+                        .collection(request.getEmail())
+                        .document(request.getName())
+                        .set(data);
+                //add to supplier's stock
+                FirebaseUtils.getOneSupplierProduct(firestore, request.getEmail(), request.getName())
+                        .document("info")
+                        .set(data);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         else {
             //add to vendor's stock
@@ -159,6 +178,8 @@ public class FirebaseProductServices {
                     .document("info")
                     .set(data);
         }
+
+        return true;
     }
 
 

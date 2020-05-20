@@ -30,12 +30,15 @@ public class FirebaseUtils {
     }
 
     //Get the collection of a vendor product: node 'users'
+    //online products must have supplier field
     protected static CollectionReference getOneVendorProduct(Firestore firestore, String email,
                                                        String productName, String productSupplier){
         if(productSupplier != null && productSupplier.length() > 0){
             String productId = productSupplier.concat("-").concat(productName);
-            CollectionReference userRef = getUserCollection(firestore, "vendors", email);
-            return userRef.document("onlineProducts").collection(productId);
+//            CollectionReference userRef = getUserCollection(firestore, "vendors", email);
+            return getUserCollection(firestore, "vendors", email)
+                    .document("onlineProducts")
+                    .collection(productId);
         }
 
         return getUserCollection(firestore, "vendors", email)
