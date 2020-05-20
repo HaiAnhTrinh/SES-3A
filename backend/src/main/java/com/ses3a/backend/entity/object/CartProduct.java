@@ -8,6 +8,7 @@ public class CartProduct {
     private String quantity;
     private String cost;
     private String category;
+    private String description;
 
     public CartProduct(){
     }
@@ -70,6 +71,14 @@ public class CartProduct {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }
