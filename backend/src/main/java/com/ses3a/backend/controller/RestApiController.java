@@ -126,8 +126,15 @@ public class RestApiController {
                 new ResponseEntity<>(new GetUserProductResponse(), HttpStatus.OK);
         try{
             List<Object> userProducts = firebaseProductServices.getUserProducts(request);
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
             responseEntity.getBody().setProducts(userProducts);
+
+            if(role.equals("Business owner")){
+                List<Object> userOnlineProducts = firebaseProductServices.getUserOnlineProducts(request);
+                responseEntity.getBody().setOnlineProducts(userOnlineProducts);
+            }
+
+            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            Objects.requireNonNull(responseEntity.getBody()).setMessage("Returned all products belong to this user");
         }
         catch (Exception e){
             e.printStackTrace();
@@ -144,9 +151,15 @@ public class RestApiController {
         System.out.println("RECEIVED ADD PRODUCT REQUEST");
         ResponseEntity<AddProductResponse> responseEntity =
                 new ResponseEntity<>(new AddProductResponse(), HttpStatus.OK);
-        firebaseProductServices.addProduct(addProductRequest);
+        boolean added = firebaseProductServices.addProduct(addProductRequest);
         Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
-        responseEntity.getBody().setMessage("Product has been added");
+        if(added){
+            responseEntity.getBody().setMessage("Product has been added");
+        }
+        else {
+            responseEntity.getBody().setMessage("This product has already existed in the suppliers' stock");
+        }
+
         return responseEntity;
     }
 
