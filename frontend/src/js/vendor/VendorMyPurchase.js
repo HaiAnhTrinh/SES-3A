@@ -55,9 +55,12 @@ export default function MaterialTableDemo(props) {
     handleInputChange(value) {
         this.setState({ isPhone: !this.state.isPhone });
     }*/
+
+    //Create state for the current size of the table
     const targetRef = useRef();
     const [dimensions, setDimensions] = useState({ width:0, height: 0 });
 
+    //Get the current size
     useLayoutEffect(() => {
         if (targetRef.current) {
             setDimensions({
@@ -67,6 +70,8 @@ export default function MaterialTableDemo(props) {
         }
     }, []);
 
+
+    //Compare the table size to the recommended size for phone and output true or false
     function isPhone() {
         if(dimensions.width < 541){
             return true;
@@ -111,6 +116,8 @@ export default function MaterialTableDemo(props) {
                             width:20,
                             maxWidth: 20
                         }},
+                    /*Hidden attribute (boolean) will call the function isPhone
+                    *If the size of table is small then hide the non required fields*/
                     { title: 'Amount', field: 'amount', type: 'numeric', hidden: isPhone(),
                         cellStyle: {
                             width: 20,
