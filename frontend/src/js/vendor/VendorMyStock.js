@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef, useLayoutEffect} from 'react';
 import MaterialTable from 'material-table';
 import Axios from "axios";
 import * as firebase from "firebase";
@@ -68,6 +68,27 @@ export default function MaterialTableDemo(props) {
         setValue(index);
     };
 
+    const targetRef = useRef();
+    const [dimensions, setDimensions] = useState({ width:0, height: 0 });
+
+    useLayoutEffect(() => {
+        if (targetRef.current) {
+            setDimensions({
+                width: targetRef.current.offsetWidth,
+                height: targetRef.current.offsetHeight
+            });
+        }
+    }, []);
+
+
+    function isPhone() {
+        if(dimensions.width < 541){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
     return (
 
         <div className={classes.root}>
@@ -91,13 +112,46 @@ export default function MaterialTableDemo(props) {
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
                     <MaterialTable
+                        tableLayout = 'auto'
                         title="Current Stock"
                         columns={
                             [
-                                { title: 'Name', field: 'productName' },
-                                { title: 'Quantity', field: 'productQuantity', type: 'numeric' },
-                                { title: 'Category', field: 'productCategory'},
-                                { title: 'Price', field: 'productPrice', initialEditValue: '$ '},
+                                { title: 'Name', field: 'productName',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Quantity', field: 'productQuantity', type: 'numeric',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Category', field: 'productCategory',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Price', field: 'productPrice', initialEditValue: '$ ',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
                                 //{ title: 'Photo', field: 'photoUrl', render: rowData => <img src={rowData.photoURL} style={{width: 40, borderRadius: '50%'}}/> },
                             ]
                         }
