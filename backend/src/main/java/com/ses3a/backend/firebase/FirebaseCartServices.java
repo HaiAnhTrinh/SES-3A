@@ -151,10 +151,9 @@ public class FirebaseCartServices {
                 RemoveFromCartRequest removeRequest =
                         new RemoveFromCartRequest(request.getEmail(), cartProduct.getName(), cartProduct.getSupplier());
                 AddProductRequest addRequest =
-                        new AddProductRequest(request.getEmail(), "Business owner",
-                                cartProduct.getName(), cartProduct.getPrice(),
-                                cartProduct.getQuantity(), cartProduct.getDescription(),
-                                cartProduct.getCategory(), cartProduct.getSupplier());
+                        new AddProductRequest(request.getEmail(), "Business owner", cartProduct.getName(),
+                                cartProduct.getPrice(), cartProduct.getQuantity(), cartProduct.getDescription(),
+                                cartProduct.getImageUrl(), cartProduct.getCategory(), cartProduct.getSupplier());
                 removeFromCart(removeRequest);
                 firebaseProductServices.addProduct(addRequest);
 
