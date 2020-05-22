@@ -9,9 +9,12 @@ import Modal from '@material-ui/core/Modal';
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 import {DropzoneDialog} from 'material-ui-dropzone';
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogActions from "@material-ui/core/DialogActions";
 
 export default function Account(props) {
-    console.log("common myAccount: ", props);
     const profileImageRef = firebase.storage().ref().child("profile images");
     const currentUser = firebase.auth().currentUser;
 
@@ -33,20 +36,27 @@ export default function Account(props) {
         getData();
     }, []);
 
-    const [email, setEmail] = useState(props.match.params.email);
+    const [email] = useState(props.match.params.email);
     const [username, setUsername] = useState("");
     const [address, setAddress] = useState("");
     const [phone, setPhone] = useState("");
     const [image, setImage] = useState([]);
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [dropZoneOpen, setDropZoneOpen] = useState(false);
     const [loadingDialogOpen, setLoadingDialogOpen] = useState(false);
-    const [updateMessage, setUpdateMessage] = useState(String);
+    const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+    const [updateProfileMessage, setUpdateProfileMessage] = useState(String);
     const [errorMessage, setErrorMessage] = useState(String);
-    const [updateStatus, setUpdateStatus] = useState(Boolean);
-    const [trigger, setTrigger] = useState("");
+    const [dialogErrorMessage, setDialogErrorMessage] = useState(String);
+    const [updateProfileStatus, setUpdateProfileStatus] = useState(Boolean);
+    const [updatePasswordMessage, setUpdatePasswordMessage] = useState(String);
+    const [updatePasswordStatus, setUpdatePasswordStatus] = useState(Boolean);
     const onUsernameChange = (event) => setUsername(event.target.value);
     const onAddressChange = (event) => setAddress(event.target.value);
     const onPhoneChange = (event) => setPhone(event.target.value);
+    const onPasswordChange = (event) => setPassword(event.target.value);
+    const onConfirmPasswordChange = (event) => setConfirmPassword(event.target.value);
 
     const getData = () => {
         Axios.get("http://localhost:8080/GetUserInfo",
@@ -78,7 +88,7 @@ export default function Account(props) {
         handleDropZoneClose();
     }
 
-    const updateButtonClick = () => {
+    const updateDetailBtnClick = () => {
         console.log("EDIT BUTTON CLICKED");
         console.log("Image: ", image[0]);
         const data = {
@@ -97,7 +107,7 @@ export default function Account(props) {
                 console.log('Upload is ' + progress + '% done');
             },  (error) => {
                 setLoadingDialogOpen(false);
-                setUpdateStatus(false);
+                setUpdateProfileStatus(false);
                 setErrorMessage(error.toString());
             }, function () {
                 setLoadingDialogOpen(false);
@@ -105,7 +115,6 @@ export default function Account(props) {
                     currentUser.updateProfile({photoURL: url})
                         .then(() => {
                             console.log("current user: ", currentUser);
-                            setTrigger("");
                         });
                 });
 
@@ -114,17 +123,36 @@ export default function Account(props) {
                     { headers: {'Content-Type': 'application/json'}})
                     .then((response) => {
                         if(response.data.status === "Success"){
-                            setUpdateStatus(true);
-                            setUpdateMessage(response.data.message);
+                            setUpdateProfileStatus(true);
+                            setUpdateProfileMessage(response.data.message);
                         }
                     })
                     .catch((err) => {
                         console.log("Error: ", err);
-                        setUpdateStatus(false);
+                        setUpdateProfileStatus(false);
                         setErrorMessage(err.toString());
                     });
             }
         )
+    }
+
+    const updatePasswordBtnClick = () => {
+        setPasswordDialogOpen(true);
+    }
+
+    const passwordDialogClose = () => {
+        setPasswordDialogOpen(false);
+    }
+
+    const saveNewPassword = () => {
+        currentUser.updatePassword(password)
+            .then(() => {
+                setUpdatePasswordMessage("Password updated!!!")
+            })
+            .catch((error) => {
+                setUpdatePasswordMessage(error);
+            });
+        setUpdatePasswordStatus(true);
     }
 
     return(
@@ -132,6 +160,38 @@ export default function Account(props) {
             <Modal open={loadingDialogOpen}>
                 <CircularProgress size={50} variant="indeterminate" />
             </Modal>
+
+            <Dialog onClose={passwordDialogClose} open={passwordDialogOpen}>
+                <DialogTitle onClose={passwordDialogClose}>
+                    Change Password
+                </DialogTitle>
+                <DialogContent dividers>
+                    <TextField required type="password" label="new password"
+                               variant="filled" helperText="At least 6 characters" onChange={onPasswordChange}/>
+                    <br/><br/>
+                    <TextField required type="password" label="confirm password"
+                               variant="filled" onChange={onConfirmPasswordChange}/>
+                    { updatePasswordStatus ?
+                        <div className={classes.updateMessage}>
+                            {updatePasswordMessage}
+                        </div>
+                        :
+                        <div className={classes.errorMessage}>
+                            {dialogErrorMessage}
+                        </div>
+                    }
+                </DialogContent>
+                <DialogActions>
+                    { password.length >= 6 && password === confirmPassword ?
+                        <Button onClick={saveNewPassword} color="primary">
+                            Update
+                        </Button>
+                        :
+                        <p/>
+                    }
+                </DialogActions>
+            </Dialog>
+
             <Typography variant="h6" className={classes.title}>
                 ACCOUNT PROFILE
             </Typography>
@@ -139,68 +199,64 @@ export default function Account(props) {
             <div id="info">
                 <Grid container spacing={3} alignItems="flex-end">
                     <Grid item xs={2}>
-                        <Typography>
-                            Email
-                        </Typography>
+                        <Typography color="primary">Email</Typography>
                     </Grid>
                     <Grid item>
                         <TextField variant="standard"
-                                   InputProps={{
-                                       readOnly: true,
-                                   }}
-                                   value={email}
-                        />
+                                   InputProps={{readOnly: true,}}
+                                   value={email}/>
                     </Grid>
                 </Grid>
                 <Grid container spacing={3} alignItems="flex-end">
                     <Grid item xs={2}>
-                        <Typography>
-                            Username
-                        </Typography>
+                        <Typography color="primary">Username</Typography>
                     </Grid>
                     <Grid item>
                         <TextField variant="standard"
                                    value={username}
-                                   onChange={onUsernameChange}
-                        />
+                                   onChange={onUsernameChange}/>
                     </Grid>
                 </Grid>
                 <Grid container spacing={3} alignItems="flex-end">
                     <Grid item xs={2}>
-                        <Typography>
-                            Address
-                        </Typography>
+                        <Typography color="primary">Address</Typography>
                     </Grid>
                     <Grid item>
                         <TextField variant="standard"
                                    value={address}
-                                   onChange={onAddressChange}
-                        />
+                                   onChange={onAddressChange}/>
                     </Grid>
                 </Grid>
                 <Grid container spacing={3} alignItems="flex-end">
                     <Grid item xs={2}>
-                        <Typography>
-                            Phone
-                        </Typography>
+                        <Typography color="primary">Phone</Typography>
                     </Grid>
                     <Grid item>
                         <TextField variant="standard"
                                    value={phone}
-                                   onChange={onPhoneChange}
-                        />
+                                   onChange={onPhoneChange}/>
                     </Grid>
                 </Grid>
-                <Grid container spacing={3} alignItems="flex-end">
+                <Grid container spacing={3} alignItems="center">
                     <Grid item xs={2}>
-                        <Typography>
-                            Profile image
-                        </Typography>
+                        <Typography color="primary">Profile image</Typography>
+                        <br/>
+                        {currentUser && currentUser.photoURL ?
+                            <Typography>(Click the image to edit)</Typography> : <p/>
+                        }
                     </Grid>
                     <Grid item>
-                        <Button variant="outlined" onClick={handleDropZoneOpen}>
-                            Add Image
-                        </Button>
+                        { currentUser && currentUser.photoURL ?
+                            <img src={currentUser.photoURL}
+                                 alt="user profile"
+                                 width="200" height="150"
+                                 onClick={handleDropZoneOpen}
+                            />
+                            :
+                            <Button variant="outlined" onClick={handleDropZoneOpen}>
+                                Add Image
+                            </Button>
+                        }
                         <DropzoneDialog
                             open={dropZoneOpen}
                             onSave={handleDropZoneSave}
@@ -217,14 +273,23 @@ export default function Account(props) {
             <br/>
             <div>
                 <br/>
-                <Button variant="outlined" color="primary" size="large" onClick={updateButtonClick}>
-                    Update
-                </Button>
+                <Grid container spacing={1}>
+                    <Grid item>
+                        <Button variant="outlined" color="primary" size="large" onClick={updateDetailBtnClick}>
+                            Update Details
+                        </Button>
+                    </Grid>
+                    <Grid item>
+                        <Button variant="outlined" color="primary" size="large" onClick={updatePasswordBtnClick}>
+                            Update Password
+                        </Button>
+                    </Grid>
+                </Grid>
             </div>
             {
-                updateStatus ?
+                updateProfileStatus ?
                     <div className={classes.updateMessage}>
-                        {updateMessage}
+                        {updateProfileMessage}
                     </div>
                     :
                     <div className={classes.errorMessage}>
