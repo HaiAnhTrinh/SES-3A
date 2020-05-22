@@ -8,8 +8,6 @@ import java.util.Map;
 
 public class FirestoreInitNewUser {
 
-    //TODO: if the final product does not require difference, merge them into 1
-
     protected static void initVendor(Firestore firestore, CreateNewUserRequest request){
         System.out.println("INIT VENDORS CALLED");
         Map<String, Object> emptyData = new HashMap<>();
@@ -26,6 +24,9 @@ public class FirestoreInitNewUser {
         firestore.collection("carts")
                 .document(request.getEmail())
                 .create(emptyData);
+        firestore.collection("vendorPurchases")
+                .document(request.getEmail())
+                .create(emptyData);
     }
 
     protected static void initSupplier(Firestore firestore, CreateNewUserRequest request){
@@ -36,5 +37,13 @@ public class FirestoreInitNewUser {
                 .collection(request.getEmail())
                 .document("products")
                 .create(emptyData);
+        firestore.collection("supplierPurchases")
+                .document(request.getEmail())
+                .collection("pendingPurchases")
+                .add(emptyData);
+        firestore.collection("supplierPurchases")
+                .document(request.getEmail())
+                .collection("deliveredPurchases")
+                .add(emptyData);
     }
 }

@@ -40,6 +40,7 @@ public class FirebaseProductServices {
                 product.setProductPrice(document.getString("price"));
                 product.setProductQuantity(document.getString("quantity"));
                 product.setProductDescription(document.getString("description"));
+                product.setProductImageUrl(document.getString("imageUrl"));
                 products.add(product);
             }
         }
@@ -92,6 +93,7 @@ public class FirebaseProductServices {
             product.setProductQuantity(data.get("quantity").toString());
             product.setProductDescription(data.get("description").toString());
             product.setProductCategory(data.get("category").toString());
+            product.setProductImageUrl(data.get("imageUrl").toString());
             products.add(product);
         }
     }
@@ -150,6 +152,7 @@ public class FirebaseProductServices {
         data.put("supplier", request.getSupplier());
         data.put("category", request.getCategory());
         data.put("description", request.getDescription());
+        data.put("imageUrl", request.getImageUrl());
 
         if(userType.equals("suppliers")){
             try {

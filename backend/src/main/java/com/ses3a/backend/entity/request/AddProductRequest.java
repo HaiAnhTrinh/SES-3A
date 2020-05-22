@@ -7,6 +7,7 @@ public class AddProductRequest extends BaseRequest{
     private String quantity;
     private String description;
     private String category;
+    private String imageUrl;
     private String supplier;
 
     public AddProductRequest(String email,
@@ -15,6 +16,7 @@ public class AddProductRequest extends BaseRequest{
                              String price,
                              String quantity,
                              String description,
+                             String imageUrl,
                              String category,
                              String supplier) {
         this.setEmail(email);
@@ -23,6 +25,7 @@ public class AddProductRequest extends BaseRequest{
         this.setPrice(price);
         this.setQuantity(quantity);
         this.setDescription(description);
+        this.setImageUrl(imageUrl);
         this.setCategory(category);
         this.setSupplier(supplier);
     }
@@ -73,5 +76,13 @@ public class AddProductRequest extends BaseRequest{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
