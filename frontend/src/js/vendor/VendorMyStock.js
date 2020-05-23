@@ -90,8 +90,17 @@ export default function MaterialTableDemo(props) {
     }
 
     return (
+        <div>
+            <div ref={targetRef}>
 
-        <div className={classes.root}>
+                <p>{dimensions.width}</p>
+                <p>{dimensions.height}</p>
+
+            </div>
+
+
+
+            <div className={classes.root}>
             <AppBar position="static" color="default">
                 <Tabs
                     value={value}
@@ -143,7 +152,7 @@ export default function MaterialTableDemo(props) {
                                         width:20,
                                         maxWidth: 20
                                     }},
-                                { title: 'Price', field: 'productPrice', initialEditValue: '$ ',
+                                { title: 'Price', field: 'productPrice', initialEditValue: '$ ',hidden: isPhone(),
                                     cellStyle: {
                                         width: 20,
                                         maxWidth: 20
@@ -408,6 +417,7 @@ export default function MaterialTableDemo(props) {
                 </TabPanel>
 
             </SwipeableViews>
+        </div>
         </div>
     );
 }
