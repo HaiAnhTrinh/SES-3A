@@ -81,7 +81,7 @@ export default function MaterialTableDemo(props) {
 
         return (
             <div>
-                //Get the current size of the table
+                {/*Get the current size of the table*/}
                 <div ref={targetRef}>
 
                     <p hidden={true}>{dimensions.width}</p>
@@ -94,63 +94,14 @@ export default function MaterialTableDemo(props) {
                 icons={tableIcons}
                 title="Purchase History"
                 columns={[
-                    {
-                        title: 'Product', field: 'prod',
-                        cellStyle: {
-                            width: 20,
-                            maxWidth: 20
-                        },
-                        headerStyle: {
-                            width:20,
-                            maxWidth: 20
-                        }},
+                    {title: 'Product', field: 'name'},
                     /*Hidden attribute (boolean) will call the function isPhone
                     *If the size of table is small then hide the non required fields*/
-                    { title: 'Amount', field: 'amount', type: 'numeric', hidden: isPhone(),
-                        cellStyle: {
-                            width: 20,
-                            maxWidth: 20
-                        },
-                        headerStyle: {
-                            width:20,
-                            maxWidth: 20
-                        }},
-                    { title: 'Price', field: 'value' , initialEditValue: '$ ', hidden: isPhone(),
-                        cellStyle: {
-                            width: 20,
-                            maxWidth: 20
-                        },
-                        headerStyle: {
-                            width:20,
-                            maxWidth: 20
-                        }},
-                    { title: 'Category', field: 'cate',
-                        cellStyle: {
-                            width: 20,
-                            maxWidth: 20
-                        },
-                        headerStyle: {
-                            width:20,
-                            maxWidth: 20
-                        }},
-                    { title: 'Date of Purchase', field: 'dop', type: 'date',
-                        cellStyle: {
-                            width: 20,
-                            maxWidth: 20
-                        },
-                        headerStyle: {
-                            width:20,
-                            maxWidth: 20
-                        }},
-                    { title: 'Supplier', field: 'sup',
-                        cellStyle: {
-                            width: 20,
-                            maxWidth: 20
-                        },
-                        headerStyle: {
-                            width:20,
-                            maxWidth: 20
-                        }}
+                    { title: 'Amount', field: 'quantity', type: 'numeric', hidden: isPhone()},
+                    { title: 'Price', field: 'cost' , initialEditValue: '$ ', hidden: isPhone()},
+                    { title: 'Category', field: 'category'},
+                    { title: 'Date of Purchase', field: 'date', type: 'date'},
+                    { title: 'Supplier', field: 'supplier'}
                 ]}
                 /*data={[
                     {prod: 'Dio', amount: '1554', value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
@@ -187,9 +138,9 @@ export default function MaterialTableDemo(props) {
                             )
                                 .then(result => {
                                     console.log("Result: ", result)
-                                    console.log("Result data", result.data.products)
+                                    console.log("Result data", result.data.purchaseHistory)
                                     resolve({
-                                        data: result.data.products,
+                                        data: result.data.purchaseHistory,
                                         page: 0,
                                         totalCount: 0,
                                     })
@@ -198,10 +149,31 @@ export default function MaterialTableDemo(props) {
                                         console.log("Error", err);
                                     }
                                 )
-                        },6000)
+                        },600)
 
                     })
                 }
+
+                detailPanel={[
+                            {
+                                tooltip: 'Show Details',
+                                disabled: !isPhone(),
+                                render: rowData => {
+                                    return (
+                                        <div
+                                            style={{
+                                                textAlign: 'center'
+                                            }}
+                                        >
+
+                                            <p>Total amount: {rowData.quantity}</p>
+                                            <p>Total cost: {rowData.cost}</p>
+                                        </div>
+                                    )
+                                }
+                            }
+                    ]}
+
 
             />
             </div>
