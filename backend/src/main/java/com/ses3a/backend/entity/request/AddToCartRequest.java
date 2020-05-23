@@ -11,9 +11,12 @@ public class AddToCartRequest extends BaseRequest{
                             String productName,
                             String productPrice,
                             String productCategory,
+                            String productDescription,
+                            String productImageUrl,
                             String quantity,
                             String email){
-        this.product = new SupplierProduct(supplierEmail, productName, productPrice, null, productCategory);
+        this.product = new SupplierProduct(supplierEmail, productName, productPrice,
+                null, productDescription, productImageUrl, productCategory);
         this.setQuantity(quantity);
         this.setEmail(email);
     }
