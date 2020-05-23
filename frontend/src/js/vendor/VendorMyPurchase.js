@@ -18,11 +18,7 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import Axios from "axios";
 import * as firebase from "firebase";
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Hidden from '@material-ui/core/Hidden';
-import withWidth from '@material-ui/core/withWidth';
+
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -47,14 +43,6 @@ const tableIcons = {
 
 
 export default function MaterialTableDemo(props) {
-    /*state = {
-        purchases: [],
-        isPhone: false,
-    };
-
-    handleInputChange(value) {
-        this.setState({ isPhone: !this.state.isPhone });
-    }*/
 
     //Create state for the current size of the table
     const targetRef = useRef();
@@ -82,10 +70,9 @@ export default function MaterialTableDemo(props) {
 
     const currentUser = firebase.auth().currentUser;
     const email = props.match.params.email;
-    const [get, setGet] = React.useState([]);
     // const test = () =>setGet("Quan");
     // console.log("GetStart:", get);
-    console.log("PRops: ", props);
+    console.log("Props: ", props);
     console.log("Email: ", email);
 
 
@@ -94,10 +81,11 @@ export default function MaterialTableDemo(props) {
 
         return (
             <div>
+                //Get the current size of the table
                 <div ref={targetRef}>
 
-                    <p>{dimensions.width}</p>
-                    <p>{dimensions.height}</p>
+                    <p hidden={true}>{dimensions.width}</p>
+                    <p hidden={true}>{dimensions.height}</p>
 
                 </div>
 
@@ -127,7 +115,7 @@ export default function MaterialTableDemo(props) {
                             width:20,
                             maxWidth: 20
                         }},
-                    { title: 'Price', field: 'value' , type: 'numeric', hidden: isPhone(),
+                    { title: 'Price', field: 'value' , initialEditValue: '$ ', hidden: isPhone(),
                         cellStyle: {
                             width: 20,
                             maxWidth: 20
@@ -190,11 +178,10 @@ export default function MaterialTableDemo(props) {
                                 return request
                             });
 
-                            Axios.get("http://localhost:8080/GetUserProduct", {
+                            Axios.get("http://localhost:8080/GetVendorPurchase", {
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'email': email,
-                                        'role': 'Supplier'
+                                        'email': email
                                     }
                                 }
                             )
@@ -217,8 +204,6 @@ export default function MaterialTableDemo(props) {
                 }
 
             />
-
-
             </div>
         )
 
