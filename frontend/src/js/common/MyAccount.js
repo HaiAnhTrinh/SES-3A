@@ -176,9 +176,7 @@ export default function Account(props) {
                             {updatePasswordMessage}
                         </div>
                         :
-                        <div className={classes.errorMessage}>
-                            {dialogErrorMessage}
-                        </div>
+                        <p/>
                     }
                 </DialogContent>
                 <DialogActions>
