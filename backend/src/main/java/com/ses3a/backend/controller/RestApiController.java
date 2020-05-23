@@ -5,6 +5,7 @@ import com.ses3a.backend.entity.object.SupplierProduct;
 import com.ses3a.backend.entity.request.*;
 import com.ses3a.backend.entity.response.*;
 import com.ses3a.backend.firebase.FirebaseCartServices;
+import com.ses3a.backend.firebase.FirebasePurchaseServices;
 import com.ses3a.backend.firebase.FirebaseUserServices;
 import com.ses3a.backend.firebase.FirebaseProductServices;
 import org.springframework.http.HttpStatus;
@@ -20,13 +21,16 @@ public class RestApiController {
     final FirebaseUserServices firebaseUserServices;
     final FirebaseProductServices firebaseProductServices;
     final FirebaseCartServices firebaseCartServices;
+    final FirebasePurchaseServices firebasePurchaseServices;
 
     public RestApiController(FirebaseUserServices firebaseUserServices,
                              FirebaseProductServices firebaseProductServices,
-                             FirebaseCartServices firebaseCartServices) {
+                             FirebaseCartServices firebaseCartServices,
+                             FirebasePurchaseServices firebasePurchaseServices) {
         this.firebaseUserServices = firebaseUserServices;
         this.firebaseProductServices = firebaseProductServices;
         this.firebaseCartServices = firebaseCartServices;
+        this.firebasePurchaseServices = firebasePurchaseServices;
     }
 
     @CrossOrigin(origins = "*")
@@ -118,8 +122,15 @@ public class RestApiController {
                 new ResponseEntity<>(new GetUserProductResponse(), HttpStatus.OK);
         try{
             List<Object> userProducts = firebaseProductServices.getUserProducts(request);
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
             responseEntity.getBody().setProducts(userProducts);
+
+            if(role.equals("Business owner")){
+                List<Object> userOnlineProducts = firebaseProductServices.getUserOnlineProducts(request);
+                responseEntity.getBody().setOnlineProducts(userOnlineProducts);
+            }
+
+            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            Objects.requireNonNull(responseEntity.getBody()).setMessage("Returned all products belong to this user");
         }
         catch (Exception e){
             e.printStackTrace();
@@ -136,9 +147,15 @@ public class RestApiController {
         System.out.println("RECEIVED ADD PRODUCT REQUEST");
         ResponseEntity<AddProductResponse> responseEntity =
                 new ResponseEntity<>(new AddProductResponse(), HttpStatus.OK);
-        firebaseProductServices.addProduct(addProductRequest);
+        boolean added = firebaseProductServices.addProduct(addProductRequest);
         Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
-        responseEntity.getBody().setMessage("Product has been added");
+        if(added){
+            responseEntity.getBody().setMessage("Product has been added");
+        }
+        else {
+            responseEntity.getBody().setMessage("This product has already existed in the suppliers' stock");
+        }
+
         return responseEntity;
     }
 
@@ -234,6 +251,81 @@ public class RestApiController {
             responseEntity.getBody().setMessage("There is an error with your purchase");
         }
 
+        return responseEntity;
+    }
+
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/GetVendorPurchase")
+    public ResponseEntity<GetVendorPurchaseResponse>
+    getVendorPurchase(@RequestHeader String email){
+        System.out.println("RECEIVED GET VENDOR PURCHASE REQUEST");
+        GetVendorPurchaseRequest request = new GetVendorPurchaseRequest(email);
+        ResponseEntity<GetVendorPurchaseResponse> responseEntity =
+                new ResponseEntity<>(new GetVendorPurchaseResponse(), HttpStatus.OK);
+        try{
+            List<Object> products = firebasePurchaseServices.getVendorPurchase(request);
+            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            responseEntity.getBody().setPurchaseHistory(products);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return responseEntity;
+    }
+
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/GetSupplierPendingPurchase")
+    public ResponseEntity<GetSupplierPendingPurchaseResponse>
+    getSupplierPendingPurchase(@RequestHeader String email){
+        System.out.println("RECEIVED GET SUPPLIER PENDING PURCHASE REQUEST");
+        GetSupplierPendingPurchaseRequest request = new GetSupplierPendingPurchaseRequest(email);
+        ResponseEntity<GetSupplierPendingPurchaseResponse> responseEntity =
+                new ResponseEntity<>(new GetSupplierPendingPurchaseResponse(), HttpStatus.OK);
+        try{
+            List<Object> products = firebasePurchaseServices.getSupplierPendingPurchase(request);
+            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            responseEntity.getBody().setPendingPurchases(products);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return responseEntity;
+    }
+
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/GetSupplierDeliveredPurchase")
+    public ResponseEntity<GetSupplierDeliveredPurchaseResponse>
+    getSupplierDeliveredPurchase(@RequestHeader String email){
+        System.out.println("RECEIVED GET SUPPLIER DELIVERED PURCHASE REQUEST");
+        GetSupplierDeliveredPurchaseRequest request = new GetSupplierDeliveredPurchaseRequest(email);
+        ResponseEntity<GetSupplierDeliveredPurchaseResponse> responseEntity =
+                new ResponseEntity<>(new GetSupplierDeliveredPurchaseResponse(), HttpStatus.OK);
+        try{
+            List<Object> products = firebasePurchaseServices.getSupplierDeliveredPurchase(request);
+            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            responseEntity.getBody().setDeliveredPurchases(products);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return responseEntity;
+    }
+
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/AddToDeliveredPurchase")
+    public ResponseEntity<BaseResponse>
+    addToDeliveredPurchase(@RequestBody AddDeliveredPurchaseRequest addDeliveredPurchaseRequest){
+        System.out.println("RECEIVED ADD TO DELIVERED PURCHASE REQUEST");
+        ResponseEntity<BaseResponse> responseEntity =
+                new ResponseEntity<>(new BaseResponse(), HttpStatus.OK);
+        firebasePurchaseServices.pendingToDelivered(addDeliveredPurchaseRequest);
+
+        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        responseEntity.getBody().setMessage("Purchase id " + addDeliveredPurchaseRequest.getId() + " moved to delivered");
         return responseEntity;
     }
 }

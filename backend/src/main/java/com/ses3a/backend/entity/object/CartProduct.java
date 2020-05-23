@@ -8,21 +8,23 @@ public class CartProduct {
     private String quantity;
     private String cost;
     private String category;
+    private String description;
+    private String imageUrl;
 
     public CartProduct(){
     }
 
-    public CartProduct(String name,
-                       String supplier,
-                       String price,
-                       String quantity,
-                       String cost) {
-        this.name = name;
-        this.supplier = supplier;
-        this.price = price;
-        this.quantity = quantity;
-        this.cost = cost;
-    }
+//    public CartProduct(String name,
+//                       String supplier,
+//                       String price,
+//                       String quantity,
+//                       String cost) {
+//        this.name = name;
+//        this.supplier = supplier;
+//        this.price = price;
+//        this.quantity = quantity;
+//        this.cost = cost;
+//    }
 
     public String getName() {
         return name;
@@ -70,6 +72,22 @@ public class CartProduct {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
 }

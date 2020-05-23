@@ -3,6 +3,8 @@ package com.ses3a.backend.firebase;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
 
 public class FirebaseUtils {
@@ -13,6 +15,13 @@ public class FirebaseUtils {
             return "vendors";
         }
         return "suppliers";
+    }
+
+    //Generate current date in the format: "dd-MM-yyyy"
+    protected static String getFormattedDate(){
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatObject = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return currentDate.format(formatObject);
     }
 
     //Get the collection of a user: node 'users'
@@ -30,12 +39,15 @@ public class FirebaseUtils {
     }
 
     //Get the collection of a vendor product: node 'users'
+    //online products must have supplier field
     protected static CollectionReference getOneVendorProduct(Firestore firestore, String email,
                                                        String productName, String productSupplier){
         if(productSupplier != null && productSupplier.length() > 0){
             String productId = productSupplier.concat("-").concat(productName);
-            CollectionReference userRef = getUserCollection(firestore, "vendors", email);
-            return userRef.document("onlineProducts").collection(productId);
+//            CollectionReference userRef = getUserCollection(firestore, "vendors", email);
+            return getUserCollection(firestore, "vendors", email)
+                    .document("onlineProducts")
+                    .collection(productId);
         }
 
         return getUserCollection(firestore, "vendors", email)

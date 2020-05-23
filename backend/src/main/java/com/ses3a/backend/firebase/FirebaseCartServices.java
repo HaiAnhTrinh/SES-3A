@@ -104,14 +104,13 @@ public class FirebaseCartServices {
 
 
     //Make the purchase
-    //Update supplier stocks
+    //Update vendor and supplier stocks
     //Update the market stocks
+    //Update vendor and supplier purchase record
     //Clear the cart
-    //TODO: add to vendors stocks
     public boolean purchase(PurchaseRequest request) {
         Firestore firestore = FirestoreClient.getFirestore();
         AtomicBoolean flag = new AtomicBoolean(true);
-        WriteBatch batch = firestore.batch();
 
         for (CartProduct cartProduct: request.getCartProducts()){
             ApiFuture<String> futureTransaction = firestore.runTransaction(transaction -> {
@@ -128,9 +127,19 @@ public class FirebaseCartServices {
                                 .document(cartProduct.getCategory())
                                 .collection(cartProduct.getSupplier())
                                 .document(cartProduct.getName());
-//                DocumentSnapshot marketProductSnapshot = transaction.get(productsProductRef).get();
 
-                Map<String, Object> transactionDetail = new HashMap<>();
+                //ref to the vendor purchase record
+                CollectionReference vendorPurchaseRef =
+                        firestore.collection("vendorPurchases")
+                                .document(request.getEmail())
+                                .collection("purchaseHistory");
+
+                //ref to the supplier purchase record
+                CollectionReference supplierPendingPurchaseRef =
+                        firestore.collection("supplierPurchases")
+                                .document(cartProduct.getSupplier())
+                                .collection("pendingPurchases");
+
                 int supplierQuantity = Integer.parseInt(Objects.requireNonNull(supplierProductSnapshot.get("quantity")).toString());
                 int requestQuantity = Integer.parseInt(cartProduct.getQuantity());
                 int result =  supplierQuantity - requestQuantity;
@@ -141,24 +150,51 @@ public class FirebaseCartServices {
                     transaction.update(productsProductRef, "quantity", String.valueOf(result));
                 }
                 else{
+                    System.out.println("not sufficient");
                     flag.set(false);
+                    System.out.println("flag in case of insufficient: " + flag.toString());
                     return "Fail";
                 }
 
-                //clear the cart, add to vendor stock
+                //clear the cart, add to vendor stock, vendor purchase and supplier pending purchase
+                //if the product already exists on the vendors onlineProduct, do update instead of add
                 FirebaseProductServices firebaseProductServices = new FirebaseProductServices();
+                FirebasePurchaseServices firebasePurchaseServices = new FirebasePurchaseServices();
                 RemoveFromCartRequest removeRequest =
                         new RemoveFromCartRequest(request.getEmail(), cartProduct.getName(), cartProduct.getSupplier());
-                AddProductRequest addRequest =
-                        new AddProductRequest(request.getEmail(), "Business owner", cartProduct.getName(), cartProduct.getPrice(),
-                                cartProduct.getQuantity(), cartProduct.getCategory(), cartProduct.getSupplier());
+
+                if(!FirebaseUtils.vendorHasProduct(firestore, request.getEmail(),
+                        cartProduct.getName(), cartProduct.getSupplier())) {
+                    AddProductRequest addRequest =
+                            new AddProductRequest(request.getEmail(), "Business owner", cartProduct.getName(),
+                                    cartProduct.getPrice(), cartProduct.getQuantity(), cartProduct.getDescription(),
+                                    cartProduct.getImageUrl(), cartProduct.getCategory(), cartProduct.getSupplier());
+                    firebaseProductServices.addProduct(addRequest);
+                }
+                else {
+                    String currentQuantity = FirebaseUtils
+                            .getOneVendorProduct(firestore, request.getEmail(), cartProduct.getName(), cartProduct.getSupplier())
+                            .document("info")
+                            .get()
+                            .get()
+                            .get("quantity").toString();
+                    String newQuantity = String.valueOf(Integer.parseInt(currentQuantity) + requestQuantity);
+                    EditProductRequest editRequest =
+                            new EditProductRequest(request.getEmail(), "Business owner", cartProduct.getName(),
+                                    cartProduct.getPrice(), newQuantity, cartProduct.getCategory(),
+                                    cartProduct.getDescription(), cartProduct.getSupplier());
+                    firebaseProductServices.editProduct(editRequest);
+                }
+
                 removeFromCart(removeRequest);
-                firebaseProductServices.addProduct(addRequest);
+                firebasePurchaseServices.addConfirmedPurchase(vendorPurchaseRef, cartProduct);
+                firebasePurchaseServices.addConfirmedPurchase(supplierPendingPurchaseRef, cartProduct);
 
                 return "Success";
             });
         }
-
-        return flag.compareAndSet(true, true);
+        System.out.println("flag in the end: " + flag.toString());
+        return flag.get();
     }
+
 }

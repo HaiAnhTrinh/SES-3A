@@ -5,6 +5,7 @@ public class EditProductRequest extends BaseRequest{
     private String name;
     private String price;
     private String quantity;
+    private String description;
     private String category;
     private String supplier;
 
@@ -14,6 +15,7 @@ public class EditProductRequest extends BaseRequest{
                               String price,
                               String quantity,
                               String category,
+                              String description,
                               String supplier){
         this.setEmail(email);
         this.setRole(role);
@@ -21,6 +23,7 @@ public class EditProductRequest extends BaseRequest{
         this.setPrice(price);
         this.setQuantity(quantity);
         this.setCategory(category);
+        this.setDescription(description);
         this.setSupplier(supplier);
     }
 
@@ -62,5 +65,13 @@ public class EditProductRequest extends BaseRequest{
 
     public void setSupplier(String supplier) {
         this.supplier = supplier;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
