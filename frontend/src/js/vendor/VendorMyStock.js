@@ -93,8 +93,8 @@ export default function MaterialTableDemo(props) {
         <div>
             <div ref={targetRef}>
 
-                <p>{dimensions.width}</p>
-                <p>{dimensions.height}</p>
+                <p hidden={true}> {dimensions.width}</p>
+                <p hidden={true}>{dimensions.height}</p>
 
             </div>
 
@@ -143,6 +143,24 @@ export default function MaterialTableDemo(props) {
                                         width:20,
                                         maxWidth: 20
                                     }},
+                                { title: 'Unit', field: 'productUnit',hidden: isPhone(),
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Description', field: 'productDescription',hidden: isPhone(),
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
                                 { title: 'Category', field: 'productCategory',
                                     cellStyle: {
                                         width: 20,
@@ -161,6 +179,7 @@ export default function MaterialTableDemo(props) {
                                         width:20,
                                         maxWidth: 20
                                     }},
+
                                 //{ title: 'Photo', field: 'photoUrl', render: rowData => <img src={rowData.photoURL} style={{width: 40, borderRadius: '50%'}}/> },
                             ]
                         }
@@ -208,12 +227,14 @@ export default function MaterialTableDemo(props) {
                                         Axios.post("http://localhost:8080/AddProduct",
                                             {
                                                 'email': email,
-                                                'role': 'Supplier',
                                                 'name': newData.productName,
                                                 'price': newData.productPrice,
                                                 'supplier': "",
                                                 'quantity': newData.productQuantity,
                                                 'category': newData.productCategory,
+                                                'description': newData.productDescription,
+                                                'imageUrl':"",
+                                                'role': 'Supplier',
                                             },
                                             {
                                                 headers: {
@@ -248,6 +269,7 @@ export default function MaterialTableDemo(props) {
                                                 'price': newData.productPrice,
                                                 'quantity': newData.productQuantity,
                                                 'category': newData.productCategory,
+                                                'description': newData.productDescription,
                                                 'supplier':""
 
                                             },
@@ -303,12 +325,69 @@ export default function MaterialTableDemo(props) {
                         title="Current Stock"
                         columns={
                             [
-                                { title: 'Name', field: 'productName' },
-                                { title: 'Quantity', field: 'productQuantity', type: 'numeric' },
-                                { title: 'Unit', field: 'unit'},
-                                { title: 'Category', field: 'productCategory'},
-                                { title: 'Price', field: 'productPrice', initialEditValue: '$ '},
-                                { title: 'Supplier', field: 'supplier'},
+                                { title: 'Name', field: 'productName',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Quantity', field: 'productQuantity', type: 'numeric',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Unit', field: 'productUnit',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Description', field: 'productDescription',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Category', field: 'productCategory',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Price', field: 'productPrice', initialEditValue: '$ ',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
+                                { title: 'Supplier', field: 'supplier',
+                                    cellStyle: {
+                                        width: 20,
+                                        maxWidth: 20
+                                    },
+                                    headerStyle: {
+                                        width:20,
+                                        maxWidth: 20
+                                    }},
                                 //{ title: 'Photo', field: 'photoUrl', render: rowData => <img src={rowData.photoURL} style={{width: 40, borderRadius: '50%'}}/> },
                             ]
                         }
@@ -365,6 +444,7 @@ export default function MaterialTableDemo(props) {
                                                 'price': newData.productPrice,
                                                 'quantity': newData.productQuantity,
                                                 'category': newData.productCategory,
+                                                'description': newData.productDescription,
                                                 'supplier':""
 
                                             },
