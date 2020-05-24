@@ -11,7 +11,7 @@
     "axios": "^0.19.2",
     "firebase": "^7.14.1",
     "material-table": "1.57.2",
-    "prop-types": "latest",
+    "prop-types": "15.6.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",

@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef, useLayoutEffect} from 'react';
+import React, {useEffect, useState, useRef, useLayoutEffect, forwardRef} from 'react';
 import MaterialTable from 'material-table';
 import Axios from "axios";
 import * as firebase from "firebase";
@@ -10,6 +10,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -110,7 +111,7 @@ export default function MaterialTableDemo(props) {
                     variant="fullWidth"
                     aria-label="full width tabs example"
                 >
-                    <Tab label="Un-Market Stock" {...a11yProps(0)} />
+                    <Tab label="Non-Market Stock" {...a11yProps(0)} />
                     <Tab label="Market Stock" {...a11yProps(1)} />
                 </Tabs>
             </AppBar>
@@ -121,64 +122,16 @@ export default function MaterialTableDemo(props) {
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
                     <MaterialTable
-                        tableLayout = 'auto'
                         title="Current Stock"
                         columns={
                             [
-                                { title: 'Name', field: 'productName',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Quantity', field: 'productQuantity', type: 'numeric',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Unit', field: 'productUnit',hidden: isPhone(),
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Description', field: 'productDescription',hidden: isPhone(),
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Category', field: 'productCategory',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Price', field: 'productPrice', initialEditValue: '$ ',hidden: isPhone(),
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
+                                { title: 'Name', field: 'productName', editable: 'onAdd',},
+                                { title: '', field: 'productImage', editable: 'never',},
+                                { title: 'Quantity', field: 'productQuantity', type: 'numeric'},
+                                // { title: 'Unit', field: 'productUnit',hidden: isPhone(),},
+                                { title: 'Category', field: 'productCategory',},
+                                { title: 'Price', field: 'productPrice', type: 'numeric', initialEditValue: '$',hidden: isPhone()},
+                                { title: 'Description', field: 'productDescription',hidden: isPhone()},
 
                                 //{ title: 'Photo', field: 'photoUrl', render: rowData => <img src={rowData.photoURL} style={{width: 40, borderRadius: '50%'}}/> },
                             ]
@@ -216,14 +169,42 @@ export default function MaterialTableDemo(props) {
 
                             })
                         }
+
+                        detailPanel={[
+                            {
+                                tooltip: 'Show Details',
+                                disabled: !isPhone(),
+                                render: rowData => {
+                                    return (
+                                        <div
+                                            style={{
+                                                textAlign: 'center'
+                                            }}
+                                        >
+                                            <p>Description: {rowData.productDescription}</p>
+                                            <p>Total cost: {rowData.productPrice}</p>
+                                        </div>
+                                    )
+                                }
+                            }
+                        ]}
+
+                        actions={[
+                            {
+                                icon: 'addImageIcon',
+                                tooltip: 'Add Image',
+                                onClick: (event, rowData) => alert("Adding Image")
+                            },
+                        ]}
+
+
+
                         editable={{
                             onRowAdd: (newData) =>
                                 new Promise((resolve) =>{
                                     console.log(newData);
                                     setTimeout(() => {
                                         resolve();
-                                        console.log("QUAN");
-                                        console.log("EMAIL: ", email);
                                         Axios.post("http://localhost:8080/AddProduct",
                                             {
                                                 'email': email,
@@ -318,6 +299,7 @@ export default function MaterialTableDemo(props) {
 
                                 }),
                         }}
+
                     />
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
@@ -325,69 +307,13 @@ export default function MaterialTableDemo(props) {
                         title="Current Stock"
                         columns={
                             [
-                                { title: 'Name', field: 'productName',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Quantity', field: 'productQuantity', type: 'numeric',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Unit', field: 'productUnit',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Description', field: 'productDescription',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Category', field: 'productCategory',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Price', field: 'productPrice', initialEditValue: '$ ',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
-                                { title: 'Supplier', field: 'supplier',
-                                    cellStyle: {
-                                        width: 20,
-                                        maxWidth: 20
-                                    },
-                                    headerStyle: {
-                                        width:20,
-                                        maxWidth: 20
-                                    }},
+                                { title: 'Name', field: 'productName', editable: 'never',},
+                                { title: 'Quantity', field: 'productQuantity', type: 'numeric', },
+                                // { title: 'Unit', field: 'productUnit', editable: 'never'},
+                                { title: 'Category', field: 'productCategory', editable: 'never'},
+                                { title: 'Price', field: 'productPrice', initialEditValue: '$', editable: 'never', hidden: isPhone()},
+                                { title: 'Supplier', field: 'supplier', editable: 'never'},
+                                { title: 'Description', field: 'productDescription', editable: 'never', hidden: isPhone()},
                                 //{ title: 'Photo', field: 'photoUrl', render: rowData => <img src={rowData.photoURL} style={{width: 40, borderRadius: '50%'}}/> },
                             ]
                         }
@@ -424,6 +350,25 @@ export default function MaterialTableDemo(props) {
 
                             })
                         }
+                        detailPanel={[
+                            {
+                                tooltip: 'Show Details',
+                                disabled: !isPhone(),
+                                render: rowData => {
+                                    return (
+                                        <div
+                                            style={{
+                                                textAlign: 'center'
+                                            }}
+                                        >
+
+                                            <p>Description: {rowData.productDescription}</p>
+                                            <p>Total cost: {rowData.productPrice}</p>
+                                        </div>
+                                    )
+                                }
+                            }
+                        ]}
                         editable={{
                             onRowUpdate: (newData, oldData) =>
                                 new Promise((resolve) =>{
