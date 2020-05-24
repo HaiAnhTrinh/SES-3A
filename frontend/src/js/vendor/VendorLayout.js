@@ -166,7 +166,7 @@ export default function VendorLayout(props) {
                     <div>
                         <Route path="/Vendor/:email/Home" exact strict component={Home}/>
                         <Route path="/Vendor/:email/MyStock" exact strict component={MyStock}/>
-                        <Route path="/Vendor/:email/MyPurchase" exact strict component={MyPurchase}/>
+                        {/*<Route path="/Vendor/:email/MyPurchase" exact strict component={MyPurchase}/>*/}
                         <Route path="/Vendor/:email/MyCart" exact strict component={MyCart}/>
                         <Route path="/Vendor/:email/Graph" exact strict component={Graph}/>
                         <Route path="/Vendor/:email/MyAccount" exact strict component={Account}/>
