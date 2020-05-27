@@ -91,358 +91,380 @@ export default function MaterialTableDemo(props) {
     }
 
     return (
-        <div>
-            <div ref={targetRef}>
-
-                <p hidden={true}> {dimensions.width}</p>
-                <p hidden={true}>{dimensions.height}</p>
-
-            </div>
-
-
-
-            <div className={classes.root}>
-            <AppBar position="static" color="default">
-                <Tabs
-                    value={value}
-                    onChange={handleChange}
-                    indicatorColor="primary"
-                    textColor="primary"
-                    variant="fullWidth"
-                    aria-label="full width tabs example"
-                >
-                    <Tab label="Non-Market Stock" {...a11yProps(0)} />
-                    <Tab label="Market Stock" {...a11yProps(1)} />
-                </Tabs>
-            </AppBar>
-            <SwipeableViews
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value}
-                onChangeIndex={handleChangeIndex}
+    <div className={classes.root}>
+        <AppBar position="static" color="default">
+            <Tabs
+                value={value}
+                onChange={handleChange}
+                indicatorColor="primary"
+                textColor="primary"
+                variant="fullWidth"
+                aria-label="full width tabs example"
             >
-                <TabPanel value={value} index={0} dir={theme.direction}>
-                    <MaterialTable
-                        title="Current Stock"
-                        columns={
-                            [
-                                { title: 'Name', field: 'productName', editable: 'onAdd',},
-                                { title: '', field: 'productImage', editable: 'never',},
-                                { title: 'Quantity', field: 'productQuantity', type: 'numeric'},
-                                // { title: 'Unit', field: 'productUnit',hidden: isPhone(),},
-                                { title: 'Category', field: 'productCategory',},
-                                { title: 'Price', field: 'productPrice', type: 'numeric', initialEditValue: '$',hidden: isPhone()},
-                                { title: 'Description', field: 'productDescription',hidden: isPhone()},
+                <Tab label="Non-Market Stock" {...a11yProps(0)} />
+                <Tab label="Market Stock" {...a11yProps(1)} />
+            </Tabs>
+        </AppBar>
+        <SwipeableViews
+            axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+            index={value}
+            onChangeIndex={handleChangeIndex}
+        >
+            <TabPanel value={value} index={0} dir={theme.direction}>
+                <div ref={targetRef}>
 
-                                //{ title: 'Photo', field: 'photoUrl', render: rowData => <img src={rowData.photoURL} style={{width: 40, borderRadius: '50%'}}/> },
-                            ]
-                        }
-                        data={() =>
-                            new Promise((resolve) => {
-                                setTimeout(() => {
-                                    Axios.interceptors.request.use(request => {
-                                        console.log('Starting Request', request)
-                                        return request
-                                    });
+                    <p hidden={true}> {dimensions.width}</p>
+                    <p hidden={true}>{dimensions.height}</p>
 
-                                    Axios.get("http://localhost:8080/GetUserProduct", {
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'email': email,
-                                                'role': 'Supplier'
-                                            }
+                </div>
+                <MaterialTable
+                    title="Current Stock"
+                    columns={
+                        [
+                            { title: 'Name', field: 'productName', editable: 'onAdd',},
+                            { title: 'Quantity', field: 'productQuantity', type: 'numeric', min:0},
+                            // { title: 'Unit', field: 'productUnit',hidden: isPhone(),},
+                            { title: 'Category', field: 'productCategory',},
+                            { title: 'Price', field: 'productPrice', type: 'currency',hidden: isPhone()},
+                            { title: 'Description', field: 'productDescription',hidden: isPhone()},
+                        ]
+                    }
+                    data={
+                        (query) =>
+                        new Promise((resolve) => {
+                            setTimeout(() => {
+                                Axios.interceptors.request.use(request => {
+                                    console.log('Starting Request', request)
+                                    return request
+                                });
+
+                                Axios.get("http://localhost:8080/GetUserProduct", {
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'email': email,
+                                            'role': 'Business owner'
+                                        }
+                                    }
+                                )
+                                    .then(result => {
+                                        console.log("Result: ", result)
+                                        console.log("Result data", result.data.products)
+                                        var data = [];
+                                        for (var i = query.pageSize * (query.page+1) - query.pageSize;
+                                             i <= query.pageSize * (query.page+1) - 1; i++)
+                                             {
+                                                 if(i +1 > result.data.products.length){
+                                                    break;}
+                                                 else{
+                                                     data.push(result.data.products[i]);
+                                                 }
+                                             }
+                                        resolve({
+                                            data: data,
+                                            page: query.page,
+                                            totalCount: result.data.products.length,
+                                        })
+                                    })
+                                    .catch((err) => {
+                                            console.log("Error", err);
                                         }
                                     )
-                                        .then(result => {
-                                            console.log("Result: ", result)
-                                            console.log("Result data", result.data.products)
-                                            resolve({
-                                                data: result.data.products,
-                                                page: 0,
-                                                totalCount: 0,
-                                            })
+                            },600)
+                        })
+                    }
+
+                    detailPanel={[
+                        {
+                            tooltip: 'Show Details',
+                            disabled: !isPhone(),
+                            render: rowData => {
+                                return (
+                                    <div
+                                        style={{
+                                            textAlign: 'center'
+                                        }}
+                                    >
+                                        <p>Description: {rowData.productDescription}</p>
+                                        <p>Total cost: {rowData.productPrice}</p>
+                                    </div>
+                                )
+                            }
+                        }
+                    ]}
+
+                    actions={[
+                        {
+                            icon: 'addImageIcon',
+                            tooltip: 'Add Image',
+                            onClick: (event, rowData) => alert("Added Image")
+                        },
+                        {
+                            icon: 'image',
+                            tooltip: 'Show Image',
+                            onClick: (event, rowData) => alert("Showing Image"),
+                        }
+                    ]}
+
+                    options={{
+                        actionsColumnIndex: -1
+                    }}
+
+                    editable={{
+                        onRowAdd: (newData) =>
+                            new Promise((resolve) =>{
+                                console.log(newData);
+                                setTimeout(message => {
+                                    resolve();
+                                    Axios.post("http://localhost:8080/AddProduct",
+                                        {
+                                            'email': email,
+                                            'name': newData.productName,
+                                            'price': newData.productPrice,
+                                            'supplier': "",
+                                            'quantity': newData.productQuantity,
+                                            'category': newData.productCategory,
+                                            'description': newData.productDescription,
+                                            'imageUrl':"",
+                                            'role': 'Business owner',
+                                        },
+                                        {
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            }
                                         })
+                                        .then(response => console.log(response))
+                                        .catch((err) => {
+                                                alert("Invalid Input");
+                                            }
+                                        )
+
+                                }, 600)
+
+                            }),
+                        onRowUpdate: (newData, oldData) =>
+                            new Promise((resolve) =>{
+                                console.log(newData);
+                                setTimeout(() => {
+                                    resolve();
+                                    console.log("QUAN");
+                                    console.log("EMAIL: ", email);
+                                    Axios.interceptors.request.use(request => {
+                                        console.log('Edit Request', request)
+                                        return request
+                                    });
+                                    Axios.post("http://localhost:8080/EditProduct",
+                                        {
+                                            'email': email,
+                                            'role': 'Business owner',
+                                            'name': newData.productName,
+                                            'price': newData.productPrice,
+                                            'quantity': newData.productQuantity,
+                                            'category': newData.productCategory,
+                                            'description': newData.productDescription,
+                                            'supplier':""
+
+                                        },
+                                        {
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            }
+                                        })
+                                        .then(response => console.log(response))
                                         .catch((err) => {
                                                 console.log("Error", err);
                                             }
                                         )
-                                },600)
 
-                            })
-                        }
+                                }, 600)
 
-                        detailPanel={[
-                            {
-                                tooltip: 'Show Details',
-                                disabled: !isPhone(),
-                                render: rowData => {
-                                    return (
-                                        <div
-                                            style={{
-                                                textAlign: 'center'
-                                            }}
-                                        >
-                                            <p>Description: {rowData.productDescription}</p>
-                                            <p>Total cost: {rowData.productPrice}</p>
-                                        </div>
-                                    )
-                                }
-                            }
-                        ]}
-
-                        actions={[
-                            {
-                                icon: 'addImageIcon',
-                                tooltip: 'Add Image',
-                                onClick: (event, rowData) => alert("Adding Image")
-                            },
-                        ]}
-
-
-
-                        editable={{
-                            onRowAdd: (newData) =>
-                                new Promise((resolve) =>{
-                                    console.log(newData);
-                                    setTimeout(() => {
-                                        resolve();
-                                        Axios.post("http://localhost:8080/AddProduct",
-                                            {
-                                                'email': email,
-                                                'name': newData.productName,
-                                                'price': newData.productPrice,
-                                                'supplier': "",
-                                                'quantity': newData.productQuantity,
-                                                'category': newData.productCategory,
-                                                'description': newData.productDescription,
-                                                'imageUrl':"",
-                                                'role': 'Supplier',
-                                            },
-                                            {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                }
-                                            })
-                                            .then(response => console.log(response))
-                                            .catch((err) => {
-                                                    console.log("Error", err);
-                                                }
-                                            )
-
-                                    }, 600)
-
-                                }),
-                            onRowUpdate: (newData, oldData) =>
-                                new Promise((resolve) =>{
-                                    console.log(newData);
-                                    setTimeout(() => {
-                                        resolve();
-                                        console.log("QUAN");
-                                        console.log("EMAIL: ", email);
-                                        Axios.interceptors.request.use(request => {
-                                            console.log('Edit Request', request)
-                                            return request
-                                        });
-                                        Axios.post("http://localhost:8080/EditProduct",
-                                            {
-                                                'email': email,
-                                                'role': 'Supplier',
-                                                'name': newData.productName,
-                                                'price': newData.productPrice,
-                                                'quantity': newData.productQuantity,
-                                                'category': newData.productCategory,
-                                                'description': newData.productDescription,
-                                                'supplier':""
-
-                                            },
-                                            {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                }
-                                            })
-                                            .then(response => console.log(response))
-                                            .catch((err) => {
-                                                    console.log("Error", err);
-                                                }
-                                            )
-
-                                    }, 600)
-
-                                }),
-                            onRowDelete: (oldData) =>
-                                new Promise((resolve) =>{
-                                    setTimeout(() => {
-                                        resolve();
-                                        Axios.interceptors.request.use(request => {
-                                            console.log('Delete Request', request)
-                                            return request
-                                        });
-                                        Axios.post("http://localhost:8080/DeleteProduct",
-                                            {
-                                                'email': email,
-                                                'role': 'Supplier',
-                                                'name': oldData.productName,
-                                                'category': oldData.productCategory,
-
-                                            },
-                                            {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                }
-                                            })
-                                            .then(response => console.log("Delete Reponse", response))
-                                            .catch((err) => {
-                                                    console.log("Error", err);
-                                                }
-                                            )
-
-                                    }, 600)
-
-                                }),
-                        }}
-
-                    />
-                </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
-                    <MaterialTable
-                        title="Current Stock"
-                        columns={
-                            [
-                                { title: 'Name', field: 'productName', editable: 'never',},
-                                { title: 'Quantity', field: 'productQuantity', type: 'numeric', },
-                                // { title: 'Unit', field: 'productUnit', editable: 'never'},
-                                { title: 'Category', field: 'productCategory', editable: 'never'},
-                                { title: 'Price', field: 'productPrice', initialEditValue: '$', editable: 'never', hidden: isPhone()},
-                                { title: 'Supplier', field: 'supplier', editable: 'never'},
-                                { title: 'Description', field: 'productDescription', editable: 'never', hidden: isPhone()},
-                                //{ title: 'Photo', field: 'photoUrl', render: rowData => <img src={rowData.photoURL} style={{width: 40, borderRadius: '50%'}}/> },
-                            ]
-                        }
-                        data={() =>
-                            new Promise((resolve) => {
+                            }),
+                        onRowDelete: (oldData) =>
+                            new Promise((resolve) =>{
                                 setTimeout(() => {
+                                    resolve();
                                     Axios.interceptors.request.use(request => {
-                                        console.log('Starting Request', request)
+                                        console.log('Delete Request', request)
                                         return request
                                     });
+                                    Axios.post("http://localhost:8080/DeleteProduct",
+                                        {
+                                            'email': email,
+                                            'role': 'Business owner',
+                                            'name': oldData.productName,
+                                            'category': oldData.productCategory,
 
-                                    Axios.get("http://localhost:8080/GetUserProduct", {
+                                        },
+                                        {
                                             headers: {
                                                 'Content-Type': 'application/json',
-                                                'email': email,
-                                                'role': 'Supplier'
                                             }
-                                        }
-                                    )
-                                        .then(result => {
-                                            console.log("Result: ", result)
-                                            console.log("Result data", result.data.products)
-                                            resolve({
-                                                data: result.data.products,
-                                                page: 0,
-                                                totalCount: 0,
-                                            })
                                         })
+                                        .then(response => console.log("Delete Reponse", response))
                                         .catch((err) => {
                                                 console.log("Error", err);
                                             }
                                         )
-                                },600)
 
-                            })
-                        }
-                        detailPanel={[
-                            {
-                                tooltip: 'Show Details',
-                                disabled: !isPhone(),
-                                render: rowData => {
-                                    return (
-                                        <div
-                                            style={{
-                                                textAlign: 'center'
-                                            }}
-                                        >
+                                }, 600)
 
-                                            <p>Description: {rowData.productDescription}</p>
-                                            <p>Total cost: {rowData.productPrice}</p>
-                                        </div>
+                            }),
+                    }}
+
+                />
+            </TabPanel>
+            <TabPanel value={value} index={1} dir={theme.direction}>
+
+                <MaterialTable
+                    title="Current Stock"
+                    columns={
+                        [
+                            { title: 'Name', field: 'productName', editable: 'never',},
+                            { title: 'Quantity', field: 'productQuantity', type: 'numeric', },
+                            // { title: 'Unit', field: 'productUnit', editable: 'never'},
+                            { title: 'Category', field: 'productCategory', editable: 'never'},
+                            { title: 'Price', field: 'productPrice', initialEditValue: '$', editable: 'never', hidden: isPhone()},
+                            { title: 'Supplier', field: 'supplierEmail', editable: 'never'},
+                            { title: 'Description', field: 'productDescription', editable: 'never', hidden: isPhone()},
+                        ]
+                    }
+                    data={(query) =>
+                        new Promise((resolve) => {
+                            setTimeout(() => {
+
+                                Axios.get("http://localhost:8080/GetUserProduct", {
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'email': email,
+                                            'role': 'Business owner'
+                                        }
+                                    }
+                                )
+                                    .then(result => {
+                                        console.log("Result: ", result)
+                                        console.log("Result data onlineProducts", result.data.onlineProducts)
+
+                                        var data = [];
+                                        for (var i = query.pageSize * (query.page+1) - query.pageSize;
+                                             i <= query.pageSize * (query.page+1) - 1; i++)
+                                        {
+                                            if(i +1 > result.data.onlineProducts.length){
+                                                break;}
+                                            else{
+                                                data.push(result.data.onlineProducts[i]);
+                                            }
+                                        }
+                                        resolve({
+                                            data: data,
+                                            page: query.page,
+                                            totalCount: result.data.onlineProducts.length,
+                                        })
+                                    })
+                                    .catch((err) => {
+                                            console.log("Error", err);
+                                        }
                                     )
-                                }
+                            },600)
+
+                        })
+                    }
+                    detailPanel={[
+                        {
+                            tooltip: 'Show Details',
+                            disabled: !isPhone(),
+                            render: rowData => {
+                                return (
+                                    <div
+                                        style={{
+                                            textAlign: 'center'
+                                        }}
+                                    >
+
+                                        <p>Description: {rowData.productDescription}</p>
+                                        <p>Total cost: {rowData.productPrice}</p>
+                                    </div>
+                                )
                             }
-                        ]}
-                        editable={{
-                            onRowUpdate: (newData, oldData) =>
-                                new Promise((resolve) =>{
-                                    console.log(newData);
-                                    setTimeout(() => {
-                                        resolve();
-                                        console.log("QUAN");
-                                        console.log("EMAIL: ", email);
-                                        Axios.interceptors.request.use(request => {
-                                            console.log('Edit Request', request)
-                                            return request
-                                        });
-                                        Axios.post("http://localhost:8080/EditProduct",
-                                            {
-                                                'email': email,
-                                                'role': 'Supplier',
-                                                'name': newData.productName,
-                                                'price': newData.productPrice,
-                                                'quantity': newData.productQuantity,
-                                                'category': newData.productCategory,
-                                                'description': newData.productDescription,
-                                                'supplier':""
+                        }
+                    ]}
+                    editable={{
+                        onRowUpdate: (newData, oldData) =>
+                            new Promise((resolve) =>{
+                                console.log(newData);
+                                setTimeout(() => {
+                                    resolve();
+                                    console.log("QUAN");
+                                    console.log("EMAIL: ", email);
+                                    Axios.interceptors.request.use(request => {
+                                        console.log('Edit Request', request)
+                                        return request
+                                    });
+                                    Axios.post("http://localhost:8080/EditProduct",
+                                        {
+                                            'email': email,
+                                            'role': 'Business owner',
+                                            'name': newData.productName,
+                                            'price': newData.productPrice,
+                                            'quantity': newData.productQuantity,
+                                            'category': newData.productCategory,
+                                            'description': newData.productDescription,
+                                            'imageUrl': newData.productImageUrl,
+                                            'supplier': newData.supplierEmail,
 
-                                            },
-                                            {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                }
-                                            })
-                                            .then(response => console.log(response))
-                                            .catch((err) => {
-                                                    console.log("Error", err);
-                                                }
-                                            )
+                                        },
+                                        {
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            }
+                                        })
+                                        .then(response => console.log(response))
+                                        .catch((err) => {
+                                                console.log("Error", err);
+                                            }
+                                        )
 
-                                    }, 600)
+                                }, 600)
 
-                                }),
-                            onRowDelete: (oldData) =>
-                                new Promise((resolve) =>{
-                                    setTimeout(() => {
-                                        resolve();
-                                        Axios.interceptors.request.use(request => {
-                                            console.log('Delete Request', request)
-                                            return request
-                                        });
-                                        Axios.post("http://localhost:8080/DeleteProduct",
-                                            {
-                                                'email': email,
-                                                'role': 'Supplier',
-                                                'name': oldData.productName,
-                                                'category': oldData.productCategory,
+                            }),
+                        onRowDelete: (oldData) =>
+                            new Promise((resolve) =>{
+                                setTimeout(() => {
+                                    resolve();
+                                    Axios.interceptors.request.use(request => {
+                                        console.log('Delete Request', request)
+                                        return request
+                                    });
+                                    Axios.post("http://localhost:8080/DeleteProduct",
+                                        {
+                                            'email': email,
+                                            'role': 'Business owner',
+                                            'name': oldData.productName,
+                                            'category': oldData.productCategory,
 
-                                            },
-                                            {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                }
-                                            })
-                                            .then(response => console.log("Delete Reponse", response))
-                                            .catch((err) => {
-                                                    console.log("Error", err);
-                                                }
-                                            )
+                                        },
+                                        {
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            }
+                                        })
+                                        .then(response => console.log("Delete Reponse", response))
+                                        .catch((err) => {
+                                                console.log("Error", err);
+                                            }
+                                        )
 
-                                    }, 600)
+                                }, 600)
 
-                                }),
-                        }}
-                    />
-                </TabPanel>
+                            }),
+                    }}
+                />
+            </TabPanel>
 
-            </SwipeableViews>
-        </div>
-        </div>
+        </SwipeableViews>
+    </div>
+
+
+
+
+
     );
 }
