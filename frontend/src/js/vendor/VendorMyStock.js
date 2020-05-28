@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef, useLayoutEffect, forwardRef} from 'react';
+import React, {useState, useRef, useLayoutEffect} from 'react';
 import MaterialTable from 'material-table';
 import Axios from "axios";
 import * as firebase from "firebase";
@@ -53,9 +53,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function MaterialTableDemo(props) {
-    const currentUser = firebase.auth().currentUser;
     const email = props.match.params.email;
-    const [get, setGet] = React.useState([]);
 
     const classes = useStyles();
     const theme = useTheme();
@@ -122,6 +120,7 @@ export default function MaterialTableDemo(props) {
                     columns={
                         [
                             { title: 'Name', field: 'productName', editable: 'onAdd',},
+                            { title: 'Image', field: 'productImageUrl', editable: 'never',},
                             { title: 'Quantity', field: 'productQuantity', type: 'numeric', min:0},
                             // { title: 'Unit', field: 'productUnit',hidden: isPhone(),},
                             { title: 'Category', field: 'productCategory',},
@@ -206,7 +205,8 @@ export default function MaterialTableDemo(props) {
                     ]}
 
                     options={{
-                        actionsColumnIndex: -1
+                        actionsColumnIndex: -1,
+                        search: false
                     }}
 
                     editable={{
@@ -299,7 +299,7 @@ export default function MaterialTableDemo(props) {
                                                 'Content-Type': 'application/json',
                                             }
                                         })
-                                        .then(response => console.log("Delete Reponse", response))
+                                        .then(response => console.log("Delete Response", response))
                                         .catch((err) => {
                                                 console.log("Error", err);
                                             }
@@ -386,6 +386,11 @@ export default function MaterialTableDemo(props) {
                             }
                         }
                     ]}
+
+                    options={{
+                        search: false
+                    }}
+
                     editable={{
                         onRowUpdate: (newData, oldData) =>
                             new Promise((resolve) =>{
