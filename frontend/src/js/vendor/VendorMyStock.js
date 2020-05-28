@@ -10,10 +10,15 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
 
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
+
+
+
 
     return (
         <div
@@ -52,6 +57,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
+
 export default function MaterialTableDemo(props) {
     const email = props.match.params.email;
 
@@ -69,6 +76,15 @@ export default function MaterialTableDemo(props) {
 
     const targetRef = useRef();
     const [dimensions, setDimensions] = useState({ width:0, height: 0 });
+
+    const [openImageDialog, setOpenImageDialog] = React.useState(false);
+    const [imageUrl, setImageUrl] = useState("");
+
+
+
+    const handleClickCloseImageDialog = () => {
+        setOpenImageDialog(false);
+    }
 
     useLayoutEffect(() => {
         if (targetRef.current) {
@@ -88,8 +104,14 @@ export default function MaterialTableDemo(props) {
         }
     }
 
+
+
     return (
     <div className={classes.root}>
+        <Dialog onClose={handleClickCloseImageDialog} aria-labelledby="simple-dialog-title" open={openImageDialog}>
+            <DialogTitle id="simple-dialog-title">Product Image</DialogTitle>
+            <img src={imageUrl}/>
+        </Dialog>
         <AppBar position="static" color="default">
             <Tabs
                 value={value}
@@ -119,12 +141,12 @@ export default function MaterialTableDemo(props) {
                     title="Current Stock"
                     columns={
                         [
-                            { title: 'Name', field: 'productName', editable: 'onAdd',},
-                            { title: 'Image', field: 'productImageUrl', editable: 'never',},
-                            { title: 'Quantity', field: 'productQuantity', type: 'numeric', min:0},
+                            { title: 'Name*', field: 'productName', editable: 'onAdd',},
+                            //{ title: 'Image', field: 'productImageUrl', editable: 'never',},
+                            { title: 'Quantity*', field: 'productQuantity', type: 'numeric', min:0},
                             // { title: 'Unit', field: 'productUnit',hidden: isPhone(),},
-                            { title: 'Category', field: 'productCategory',},
-                            { title: 'Price', field: 'productPrice', type: 'currency',hidden: isPhone()},
+                            { title: 'Category*', field: 'productCategory',},
+                            { title: 'Price*', field: 'productPrice', type: 'currency',hidden: isPhone()},
                             { title: 'Description', field: 'productDescription',hidden: isPhone()},
                         ]
                     }
@@ -200,7 +222,15 @@ export default function MaterialTableDemo(props) {
                         {
                             icon: 'image',
                             tooltip: 'Show Image',
-                            onClick: (event, rowData) => alert("Showing Image"),
+                            onClick:
+                                (event, rowData) => {
+                                console.log("ImageRowData", rowData)
+
+                                    setOpenImageDialog(true);
+                                    setImageUrl(rowData.productImageUrl);
+
+
+                            },
                         }
                     ]}
 
