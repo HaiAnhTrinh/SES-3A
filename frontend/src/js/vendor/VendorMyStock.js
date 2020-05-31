@@ -217,7 +217,7 @@ export default function MaterialTableDemo(props) {
                                 new Promise((resolve) => {
                                     setTimeout(() => {
                                         Axios.interceptors.request.use(request => {
-                                            console.log('Starting Request', request)
+                                            console.log('Data Receive Request', request)
                                             return request
                                         });
 
@@ -252,7 +252,7 @@ export default function MaterialTableDemo(props) {
                                                     console.log("Error", err);
                                                 }
                                             )
-                                    },600)
+                                    },3000)
                                 })
                         }
 
@@ -547,6 +547,7 @@ export default function MaterialTableDemo(props) {
                         ]}
 
                         options={{
+                            actionsColumnIndex: -1,
                             search: false,
                         }}
 
