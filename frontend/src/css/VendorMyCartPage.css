@@ -8,7 +8,7 @@
 .my-cart-font{
 	display: inline-block;
 	position: relative;
-	font-size: 50px;
+	font-size: 60px;
     font-weight: bold;
 }
 .my-cart-image{
@@ -66,9 +66,9 @@
     overflow-y: scroll;
 }
 .my-cart-text-total-price{
-	font-size: 28px;
+	font-size: 20px;
     font-weight: bold;
-    margin-right: -40px;
+    margin-right: -16px;
 }
 
 .my-cart-add-button-item{
