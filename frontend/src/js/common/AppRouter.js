@@ -6,8 +6,6 @@ import SupplierLoginPage from "../supplier/SupplierLoginPage";
 import SupplierLayout from "../supplier/SupplierLayout";
 import VendorLayout from "../vendor/VendorLayout";
 import CreateNewUser from "./CreateNewUser";
-import VendorMyCartPage from "../vendor/VendorMyCart";
-import VendorMyStockPage from "../vendor/VendorMyStock";
 import * as firebase from "firebase/app";
 
 export default function AppRouter() {
@@ -27,7 +25,7 @@ export default function AppRouter() {
         firebase.initializeApp(firebaseConfig);
     }
 
-    //TODO: configure this variable to false in the production stage
+    //TODO: configure this variable to false in the production stage to avoid login on every code change
     //initialize this variable as 'true' during development stage
     //really login to test firebase related functions
     const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -51,10 +49,6 @@ export default function AppRouter() {
                 <Route path="/Supplier/:email"
                        render={ (props) =>
                            isLoggedIn ? <SupplierLayout {...props}/> : <Redirect to="/"/>}
-                />
-                <Route path="/VendorMyCart/:email" exact strict render={ (props) => <VendorMyCartPage {...props} />} />
-                />
-                <Route path="/VendorMyStock" exact strict render={ (props) => <VendorMyStockPage {...props} />} />
                 />
                 <Route path="/CreateNewUser" exact strict component={CreateNewUser} />
             </Switch>
