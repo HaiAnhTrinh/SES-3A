@@ -77,6 +77,7 @@ export default function VendorLayout(props) {
     const handleLogout = () => logout(props);
 
     const handleMyAccount = () => {
+        setSelectedIndex(null);
         props.history.push(baseUrl + "/MyAccount");
         handleClose();
     };

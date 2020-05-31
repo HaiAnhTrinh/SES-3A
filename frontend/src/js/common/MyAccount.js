@@ -48,7 +48,6 @@ export default function Account(props) {
     const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
     const [updateProfileMessage, setUpdateProfileMessage] = useState(String);
     const [errorMessage, setErrorMessage] = useState(String);
-    const [dialogErrorMessage, setDialogErrorMessage] = useState(String);
     const [updateProfileStatus, setUpdateProfileStatus] = useState(Boolean);
     const [updatePasswordMessage, setUpdatePasswordMessage] = useState(String);
     const [updatePasswordStatus, setUpdatePasswordStatus] = useState(Boolean);
@@ -84,6 +83,7 @@ export default function Account(props) {
 
     const handleDropZoneSave = (file) => {
         console.log("DROP ZONE SAVE");
+        console.log("image file: ", file);
         setImage(file);
         handleDropZoneClose();
     }
@@ -100,16 +100,31 @@ export default function Account(props) {
         }
         const imageRef = profileImageRef.child(email);
 
+        Axios.post("http://localhost:8080/EditUserInfo",
+            data,
+            { headers: {'Content-Type': 'application/json'}})
+            .then((response) => {
+                if(response.data.status === "Success"){
+                    setUpdateProfileStatus(true);
+                    setUpdateProfileMessage(response.data.message);
+                }
+            })
+            .catch((err) => {
+                console.log("Error: ", err);
+                setUpdateProfileStatus(false);
+                setErrorMessage(err.toString());
+            });
+
         imageRef.put(image[0]).on('state_changed', (snapshot) =>
             {
                 setLoadingDialogOpen(true);
                 var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 console.log('Upload is ' + progress + '% done');
-            },  (error) => {
+            }, (error) => {
                 setLoadingDialogOpen(false);
                 setUpdateProfileStatus(false);
                 setErrorMessage(error.toString());
-            }, function () {
+            },  () => {
                 setLoadingDialogOpen(false);
                 imageRef.getDownloadURL().then( (url) => {
                     currentUser.updateProfile({photoURL: url})
@@ -117,21 +132,6 @@ export default function Account(props) {
                             console.log("current user: ", currentUser);
                         });
                 });
-
-                Axios.post("http://localhost:8080/EditUserInfo",
-                    data,
-                    { headers: {'Content-Type': 'application/json'}})
-                    .then((response) => {
-                        if(response.data.status === "Success"){
-                            setUpdateProfileStatus(true);
-                            setUpdateProfileMessage(response.data.message);
-                        }
-                    })
-                    .catch((err) => {
-                        console.log("Error: ", err);
-                        setUpdateProfileStatus(false);
-                        setErrorMessage(err.toString());
-                    });
             }
         )
     }

@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import * as firebase from "firebase";
 
-const drawerWidth = 240;
+const drawerWidth = 210;
 
 export const layoutStyles = makeStyles((theme) => ({
     root: {
@@ -33,7 +33,7 @@ export const layoutStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3),
+        padding: theme.spacing(1),
     },
     title: {
         flexGrow: 1,
