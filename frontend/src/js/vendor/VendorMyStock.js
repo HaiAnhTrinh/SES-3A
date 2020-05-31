@@ -177,13 +177,39 @@ export default function MaterialTableDemo(props) {
                         title="Current Stock"
                         columns={
                             [
-                                { title: 'Name*', field: 'productName', editable: 'onAdd',},
-                                //{ title: 'Image', field: 'productImageUrl', editable: 'never',},
-                                { title: 'Quantity*', field: 'productQuantity', type: 'numeric', min:0},
+                                { title: 'Name*', field: 'productName', editable: 'onAdd',
+                                    cellStyle: {
+                                        textAlign: 'left'
+
+                                    },},
+                                { title: 'Quantity*', field: 'productQuantity', type:'numeric',
+                                    cellStyle: {
+                                        textAlign: 'left',
+
+                                    },
+                                    headerStyle:{
+                                        textAlign:'left',}
+                                    },
                                 // { title: 'Unit', field: 'productUnit',hidden: isPhone(),},
-                                { title: 'Category*', field: 'productCategory',},
-                                { title: 'Price*', field: 'productPrice', type: 'currency',hidden: isPhone()},
-                                { title: 'Description', field: 'productDescription',hidden: isPhone()},
+                                { title: 'Category*', field: 'productCategory',
+                                    cellStyle: {
+                                        textAlign: 'left',
+                                    },
+                                    headerStyle:{
+                                        textAlign:'left',
+                                    }},
+                                { title: 'Price*', field: 'productPrice', type: 'currency',hidden: isPhone(),
+                                    cellStyle: {
+                                        textAlign: 'left',
+                                    },
+                                    headerStyle:{
+                                        textAlign:'left'}},
+                                { title: 'Description', field: 'productDescription',hidden: isPhone(),
+                                    cellStyle: {
+                                        textAlign: 'left',
+                                    },
+                                    headerStyle:{
+                                        textAlign:'left'}},
                             ]
                         }
                         data={
@@ -226,7 +252,7 @@ export default function MaterialTableDemo(props) {
                                                     console.log("Error", err);
                                                 }
                                             )
-                                    },3000)
+                                    },600)
                                 })
                         }
 
@@ -247,6 +273,7 @@ export default function MaterialTableDemo(props) {
                                     )
                                 }
                             }
+
                         ]}
 
                         actions={[
@@ -268,12 +295,14 @@ export default function MaterialTableDemo(props) {
                                         setOpenImageDialog(true);
                                         setImageUrl(rowData.productImageUrl);
                                     },
-                            }
+                            },
                         ]}
+
+
 
                         options={{
                             actionsColumnIndex: -1,
-                            search: false
+                            search: false,
                         }}
 
                         editable={{
@@ -283,9 +312,10 @@ export default function MaterialTableDemo(props) {
                                     const photoRef = productPhotoRef.child(email.concat("-").concat(newData.productName));
                                     if( newData.productName && newData.productName.trim().length > 0 &&
                                         newData.productQuantity && newData.productQuantity.trim().length > 0 &&
+                                        newData.productQuantity >0 &&
                                         newData.productCategory && newData.productCategory.trim().length > 0 &&
                                         newData.productPrice && newData.productPrice.trim().length > 0 &&
-                                        newData.productQuantity >= 0 && newData.productPrice >= 0){
+                                        newData.productPrice >0){
                                         setTimeout(() => {
                                             resolve();
                                             let canvas = document.createElement('canvas');
@@ -322,9 +352,10 @@ export default function MaterialTableDemo(props) {
                                                                     'quantity': newData.productQuantity,
                                                                     'category': newData.productCategory,
                                                                     'description':
-                                                                        newData.productDescription && newData.productDescription.trim().length > 0
-                                                                            ? newData.productDescription
-                                                                            : "",
+                                                                                 newData.productDescription &&
+                                                                                 newData.productDescription.trim().length > 0
+                                                                                ? newData.productDescription
+                                                                                : "",
                                                                     'imageUrl': url,
                                                                     'role': 'Business owner',
                                                                 },
@@ -336,7 +367,6 @@ export default function MaterialTableDemo(props) {
                                                                 .then(response => console.log(response))
                                                                 .catch((err) => {
                                                                         console.log("Error", err);
-                                                                        alert("Invalid Input")
                                                                     }
                                                                 )
                                                         });
@@ -346,8 +376,27 @@ export default function MaterialTableDemo(props) {
                                             /******************************************************************************/
                                         }, 600)
                                     }
-                                    else {
+                                    else if(newData.productName && newData.productName.trim().length <= 0){
                                         resolve();
+                                        alert("Name is required");
+                                    }
+                                    else if(newData.productQuantity && newData.productQuantity.trim().length <= 0 &&
+                                        newData.productQuantity >0){
+                                        resolve();
+                                        alert("Quantity is required and must be a positive value");
+                                    }
+                                    else if(newData.productCategory && newData.productCategory.trim().length <= 0){
+                                        resolve();
+                                        alert("Category is required");
+                                    }
+                                    else if(newData.productPrice && newData.productPrice.trim().length <= 0 &&
+                                        newData.productPrice > 0) {
+                                        resolve();
+                                        alert("Price is required and must be a positive value");
+                                    }
+                                    else{
+                                        resolve();
+                                        alert("Name, Quantity, Category and Price are required")
                                     }
 
                                 }),
@@ -498,7 +547,7 @@ export default function MaterialTableDemo(props) {
                         ]}
 
                         options={{
-                            search: false
+                            search: false,
                         }}
 
                         editable={{
