@@ -16,7 +16,6 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import Axios from "axios";
-import * as firebase from "firebase";
 
 
 
@@ -65,8 +64,6 @@ export default function MaterialTableDemo(props) {
     }
 
     const email = props.match.params.email;
-    // const test = () =>setGet("Quan");
-    // console.log("GetStart:", get);
     console.log("Props: ", props);
     console.log("Email: ", email);
 
@@ -148,23 +145,25 @@ export default function MaterialTableDemo(props) {
                 }}
 
                 detailPanel={[
-                            {
-                                tooltip: 'Show Details',
-                                disabled: !isPhone(),
-                                render: rowData => {
-                                    return (
-                                        <div
-                                            style={{
-                                                textAlign: 'center'
-                                            }}
-                                        >
-                                            <p>Total amount: {rowData.quantity}</p>
-                                            <p>Total cost: {rowData.cost}</p>
-                                        </div>
-                                    )
-                                }
-                            }
-                    ]}
+                {
+                    tooltip: 'Show Details',
+                    disabled: !isPhone(),
+                    render: rowData => {
+                        return (
+                            <div
+                                style={{
+                                    textAlign: 'center'
+                                }}
+                            >
+
+                                <p>Total amount: {rowData.quantity}</p>
+                                <p>Total cost: {rowData.cost}</p>
+                            </div>
+                        )
+                    }
+                }
+            ]}
+
             />
             </div>
         )
