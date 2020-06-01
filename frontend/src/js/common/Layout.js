@@ -47,6 +47,14 @@ export const layoutStyles = makeStyles((theme) => ({
     logo: {
         width: drawerWidth,
         height: 58,
+    },
+    anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'right',
+    },
+    transformOrigin: {
+        vertical: 'top',
+        horizontal: 'right',
     }
 }));
 

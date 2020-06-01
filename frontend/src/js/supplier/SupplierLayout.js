@@ -1,6 +1,7 @@
 import React, {useEffect, useState } from 'react';
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import AppBar from '@material-ui/core/AppBar';
+import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
@@ -18,7 +19,7 @@ import Home from "./SupplierHome";
 import MyProduct from "./SupplierMyProduct";
 import ProductSold from "./SupplierProductSold";
 import Graph from "./SupplierGraph";
-import Account from "./SupplierAccount";
+import Account from "../common/MyAccount";
 
 export default function SupplierLayout(props) {
     const currentUser = firebase.auth().currentUser;
@@ -41,9 +42,6 @@ export default function SupplierLayout(props) {
     }, {
         'text': 'Graph',
         'path': baseUrl + '/Graph'
-    }, {
-        'text': 'Account',
-        'path': baseUrl + '/Account'
     }];
 
     useEffect(() => {
@@ -74,6 +72,11 @@ export default function SupplierLayout(props) {
         }
     };
 
+    const handleMyAccount = () => {
+        props.history.push(baseUrl + "/MyAccount");
+        handleClose();
+    };
+
     const supplierDrawer = () => drawer(classes, drawerListObject, onItemClick);
 
     return (
@@ -102,25 +105,22 @@ export default function SupplierLayout(props) {
                                 onClick={handleMenu}
                                 color="inherit"
                             >
-                                <AccountCircle />
+                                { currentUser && currentUser.photoURL ?
+                                    <Avatar alt="avatar" src={currentUser.photoURL} />
+                                    :
+                                    <AccountCircle />
+                                }
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
                                 anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                anchorOrigin={classes.anchorOrigin}
                                 keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                transformOrigin={classes.transformOrigin}
                                 open={open}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleMyAccount}>My account</MenuItem>
                                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
                             </Menu>
                         </div>
@@ -165,7 +165,9 @@ export default function SupplierLayout(props) {
                         <Route path="/Supplier/:email/MyProduct" exact strict component={MyProduct}/>
                         <Route path="/Supplier/:email/ProductSold" exact strict component={ProductSold}/>
                         <Route path="/Supplier/:email/Graph" exact strict component={Graph}/>
-                        <Route path="/Supplier/:email/Account" exact strict component={Account}/>
+                        <Route path="/Supplier/:email/MyAccount" exact strict>
+                            <Account {...props} role="Supplier" />
+                        </Route>
                     </div>
 
                 </main>

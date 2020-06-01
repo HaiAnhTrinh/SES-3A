@@ -2,6 +2,7 @@ package com.ses3a.backend.controller;
 
 import com.ses3a.backend.entity.object.CartProduct;
 import com.ses3a.backend.entity.object.SupplierProduct;
+import com.ses3a.backend.entity.object.UserInfo;
 import com.ses3a.backend.entity.request.*;
 import com.ses3a.backend.entity.response.*;
 import com.ses3a.backend.firebase.FirebaseCartServices;
@@ -56,7 +57,7 @@ public class RestApiController {
         return responseEntity;
     }
 
-    /*******************************************prototype functions****************************************************/
+
     @CrossOrigin(origins = "*")
     @GetMapping("/GetUserInfo")
     public ResponseEntity<GetUserInfoResponse>
@@ -68,8 +69,15 @@ public class RestApiController {
         try{
             Map<String, Object> userInfo = firebaseUserServices.getUserInfo(request);
             Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
-            responseEntity.getBody().setEmail(userInfo.get("email").toString());
-            responseEntity.getBody().setUsername(userInfo.get("username").toString());
+            responseEntity.getBody().setMessage("Returned user info");
+            responseEntity.getBody().setUserInfo(
+                    new UserInfo(
+                            userInfo.get("email").toString(),
+                            userInfo.get("username").toString(),
+                            userInfo.get("address").toString(),
+                            userInfo.get("phone").toString()
+                    )
+            );
         }
         catch (Exception e){
             e.printStackTrace();
@@ -87,7 +95,7 @@ public class RestApiController {
                 new ResponseEntity<>(new EditUserInfoResponse(), HttpStatus.OK);
         firebaseUserServices.editUserInfo(editUserInfoRequest);
         Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
-        responseEntity.getBody().setMessage("User info has been edited");
+        responseEntity.getBody().setMessage("User info has been updated");
         return responseEntity;
     }
 

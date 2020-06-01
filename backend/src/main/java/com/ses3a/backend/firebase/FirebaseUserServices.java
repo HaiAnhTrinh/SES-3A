@@ -71,6 +71,8 @@ public class FirebaseUserServices {
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
         data.put("username", request.getUsername());
+        data.put("address", request.getAddress());
+        data.put("phone", request.getPhone());
         String userType = convertToUserType(request.getRole());
 
         FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())

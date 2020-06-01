@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import AccountCircle from "@material-ui/icons/AccountCircle";
+import Avatar from '@material-ui/core/Avatar';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -13,14 +14,14 @@ import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
 import { Route } from "react-router-dom";
+
 import {drawer, layoutStyles, logout} from "../common/Layout";
-import Logo from '../../image/Logo.png';
 import Home from "./VendorHome";
 import MyStock from "./VendorMyStock";
 import MyPurchase from "./VendorMyPurchase";
 import MyCart from "./VendorMyCart";
 import Graph from "./VendorGraph";
-import Account from "./VendorAccount";
+import Account from "../common/MyAccount";
 
 export default function VendorLayout(props) {
     const currentUser = firebase.auth().currentUser;
@@ -46,9 +47,6 @@ export default function VendorLayout(props) {
     }, {
         'text': 'Graph',
         'path': baseUrl + '/Graph'
-    }, {
-        'text': 'Account',
-        'path': baseUrl + '/MyAccount'
     }];
 
     useEffect(() => {
@@ -70,6 +68,11 @@ export default function VendorLayout(props) {
     };
 
     const handleLogout = () => logout(props);
+
+    const handleMyAccount = () => {
+        props.history.push(baseUrl + "/MyAccount");
+        handleClose();
+    };
 
     const onItemClick = (variant) => {
         if(variant === "temporary"){
@@ -105,25 +108,22 @@ export default function VendorLayout(props) {
                                 onClick={handleMenu}
                                 color="inherit"
                             >
-                                <AccountCircle />
+                                { currentUser && currentUser.photoURL ?
+                                    <Avatar alt="avatar" src={currentUser.photoURL} />
+                                    :
+                                    <AccountCircle />
+                                }
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
                                 anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                anchorOrigin={classes.anchorOrigin}
                                 keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                transformOrigin={classes.transformOrigin}
                                 open={open}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleMyAccount}>My account</MenuItem>
                                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
                             </Menu>
                         </div>
@@ -169,7 +169,9 @@ export default function VendorLayout(props) {
                         {/*<Route path="/Vendor/:email/MyPurchase" exact strict component={MyPurchase}/>*/}
                         <Route path="/Vendor/:email/MyCart" exact strict component={MyCart}/>
                         <Route path="/Vendor/:email/Graph" exact strict component={Graph}/>
-                        <Route path="/Vendor/:email/MyAccount" exact strict component={Account}/>
+                        <Route path="/Vendor/:email/MyAccount" exact strict>
+                            <Account {...props} role="Business owner" />
+                        </Route>
                     </div>
 
                 </main>

@@ -21,6 +21,7 @@ function SupplierLoginPage(props) {
             setLoginMessage("Require both email and password");
         }
         else{
+            //TODO: enable this code for authorization
             //**************Authorization layer**************
             // firebase.auth().signInWithEmailAndPassword(email, password)
             //     .then((res) => {
