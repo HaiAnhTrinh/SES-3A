@@ -253,7 +253,7 @@ export default function MaterialTableDemo(props) {
                                                     console.log("Error", err);
                                                 }
                                             )
-                                    },3000)
+                                    },800)
                                 })
                         }
 
@@ -651,6 +651,5 @@ export default function MaterialTableDemo(props) {
                 onClose={handleDropZoneClose}
             />
         </div>
-
     );
 }

@@ -41,6 +41,7 @@ public class FirebaseProductServices {
                 product.setProductQuantity(document.getString("quantity"));
                 product.setProductDescription(document.getString("description"));
                 product.setProductImageUrl(document.getString("imageUrl"));
+                product.setProductCategory(document.getString("category"));
                 products.add(product);
             }
         }
