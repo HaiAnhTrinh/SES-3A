@@ -217,7 +217,8 @@ export default function MaterialTableDemo(props) {
                                 new Promise((resolve) => {
                                     setTimeout(() => {
                                         Axios.interceptors.request.use(request => {
-                                            console.log('Data Receive Request', request)
+
+                                            console.log('Data Receive Request', request);
                                             return request
                                         });
 
@@ -252,7 +253,7 @@ export default function MaterialTableDemo(props) {
                                                     console.log("Error", err);
                                                 }
                                             )
-                                    },3000)
+                                    },800)
                                 })
                         }
 
@@ -296,9 +297,23 @@ export default function MaterialTableDemo(props) {
                                         setImageUrl(rowData.productImageUrl);
                                     },
                             },
+                            {
+                                icon: 'image',
+                                tooltip: 'Show Image',
+                                onClick:
+                                    (event, rowData) => {
+                                        console.log("ImageRowData", rowData)
+
+                                        setOpenImageDialog(true);
+                                        setImageUrl(rowData.productImageUrl);
+                                    },
+                            }
                         ]}
 
-
+                        options={{
+                            actionsColumnIndex: -1,
+                            search: false
+                        }}
 
                         options={{
                             actionsColumnIndex: -1,
@@ -310,6 +325,7 @@ export default function MaterialTableDemo(props) {
                                 new Promise((resolve) =>{
                                     /**********************************************************************************/
                                     const photoRef = productPhotoRef.child(email.concat("-").concat(newData.productName));
+
                                     if( newData.productName && newData.productName.trim().length > 0 &&
                                         newData.productQuantity && newData.productQuantity.trim().length > 0 &&
                                         newData.productQuantity >0 &&
@@ -352,10 +368,10 @@ export default function MaterialTableDemo(props) {
                                                                     'quantity': newData.productQuantity,
                                                                     'category': newData.productCategory,
                                                                     'description':
-                                                                                 newData.productDescription &&
-                                                                                 newData.productDescription.trim().length > 0
-                                                                                ? newData.productDescription
-                                                                                : "",
+                                                                         newData.productDescription &&
+                                                                         newData.productDescription.trim().length > 0
+                                                                        ? newData.productDescription
+                                                                        : "",
                                                                     'imageUrl': url,
                                                                     'role': 'Business owner',
                                                                 },
@@ -396,7 +412,7 @@ export default function MaterialTableDemo(props) {
                                     }
                                     else{
                                         resolve();
-                                        alert("Name, Quantity, Category and Price are required")
+                                        alert("Name, Quantity, Category and Price are required");
                                     }
 
                                 }),
@@ -451,7 +467,6 @@ export default function MaterialTableDemo(props) {
                                                 'role': 'Business owner',
                                                 'name': oldData.productName,
                                                 'category': oldData.productCategory,
-
                                             },
                                             {
                                                 headers: {
@@ -636,10 +651,5 @@ export default function MaterialTableDemo(props) {
                 onClose={handleDropZoneClose}
             />
         </div>
-
-
-
-
-
     );
 }

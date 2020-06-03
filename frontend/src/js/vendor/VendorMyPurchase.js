@@ -42,7 +42,7 @@ const tableIcons = {
 
 
 
-export default function MaterialTableDemo(props) {
+export default function MyPurchase(props) {
 
     //Create state for the current size of the table
     const targetRef = useRef();
@@ -98,28 +98,11 @@ export default function MaterialTableDemo(props) {
                     /*Hidden attribute (boolean) will call the function isPhone
                     *If the size of table is small then hide the non required fields*/
                     { title: 'Amount', field: 'quantity', type: 'numeric', hidden: isPhone()},
-                    { title: 'Price', field: 'cost' , initialEditValue: '$ ', hidden: isPhone()},
+                    { title: 'Cost', field: 'cost' , initialEditValue: '$ ', hidden: isPhone()},
                     { title: 'Category', field: 'category'},
                     { title: 'Date of Purchase', field: 'date', type: 'date'},
                     { title: 'Supplier', field: 'supplier'}
                 ]}
-                /*data={[
-                    {prod: 'Dio', amount: '1554', value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Quan', amount: '1554', value: '$ 1616' , dop: 1997, sup: 'Richboi', cate: 'food'},
-                    {prod: 'Rice', amount: 305, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Old Rice', amount: 452,value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'New Rice', amount: 262, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Some Rice', amount: 159, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Fried Rice', amount: 356, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Broken Rice', amount: 408, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Expensive Rice', amount: 237, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Sticky Rice', amount: 375, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Other Rice', amount: 518, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Another Rice', amount: 392, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Good Rice', amount: 318, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Better Rice', amount: 360, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'},
-                    {prod: 'Best Rice', amount: 437, value: '$ 1616' , dop: 1997, sup: 'Gotham', cate: 'food'}
-                    ]}*/
 
                 data={() =>
                     new Promise((resolve) => {

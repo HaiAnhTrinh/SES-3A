@@ -23,10 +23,12 @@ public class FirebaseCartServices {
         productId.append("-");
         productId.append(request.getProduct().getProductName());
 
-        data.put("name", request.getProduct().getProductName());
-        data.put("price", request.getProduct().getProductPrice());
-        data.put("category", request.getProduct().getProductCategory());
-        data.put("supplier", request.getProduct().getSupplierEmail());
+        data.put("productName", request.getProduct().getProductName());
+        data.put("productPrice", request.getProduct().getProductPrice());
+        data.put("productCategory", request.getProduct().getProductCategory());
+        data.put("supplierEmail", request.getProduct().getSupplierEmail());
+        data.put("productDescription", request.getProduct().getProductDescription());
+        data.put("productImageUrl", request.getProduct().getProductImageUrl());
         data.put("quantity", request.getQuantity());
 
         //add to node 'carts'
@@ -35,7 +37,6 @@ public class FirebaseCartServices {
                 .collection(productId.toString())
                 .document("info")
                 .set(data);
-
     }
 
 
@@ -56,17 +57,19 @@ public class FirebaseCartServices {
         for(CollectionReference ref : collectionRefs){
             Map<String, Object> data = ref.document("info").get().get().getData();
             CartProduct product = new CartProduct();
-            String price = data.get("price").toString();
+            String price = data.get("productPrice").toString();
             String quantity = data.get("quantity").toString();
 
             //calculate the cost
             double cost = Double.parseDouble(price) * Integer.parseInt(quantity);
 
-            product.setName(data.get("name").toString());
+            product.setName(data.get("productName").toString());
             product.setPrice(price);
             product.setQuantity(quantity);
-            product.setCategory(data.get("category").toString());
-            product.setSupplier(data.get("supplier").toString());
+            product.setCategory(data.get("productCategory").toString());
+            product.setDescription(data.get("productDescription").toString());
+            product.setImageUrl(data.get("productImageUrl").toString());
+            product.setSupplier(data.get("supplierEmail").toString());
             product.setCost(String.valueOf(cost));
 
             cartProducts.add(product);

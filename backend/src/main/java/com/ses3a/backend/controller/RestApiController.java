@@ -216,7 +216,7 @@ public class RestApiController {
 
 
     @CrossOrigin(origins = "*")
-    @GetMapping("GetCart")
+    @GetMapping("/GetCart")
     public ResponseEntity<GetCartResponse>
     getCart(@RequestHeader String email){
         System.out.println("RECEIVED GET CART REQUEST");
