@@ -93,7 +93,7 @@ export default function MaterialTableDemo(props) {
                     { title: 'Price', field: 'cost' , hidden: isPhone()},
                     { title: 'Category', field: 'category'},
                     { title: 'Date of Purchase', field: 'date', type: 'date'},
-                    { title: 'Supplier', field: 'supplier'}
+
                 ]}
 
                 data={() =>
@@ -104,7 +104,7 @@ export default function MaterialTableDemo(props) {
                                 return request
                             });
 
-                            Axios.get("http://localhost:8080/GetVendorPurchase", {
+                            Axios.get("http://localhost:8080/GetSupplierPendingPurchase", {
                                     headers: {
                                         'Content-Type': 'application/json',
                                         'email': email
@@ -113,7 +113,7 @@ export default function MaterialTableDemo(props) {
                             )
                                 .then(result => {
                                     console.log("Result: ", result)
-                                    console.log("Result data", result.data.purchaseHistory)
+                                    console.log("Result data", result.data.pendingPurchases)
                                     /*var data = [];
                                     for (var i = query.pageSize * (query.page+1) - query.pageSize;
                                          i <= query.pageSize * (query.page+1) - 1; i++)
@@ -125,7 +125,7 @@ export default function MaterialTableDemo(props) {
                                         }
                                     }*/
                                     resolve({
-                                        data: result.data.purchaseHistory,
+                                        data: result.data.pendingPurchases,
                                         page: 0,
                                         totalCount: 0,
                                     })

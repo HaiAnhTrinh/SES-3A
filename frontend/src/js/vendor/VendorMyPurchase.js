@@ -82,7 +82,7 @@ export default function MaterialTableDemo(props) {
                 </div>
 
             <MaterialTable
-                tableLayout = 'auto'
+                layout = 'auto'
                 icons={tableIcons}
                 title="Purchase History"
                 columns={[
@@ -141,7 +141,8 @@ export default function MaterialTableDemo(props) {
                     })
                 }
                 options={{
-                    search: false
+                    search: false,
+                    headerStyle:{width: '5',padding: '5px'}
                 }}
 
                 detailPanel={[
