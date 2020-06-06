@@ -141,8 +141,7 @@ export default function MaterialTableDemo(props) {
                     })
                 }
                 options={{
-                    search: false,
-                    headerStyle:{width: '5',padding: '5px'}
+                    search: false
                 }}
 
                 detailPanel={[
