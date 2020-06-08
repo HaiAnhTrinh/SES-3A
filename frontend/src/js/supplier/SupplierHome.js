@@ -1,4 +1,5 @@
-import React, {useRef, useLayoutEffect, useState, forwardRef} from 'react';
+import React, {useRef, useLayoutEffect, useEffect, useState} from 'react';
+import { forwardRef } from 'react';
 import MaterialTable from "material-table";
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
@@ -96,7 +97,7 @@ export default function MaterialTableDemo(props) {
 
                 ]}
 
-                data={() =>
+                data={(query) =>
                     new Promise((resolve) => {
                         setTimeout(() => {
                             Axios.interceptors.request.use(request => {
@@ -114,22 +115,21 @@ export default function MaterialTableDemo(props) {
                                 .then(result => {
                                     console.log("Result: ", result)
                                     console.log("Result data", result.data.pendingPurchases)
-                                    /*var data = [];
-                                    for (var i = query.pageSize * (query.page+1) - query.pageSize;
+                                    var data = [];
+                                    for (let i = query.pageSize * (query.page+1) - query.pageSize;
                                          i <= query.pageSize * (query.page+1) - 1; i++)
                                     {
-                                        if(i +1 > result.data.purchaseHistory.length){
+                                        if(i +1 > result.data.pendingPurchases.length){
                                             break;}
                                         else{
-                                            data.push(result.data.purchaseHistory[i]);
+                                            data.push(result.data.pendingPurchases[i]);
                                         }
-                                    }*/
+                                    }
                                     resolve({
-                                        data: result.data.pendingPurchases,
-                                        page: 0,
-                                        totalCount: 0,
+                                        data: data,
+                                        page: query.page,
+                                        totalCount: result.data.pendingPurchases.length,
                                     })
-
                                 })
                                 .catch((err) => {
                                         console.log("Error", err);
