@@ -1,4 +1,5 @@
-import React, {useRef, useLayoutEffect, useState, forwardRef} from 'react';
+import React, {useRef, useLayoutEffect, useEffect, useState} from 'react';
+import { forwardRef } from 'react';
 import MaterialTable from "material-table";
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
@@ -16,8 +17,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import Axios from "axios";
-
-
+import * as firebase from "firebase";
 
 
 const tableIcons = {
@@ -41,7 +41,8 @@ const tableIcons = {
 };
 
 
-export default function MaterialTableDemo(props) {
+
+export default function MyPurchase(props) {
 
     //Create state for the current size of the table
     const targetRef = useRef();
@@ -60,10 +61,17 @@ export default function MaterialTableDemo(props) {
 
     //Compare the table size to the recommended size for phone and output true or false
     function isPhone() {
-        return dimensions.width < 541
+        if(dimensions.width < 541){
+            return true;
+        }else {
+            return false;
+        }
     }
 
+    const currentUser = firebase.auth().currentUser;
     const email = props.match.params.email;
+    // const test = () =>setGet("Quan");
+    // console.log("GetStart:", get);
     console.log("Props: ", props);
     console.log("Email: ", email);
 
@@ -82,7 +90,7 @@ export default function MaterialTableDemo(props) {
                 </div>
 
             <MaterialTable
-                layout = 'auto'
+                tableLayout = 'auto'
                 icons={tableIcons}
                 title="Purchase History"
                 columns={[
@@ -90,7 +98,7 @@ export default function MaterialTableDemo(props) {
                     /*Hidden attribute (boolean) will call the function isPhone
                     *If the size of table is small then hide the non required fields*/
                     { title: 'Amount', field: 'quantity', type: 'numeric', hidden: isPhone()},
-                    { title: 'Price', field: 'cost' , hidden: isPhone()},
+                    { title: 'Cost', field: 'cost' , initialEditValue: '$ ', hidden: isPhone()},
                     { title: 'Category', field: 'category'},
                     { title: 'Date of Purchase', field: 'date', type: 'date'},
                     { title: 'Supplier', field: 'supplier'}
@@ -114,7 +122,7 @@ export default function MaterialTableDemo(props) {
                                 .then(result => {
                                     console.log("Result: ", result)
                                     console.log("Result data", result.data.purchaseHistory)
-                                    /*var data = [];
+                                    var data = [];
                                     for (var i = query.pageSize * (query.page+1) - query.pageSize;
                                          i <= query.pageSize * (query.page+1) - 1; i++)
                                     {
@@ -123,46 +131,42 @@ export default function MaterialTableDemo(props) {
                                         else{
                                             data.push(result.data.purchaseHistory[i]);
                                         }
-                                    }*/
+                                    }
                                     resolve({
-                                        data: result.data.purchaseHistory,
-                                        page: 0,
-                                        totalCount: 0,
+                                        data: data,
+                                        page: query.page,
+                                        totalCount: result.data.purchaseHistory.length,
                                     })
-
                                 })
                                 .catch((err) => {
                                         console.log("Error", err);
-
                                     }
                                 )
                         },600)
 
                     })
                 }
-                options={{
-                    search: false
-                }}
 
                 detailPanel={[
-                {
-                    tooltip: 'Show Details',
-                    disabled: !isPhone(),
-                    render: rowData => {
-                        return (
-                            <div
-                                style={{
-                                    textAlign: 'center'
-                                }}
-                            >
+                            {
+                                tooltip: 'Show Details',
+                                disabled: !isPhone(),
+                                render: rowData => {
+                                    return (
+                                        <div
+                                            style={{
+                                                textAlign: 'center'
+                                            }}
+                                        >
 
-                                <p>Total amount: {rowData.quantity}</p>
-                                <p>Total cost: {rowData.cost}</p>
-                            </div>
-                        )
-                    }
-                }
-            ]}
+                                            <p>Total amount: {rowData.quantity}</p>
+                                            <p>Total cost: {rowData.cost}</p>
+                                        </div>
+                                    )
+                                }
+                            }
+                    ]}
+
 
             />
             </div>
@@ -171,5 +175,3 @@ export default function MaterialTableDemo(props) {
 
 
 }
-
-

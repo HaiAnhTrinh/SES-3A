@@ -23,6 +23,8 @@ public class FirebaseUserServices {
         Map<String, Object> data = new HashMap<>();
         data.put("email", request.getEmail());
         data.put("username", request.getUsername());
+        data.put("address", "");
+        data.put("phone", "");
         String userType = convertToUserType(request.getRole());
 
         if(userType.equals("vendors")){
@@ -71,6 +73,8 @@ public class FirebaseUserServices {
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
         data.put("username", request.getUsername());
+        data.put("address", request.getAddress());
+        data.put("phone", request.getPhone());
         String userType = convertToUserType(request.getRole());
 
         FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())

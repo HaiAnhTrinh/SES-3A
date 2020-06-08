@@ -92,13 +92,17 @@ export default function CreateNewUser() {
         <div className="outerDiv">
             <form>
                 <h1 className="header">CREATE A NEW USER</h1>
-                <TextField required label="email" variant="filled" onChange={onEmailChange} />
+                <TextField required label="email"
+                           variant="filled" onChange={onEmailChange} />
                 <br/><br/>
-                <TextField required label="username" variant="filled" onChange={onUsernameChange}/>
+                <TextField required label="username"
+                           variant="filled" onChange={onUsernameChange}/>
                 <br/><br/>
-                <TextField required type="password" label="password" variant="filled" onChange={onPasswordChange}/>
+                <TextField required type="password" label="password"
+                           variant="filled" helperText="At least 6 characters" onChange={onPasswordChange}/>
                 <br/><br/>
-                <TextField required type="password" label="confirm password" variant="filled" onChange={onConfirmPasswordChange}/>
+                <TextField required type="password" label="confirm password"
+                           variant="filled" onChange={onConfirmPasswordChange}/>
                 <br/><br/>
                 <FormControl required variant="filled" className={classes.formControl}>
                     <InputLabel>role</InputLabel>

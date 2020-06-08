@@ -2,6 +2,7 @@ package com.ses3a.backend.controller;
 
 import com.ses3a.backend.entity.object.CartProduct;
 import com.ses3a.backend.entity.object.SupplierProduct;
+import com.ses3a.backend.entity.object.UserInfo;
 import com.ses3a.backend.entity.request.*;
 import com.ses3a.backend.entity.response.*;
 import com.ses3a.backend.firebase.FirebaseCartServices;
@@ -56,7 +57,7 @@ public class RestApiController {
         return responseEntity;
     }
 
-    /*******************************************prototype functions****************************************************/
+
     @CrossOrigin(origins = "*")
     @GetMapping("/GetUserInfo")
     public ResponseEntity<GetUserInfoResponse>
@@ -68,8 +69,15 @@ public class RestApiController {
         try{
             Map<String, Object> userInfo = firebaseUserServices.getUserInfo(request);
             Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
-            responseEntity.getBody().setEmail(userInfo.get("email").toString());
-            responseEntity.getBody().setUsername(userInfo.get("username").toString());
+            responseEntity.getBody().setMessage("Returned user info");
+            responseEntity.getBody().setUserInfo(
+                    new UserInfo(
+                            userInfo.get("email").toString(),
+                            userInfo.get("username").toString(),
+                            userInfo.get("address").toString(),
+                            userInfo.get("phone").toString()
+                    )
+            );
         }
         catch (Exception e){
             e.printStackTrace();
@@ -87,7 +95,7 @@ public class RestApiController {
                 new ResponseEntity<>(new EditUserInfoResponse(), HttpStatus.OK);
         firebaseUserServices.editUserInfo(editUserInfoRequest);
         Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
-        responseEntity.getBody().setMessage("User info has been edited");
+        responseEntity.getBody().setMessage("User info has been updated");
         return responseEntity;
     }
 
@@ -95,19 +103,24 @@ public class RestApiController {
     @CrossOrigin(origins = "*")
     @GetMapping("/GetProductByCategory")
     public ResponseEntity<GetProductByCategoryResponse>
-    getProductByCategory(@RequestHeader String email, @RequestHeader String category){
+    getProductByCategory(@RequestHeader String email, @RequestHeader String[] category){
         System.out.println("RECEIVED GET PRODUCT BY CATEGORY REQUEST");
-        GetProductByCategoryRequest request = new GetProductByCategoryRequest(email, category);
         ResponseEntity<GetProductByCategoryResponse> responseEntity =
                 new ResponseEntity<>(new GetProductByCategoryResponse(), HttpStatus.OK);
-        try{
-            List<SupplierProduct> products = firebaseProductServices.getProductByCategory(request);
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
-            responseEntity.getBody().setProducts(products);
+        for(int i = 0; i < category.length; i++){
+            try{
+                System.out.println(category[i]);
+                GetProductByCategoryRequest request = new GetProductByCategoryRequest(email, category[i]);
+                List<SupplierProduct> products = firebaseProductServices.getProductByCategory(request);
+                System.out.println(products);
+                Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+                responseEntity.getBody().getProducts().addAll(products);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
         }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+
         return responseEntity;
     }
 
@@ -203,7 +216,7 @@ public class RestApiController {
 
 
     @CrossOrigin(origins = "*")
-    @GetMapping("GetCart")
+    @GetMapping("/GetCart")
     public ResponseEntity<GetCartResponse>
     getCart(@RequestHeader String email){
         System.out.println("RECEIVED GET CART REQUEST");
