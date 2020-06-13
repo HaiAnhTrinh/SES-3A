@@ -1,6 +1,7 @@
-import React, {useRef, useLayoutEffect, useEffect, useState} from 'react';
+import React, {useState, useRef, useLayoutEffect} from 'react';
+import MaterialTable from 'material-table';
+import * as firebase from "firebase";
 import { forwardRef } from 'react';
-import MaterialTable from "material-table";
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import Check from '@material-ui/icons/Check';
@@ -17,7 +18,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import Axios from "axios";
-import * as firebase from "firebase";
+
 
 
 const tableIcons = {
@@ -104,7 +105,7 @@ export default function MyPurchase(props) {
                     { title: 'Supplier', field: 'supplier'}
                 ]}
 
-                data={() =>
+                data={(query) =>
                     new Promise((resolve) => {
                         setTimeout(() => {
                             Axios.interceptors.request.use(request => {
@@ -122,10 +123,21 @@ export default function MyPurchase(props) {
                                 .then(result => {
                                     console.log("Result: ", result)
                                     console.log("Result data", result.data.purchaseHistory)
+
+                                    var data = [];
+                                    for (let i = query.pageSize * (query.page+1) - query.pageSize;
+                                         i <= query.pageSize * (query.page+1) - 1; i++)
+                                    {
+                                        if(i +1 > result.data.purchaseHistory.length){
+                                            break;}
+                                        else{
+                                            data.push(result.data.purchaseHistory[i]);
+                                        }
+                                    }
                                     resolve({
-                                        data: result.data.purchaseHistory,
-                                        page: 0,
-                                        totalCount: 0,
+                                        data: data,
+                                        page: query.page,
+                                        totalCount: result.data.purchaseHistory.length,
                                     })
                                 })
                                 .catch((err) => {
