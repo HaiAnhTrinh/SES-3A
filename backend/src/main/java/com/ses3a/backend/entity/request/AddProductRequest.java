@@ -1,6 +1,6 @@
 package com.ses3a.backend.entity.request;
 
-public class AddProductRequest extends BaseRequest{
+public class AddProductRequest extends BaseRequest {
 
     private String name;
     private String price;

@@ -1,6 +1,6 @@
 package com.ses3a.backend.entity.request;
 
-public class EditUserInfoRequest extends BaseRequest{
+public class EditUserInfoRequest extends BaseRequest {
     private String username;
     private String address;
     private String phone;
@@ -9,7 +9,7 @@ public class EditUserInfoRequest extends BaseRequest{
                                String role,
                                String username,
                                String address,
-                               String phone){
+                               String phone) {
         this.setEmail(email);
         this.setRole(role);
         this.setUsername(username);

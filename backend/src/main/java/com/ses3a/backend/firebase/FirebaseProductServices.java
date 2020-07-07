@@ -6,6 +6,7 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.ses3a.backend.entity.object.SupplierProduct;
 import com.ses3a.backend.entity.request.*;
 import org.springframework.stereotype.Service;
+
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,11 +30,11 @@ public class FirebaseProductServices {
         List<SupplierProduct> products = new ArrayList<>();
 
         //Iterate through all products
-        for(CollectionReference ref : collectionRefs){
+        for (CollectionReference ref : collectionRefs) {
             List<QueryDocumentSnapshot> documents =
                     ref.get().get().getDocuments();
 
-            for(QueryDocumentSnapshot document : documents){
+            for (QueryDocumentSnapshot document : documents) {
                 SupplierProduct product = new SupplierProduct();
                 product.setSupplierEmail(ref.getId());
                 product.setProductName(document.getString("name"));
@@ -85,7 +86,7 @@ public class FirebaseProductServices {
     //support getUserProducts and getUserOnlineProducts
     private void initGetUserProductsResponse(Iterable<CollectionReference> onlineProductRefs, List<Object> products)
             throws InterruptedException, ExecutionException {
-        for(CollectionReference ref : onlineProductRefs){
+        for (CollectionReference ref : onlineProductRefs) {
             Map<String, Object> data = ref.document("info").get().get().getData();
             SupplierProduct product = new SupplierProduct();
             product.setSupplierEmail(data.get("supplier").toString());
@@ -106,7 +107,7 @@ public class FirebaseProductServices {
     //2. Suppliers can change any info except for name and category
     //3. BO can change everything they manually added
     //4. BO can only change the quantity if they got the products from the website
-    public void editProduct(@NotNull EditProductRequest request){
+    public void editProduct(@NotNull EditProductRequest request) {
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
         String userType = convertToUserType(request.getRole());
@@ -118,12 +119,11 @@ public class FirebaseProductServices {
         data.put("category", request.getCategory());
         data.put("description", request.getDescription());
 
-        if(userType.equals("vendors")){
+        if (userType.equals("vendors")) {
             FirebaseUtils.getOneVendorProduct(firestore, request.getEmail(), request.getName(), request.getSupplier())
                     .document("info")
                     .set(data, SetOptions.merge());
-        }
-        else {
+        } else {
             //edit in the market
             firestore.collection("products")
                     .document(request.getCategory())
@@ -142,7 +142,7 @@ public class FirebaseProductServices {
     //Add products in Firestore
     //Vendors: add to node 'users'
     //Suppliers: add to node 'users' and 'products'
-    public boolean addProduct(@NotNull AddProductRequest request){
+    public boolean addProduct(@NotNull AddProductRequest request) {
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
         String userType = convertToUserType(request.getRole());
@@ -155,9 +155,9 @@ public class FirebaseProductServices {
         data.put("description", request.getDescription());
         data.put("imageUrl", request.getImageUrl());
 
-        if(userType.equals("suppliers")){
+        if (userType.equals("suppliers")) {
             try {
-                if(FirebaseUtils.supplierHasProduct(firestore, request.getEmail(), request.getName())){
+                if (FirebaseUtils.supplierHasProduct(firestore, request.getEmail(), request.getName())) {
                     System.out.println("This product has already existed in the suppliers' stock");
                     return false;
                 }
@@ -171,12 +171,10 @@ public class FirebaseProductServices {
                 FirebaseUtils.getOneSupplierProduct(firestore, request.getEmail(), request.getName())
                         .document("info")
                         .set(data);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        else {
+        } else {
             //add to vendor's stock
             FirebaseUtils.getOneVendorProduct(firestore, request.getEmail(), request.getName(), request.getSupplier())
                     .document("info")
@@ -195,28 +193,26 @@ public class FirebaseProductServices {
         String userType = convertToUserType(request.getRole());
         ApiFuture<QuerySnapshot> future;
 
-        if(userType.equals("suppliers")){
+        if (userType.equals("suppliers")) {
             firestore.collection("products")
                     .document(request.getCategory())
                     .collection(request.getEmail())
                     .document(request.getName())
                     .delete();
             future = FirebaseUtils.getOneSupplierProduct(firestore, request.getEmail(), request.getName()).get();
-        }
-        else{
+        } else {
             future = FirebaseUtils
                     .getOneVendorProduct(firestore, request.getEmail(), request.getName(), request.getSupplier())
                     .get();
         }
 
-        try{
+        try {
             // future.get() blocks on document retrieval
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
             for (QueryDocumentSnapshot document : documents) {
                 document.getReference().delete();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

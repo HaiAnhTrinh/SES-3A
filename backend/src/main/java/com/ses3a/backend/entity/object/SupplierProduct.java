@@ -9,7 +9,7 @@ public class SupplierProduct {
     private String productDescription;
     private String productImageUrl;
 
-    public SupplierProduct(){
+    public SupplierProduct() {
     }
 
     public SupplierProduct(String supplierEmail,

@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class FirestoreInitNewUser {
 
-    protected static void initVendor(Firestore firestore, CreateNewUserRequest request){
+    protected static void initVendor(Firestore firestore, CreateNewUserRequest request) {
         System.out.println("INIT VENDORS CALLED");
         Map<String, Object> emptyData = new HashMap<>();
         firestore.collection("users")
@@ -29,7 +29,7 @@ public class FirestoreInitNewUser {
                 .create(emptyData);
     }
 
-    protected static void initSupplier(Firestore firestore, CreateNewUserRequest request){
+    protected static void initSupplier(Firestore firestore, CreateNewUserRequest request) {
         System.out.println("INIT SUPPLIERS CALLED");
         Map<String, Object> emptyData = new HashMap<>();
         firestore.collection("users")

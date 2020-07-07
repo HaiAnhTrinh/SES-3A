@@ -6,7 +6,7 @@ public class GetUserInfoResponse extends BaseResponse {
 
     private UserInfo userInfo;
 
-    public GetUserInfoResponse(){
+    public GetUserInfoResponse() {
     }
 
     public UserInfo getUserInfo() {

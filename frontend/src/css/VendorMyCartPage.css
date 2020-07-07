@@ -1,77 +1,90 @@
 
-.my-cart-page-heading{
-	display: block;
+.my-cart-page-heading {
+    display: block;
     position: relative;
     margin-left: 10%;
-    
-}
-.my-cart-font{
-	display: inline-block;
-	position: relative;
-	font-size: 60px;
-    font-weight: bold;
-}
-.my-cart-image{
-	display: inline-block;
-	position: relative;
-	margin-left : 10px;
-}
-.my-cart-actions-holder-div{
-	text-align : center;
-	margin-top:90px;
+
 }
 
-.my-cart-item-quantity-holder{
-	display: inline-block;
+.my-cart-font {
+    display: inline-block;
+    position: relative;
+    font-size: 60px;
+    font-weight: bold;
 }
-.my-cart-item-quantity-textfield ,.my-cart-item-quantity-textfield input{
-	width: 30px;
+
+.my-cart-image {
+    display: inline-block;
+    position: relative;
+    margin-left: 10px;
+}
+
+.my-cart-actions-holder-div {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.my-cart-item-quantity-holder {
+    display: inline-block;
+}
+
+.my-cart-item-quantity-textfield, .my-cart-item-quantity-textfield input {
+    width: 30px;
     height: 25px;
     border-radius: 0;
-    padding:0;
+    padding: 0;
     text-align: center;
 }
-.my-cart-additem-button-placement-div{
-	text-align: left;
+
+.my-cart-additem-button-placement-div {
+    text-align: left;
     margin-left: 15%;
     margin-top: 30px;
 }
-.my-cart-subtitle-font{
-	font-weight: bold;
-	width: 21%;
+
+.my-cart-subtitle-font {
+    font-weight: bold;
+    width: 21%;
 }
-    .my-cart-items-description-div{
-         margin-top:33px;
-    }
-.my-cart-total-price-div{
-	 margin-top: 33px;
+
+.my-cart-items-description-div {
+    margin-top: 33px;
+}
+
+.my-cart-total-price-div {
+    margin-top: 33px;
     text-align: right;
     margin-right: 21%;
 }
-.my-cart-total-price-div input{
-	 width:70px;
-	 height: 35px;
-	 padding:0;
-	 text-align: center;
-	 border: 0;
+
+.my-cart-total-price-div input {
+    width: 70px;
+    height: 35px;
+    padding: 0;
+    text-align: center;
+    border: 0;
 }
-.my-cart-total-price-div input:hover{
-	cursor: default;
+
+.my-cart-total-price-div input:hover {
+    cursor: default;
 }
-.my-cart-proceed-payment-div{
-	margin-top:50px;
+
+.my-cart-proceed-payment-div {
+    margin-top: 50px;
 }
-.my-cart-items-box-holder{
-	height: 200px;
+
+.my-cart-items-box-holder {
+    height: 200px;
     overflow-y: scroll;
 }
-.my-cart-text-total-price{
-	font-size: 20px;
+
+.my-cart-text-total-price {
+    font-size: 20px;
     font-weight: bold;
     margin-right: -16px;
 }
 
-.my-cart-add-button-item{
+.my-cart-add-button-item {
     position: relative;
     font-weight: bold;
     font-size: 32px;
@@ -82,26 +95,28 @@ span.my-cart-add-button-item:hover {
     cursor: pointer;
 }
 
-.my-cart-table-heading{
-    width : 100%;
+.my-cart-table-heading {
+    width: 100%;
 }
+
 /* css for payment information */
 
-.my-cart-payment-information-box{
-	position: relative;
-	display : block;
+.my-cart-payment-information-box {
+    position: relative;
+    display: block;
 }
-.my-cart-heading-payment-info{
-	position: relative;
+
+.my-cart-heading-payment-info {
+    position: relative;
     width: 55%;
     margin-left: 10%;
     font-size: 23px;
     color: limegreen;
     font-weight: bolder;
 }
-	
-.my-cart-sub-heading-payment{
-	position: relative;
+
+.my-cart-sub-heading-payment {
+    position: relative;
     font-size: 17px;
     height: 45px;
     width: 80%;
@@ -112,8 +127,8 @@ span.my-cart-add-button-item:hover {
     overflow: hidden;
 }
 
-.my-cart-payment-details-div-box{
-	position: relative;
+.my-cart-payment-details-div-box {
+    position: relative;
     margin-left: 10%;
     margin-right: 10%;
     margin-top: 20px;
@@ -121,21 +136,21 @@ span.my-cart-add-button-item:hover {
     width: 80%;
 }
 
-.my-cart-payment-info-details-box{
-	position: relative;
-	display: inline-block;
-	 width: 50%;
+.my-cart-payment-info-details-box {
+    position: relative;
+    display: inline-block;
+    width: 50%;
 }
 
-.my-cart-payment-info-filling-box{
-	position: relative;
+.my-cart-payment-info-filling-box {
+    position: relative;
     display: inline-block;
     width: 50%;
     margin-top: -9px;
 }
 
-.my-cart-payment-info-details-title{
-	position: relative;
+.my-cart-payment-info-details-title {
+    position: relative;
     margin-bottom: 30px;
     font-weight: 600;
     text-overflow: ellipsis;
@@ -143,46 +158,46 @@ span.my-cart-add-button-item:hover {
     white-space: nowrap;
 }
 
-.my-cart-payment-info-filling-details-text{
+.my-cart-payment-info-filling-details-text {
     display: block;
     position: relative;
     height: 30px;
     margin-bottom: 21px;
 }
 
-.my-cart-payment-info-filling-details-text input{
+.my-cart-payment-info-filling-details-text input {
     padding: 0;
     height: 30px;
 }
 
-.my-cart-payment-info-filling-details-text div{
-   width:100%;
+.my-cart-payment-info-filling-details-text div {
+    width: 100%;
 }
 
-#my-cart-month-select{
-	width: 50%;
+#my-cart-month-select {
+    width: 50%;
     display: inline-flex;
 }
 
-.my-cart-cvv-width-box{
-	width:60px;
+.my-cart-cvv-width-box {
+    width: 60px;
 }
 
-.my-cart-year-select{
-	margin-left:40px;
+.my-cart-year-select {
+    margin-left: 40px;
 }
 
-.my-cart-radiobutton-text{
-	position: relative;
+.my-cart-radiobutton-text {
+    position: relative;
     top: -10px;
 }
 
-.hide-class-payment-button{
-	display: none;
+.hide-class-payment-button {
+    display: none;
 }
 
-.my-cart-proceed-payment-div-hide{
-	position:relative;
-	display: none;
+.my-cart-proceed-payment-div-hide {
+    position: relative;
+    display: none;
 }
 
