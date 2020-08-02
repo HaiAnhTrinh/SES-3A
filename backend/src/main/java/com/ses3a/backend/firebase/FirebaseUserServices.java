@@ -7,6 +7,7 @@ import com.ses3a.backend.entity.request.CreateNewUserRequest;
 import com.ses3a.backend.entity.request.EditUserInfoRequest;
 import com.ses3a.backend.entity.request.GetUserInfoRequest;
 import org.springframework.stereotype.Service;
+
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +19,7 @@ import static com.ses3a.backend.firebase.FirebaseUtils.convertToUserType;
 public class FirebaseUserServices {
 
     //Add newly registered user to Firestore
-    public void createNewUser(@NotNull CreateNewUserRequest request){
+    public void createNewUser(@NotNull CreateNewUserRequest request) {
         Firestore firestore = FirestoreClient.getFirestore();
         Map<String, Object> data = new HashMap<>();
         data.put("email", request.getEmail());
@@ -27,10 +28,9 @@ public class FirebaseUserServices {
         data.put("phone", "");
         String userType = convertToUserType(request.getRole());
 
-        if(userType.equals("vendors")){
+        if (userType.equals("vendors")) {
             FirestoreInitNewUser.initVendor(firestore, request);
-        }
-        else{
+        } else {
             FirestoreInitNewUser.initSupplier(firestore, request);
         }
 
@@ -45,11 +45,10 @@ public class FirebaseUserServices {
 
         Firestore firestore = FirestoreClient.getFirestore();
         String userType = convertToUserType(role);
-        try{
+        try {
             System.out.println("LOGIN: " + FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty());
             return !FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;

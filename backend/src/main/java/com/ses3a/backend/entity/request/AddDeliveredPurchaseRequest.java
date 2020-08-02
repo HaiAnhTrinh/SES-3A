@@ -1,10 +1,10 @@
 package com.ses3a.backend.entity.request;
 
-public class AddDeliveredPurchaseRequest extends BaseRequest{
+public class AddDeliveredPurchaseRequest extends BaseRequest {
 
     private String id;
 
-    public AddDeliveredPurchaseRequest(String email, String id){
+    public AddDeliveredPurchaseRequest(String email, String id) {
         this.setEmail(email);
         this.setId(id);
     }

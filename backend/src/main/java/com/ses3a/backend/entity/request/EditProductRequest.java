@@ -1,6 +1,6 @@
 package com.ses3a.backend.entity.request;
 
-public class EditProductRequest extends BaseRequest{
+public class EditProductRequest extends BaseRequest {
 
     private String name;
     private String price;
@@ -16,7 +16,7 @@ public class EditProductRequest extends BaseRequest{
                               String quantity,
                               String category,
                               String description,
-                              String supplier){
+                              String supplier) {
         this.setEmail(email);
         this.setRole(role);
         this.setName(name);

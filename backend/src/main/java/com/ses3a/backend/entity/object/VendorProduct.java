@@ -4,7 +4,7 @@ public class VendorProduct {
     private String productName;
     private String productQuantity;
 
-    public VendorProduct(){
+    public VendorProduct() {
     }
 
     public VendorProduct(String productName,
