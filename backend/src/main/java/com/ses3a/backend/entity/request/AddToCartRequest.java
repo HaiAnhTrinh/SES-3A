@@ -2,7 +2,7 @@ package com.ses3a.backend.entity.request;
 
 import com.ses3a.backend.entity.object.SupplierProduct;
 
-public class AddToCartRequest extends BaseRequest{
+public class AddToCartRequest extends BaseRequest {
 
     private SupplierProduct product;
     private String quantity;
@@ -14,7 +14,7 @@ public class AddToCartRequest extends BaseRequest{
                             String productDescription,
                             String productImageUrl,
                             String quantity,
-                            String email){
+                            String email) {
         this.product = new SupplierProduct(supplierEmail, productName, productPrice,
                 null, productDescription, productImageUrl, productCategory);
         this.setQuantity(quantity);

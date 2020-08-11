@@ -11,7 +11,7 @@ public class CartProduct {
     private String description;
     private String imageUrl;
 
-    public CartProduct(){
+    public CartProduct() {
     }
 
 //    public CartProduct(String name,

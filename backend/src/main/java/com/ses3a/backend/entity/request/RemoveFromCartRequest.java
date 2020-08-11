@@ -1,11 +1,11 @@
 package com.ses3a.backend.entity.request;
 
-public class RemoveFromCartRequest extends BaseRequest{
+public class RemoveFromCartRequest extends BaseRequest {
 
     private String productName;
     private String supplierEmail;
 
-    public RemoveFromCartRequest(String email, String productName, String supplierEmail){
+    public RemoveFromCartRequest(String email, String productName, String supplierEmail) {
         this.setEmail(email);
         this.setProductName(productName);
         this.setSupplierEmail(supplierEmail);

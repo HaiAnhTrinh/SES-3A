@@ -6,7 +6,7 @@ public class GetVendorPurchaseResponse extends BaseResponse {
 
     List<Object> purchaseHistory;
 
-    public GetVendorPurchaseResponse(){
+    public GetVendorPurchaseResponse() {
     }
 
     public List<Object> getPurchaseHistory() {
