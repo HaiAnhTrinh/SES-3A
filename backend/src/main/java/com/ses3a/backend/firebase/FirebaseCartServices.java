@@ -3,6 +3,7 @@ package com.ses3a.backend.firebase;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.ses3a.backend.Configs;
 import com.ses3a.backend.entity.object.CartProduct;
 import com.ses3a.backend.entity.request.*;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,10 @@ public class FirebaseCartServices {
         data.put("quantity", request.getQuantity());
 
         //add to node 'carts'
-        firestore.collection("carts")
+        firestore.collection(Configs.CARTS_COLLECTION)
                 .document(request.getEmail())
                 .collection(productId.toString())
-                .document("info")
+                .document(Configs.INFO)
                 .set(data);
     }
 
@@ -50,13 +51,13 @@ public class FirebaseCartServices {
 
         //Get the reference list of products in the cart
         Iterable<CollectionReference> collectionRefs =
-                firestore.collection("carts")
+                firestore.collection(Configs.CARTS_COLLECTION)
                         .document(request.getEmail())
                         .listCollections();
 
         //Iterate through all collection of products
         for (CollectionReference ref : collectionRefs) {
-            Map<String, Object> data = ref.document("info").get().get().getData();
+            Map<String, Object> data = ref.document(Configs.INFO).get().get().getData();
             CartProduct product = new CartProduct();
             String price = data.get("productPrice").toString();
             String quantity = data.get("quantity").toString();
@@ -90,7 +91,7 @@ public class FirebaseCartServices {
 
         try {
             ApiFuture<QuerySnapshot> future =
-                    firestore.collection("carts")
+                    firestore.collection(Configs.CARTS_COLLECTION)
                             .document(request.getEmail())
                             .collection(productId.toString())
                             .get();
@@ -122,30 +123,30 @@ public class FirebaseCartServices {
                 //ref to the supplier product in node 'users'
                 DocumentReference supplierProductRef = FirebaseUtils
                         .getOneSupplierProduct(firestore, cartProduct.getSupplier(), cartProduct.getName())
-                        .document("info");
+                        .document(Configs.INFO);
                 DocumentSnapshot supplierProductSnapshot = transaction.get(supplierProductRef).get();
 
                 //ref to the product in node 'products'
                 DocumentReference productsProductRef =
-                        firestore.collection("products")
+                        firestore.collection(Configs.PRODUCTS_COLLECTION)
                                 .document(cartProduct.getCategory())
                                 .collection(cartProduct.getSupplier())
                                 .document(cartProduct.getName());
 
                 //ref to the vendor purchase record
                 CollectionReference vendorPurchaseRef =
-                        firestore.collection("vendorPurchases")
+                        firestore.collection(Configs.VENDOR_PURCHASES_COLLECTION)
                                 .document(request.getEmail())
                                 .collection("purchaseHistory");
 
                 //ref to the supplier purchase record
                 CollectionReference supplierPendingPurchaseRef =
-                        firestore.collection("supplierPurchases")
+                        firestore.collection(Configs.SUPPLIER_PURCHASES_COLLECTION)
                                 .document(cartProduct.getSupplier())
                                 .collection("pendingPurchases");
 
                 //ref to the supplier revenue
-                DocumentReference revenueRef = firestore.collection("revenue").document(cartProduct.getSupplier());
+                DocumentReference revenueRef = firestore.collection(Configs.REVENUE_COLLECTION).document(cartProduct.getSupplier());
 
                 int supplierQuantity = Integer.parseInt(Objects.requireNonNull(supplierProductSnapshot.get("quantity")).toString());
                 int requestQuantity = Integer.parseInt(cartProduct.getQuantity());
@@ -181,20 +182,20 @@ public class FirebaseCartServices {
                 if (!FirebaseUtils.vendorHasOnlineProduct(firestore, request.getEmail(),
                         cartProduct.getName(), cartProduct.getSupplier())) {
                     AddProductRequest addRequest =
-                            new AddProductRequest(request.getEmail(), "Business owner", cartProduct.getName(),
+                            new AddProductRequest(request.getEmail(), Configs.BUSINESS_OWNER, cartProduct.getName(),
                                     cartProduct.getPrice(), cartProduct.getQuantity(), cartProduct.getDescription(),
                                     cartProduct.getImageUrl(), cartProduct.getCategory(), cartProduct.getSupplier());
                     firebaseProductServices.addProduct(addRequest);
                 } else {
                     String currentQuantity = FirebaseUtils
                             .getOneVendorProduct(firestore, request.getEmail(), cartProduct.getName(), cartProduct.getSupplier())
-                            .document("info")
+                            .document(Configs.INFO)
                             .get()
                             .get()
                             .get("quantity").toString();
                     String newQuantity = String.valueOf(Integer.parseInt(currentQuantity) + requestQuantity);
                     EditProductRequest editRequest =
-                            new EditProductRequest(request.getEmail(), "Business owner", cartProduct.getName(),
+                            new EditProductRequest(request.getEmail(), Configs.BUSINESS_OWNER, cartProduct.getName(),
                                     cartProduct.getPrice(), newQuantity, cartProduct.getCategory(),
                                     cartProduct.getDescription(), cartProduct.getSupplier());
                     firebaseProductServices.editProduct(editRequest);
@@ -204,7 +205,7 @@ public class FirebaseCartServices {
                 firebasePurchaseServices.addConfirmedPurchase(vendorPurchaseRef, cartProduct);
                 firebasePurchaseServices.addConfirmedPurchase(supplierPendingPurchaseRef, cartProduct);
 
-                return "Success";
+                return Configs.SUCCESS_MESSAGE;
             });
         }
         System.out.println("flag in the end: " + flag.toString());

@@ -1,11 +1,9 @@
 package com.ses3a.backend.firebase;
 
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.SetOptions;
 import com.google.firebase.cloud.FirestoreClient;
-import com.ses3a.backend.entity.object.CartProduct;
+import com.ses3a.backend.Configs;
 import com.ses3a.backend.entity.object.GraphData;
 import com.ses3a.backend.entity.request.CreateNewUserRequest;
 import com.ses3a.backend.entity.request.EditUserInfoRequest;
@@ -34,14 +32,14 @@ public class FirebaseUserServices {
         data.put("phone", "");
         String userType = convertToUserType(request.getRole());
 
-        if (userType.equals("vendors")) {
+        if (userType.equals(Configs.VENDOR_TYPE)) {
             FirestoreInitNewUser.initVendor(firestore, request);
         } else {
             FirestoreInitNewUser.initSupplier(firestore, request);
         }
 
         FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                .document("userInfo")
+                .document(Configs.USER_INFO)
                 .set(data);
     }
 
@@ -67,7 +65,7 @@ public class FirebaseUserServices {
         String userType = convertToUserType(request.getRole());
 
         return FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                .document("userInfo")
+                .document(Configs.USER_INFO)
                 .get()
                 .get()
                 .getData();
@@ -83,7 +81,7 @@ public class FirebaseUserServices {
         String userType = convertToUserType(request.getRole());
 
         FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                .document("userInfo")
+                .document(Configs.USER_INFO)
                 .set(data, SetOptions.merge());
     }
 
@@ -93,7 +91,7 @@ public class FirebaseUserServices {
         List<GraphData> graphData = new ArrayList<>();
 
         try{
-            firestore.collection("revenue").document(email).get().get().getData()
+            firestore.collection(Configs.REVENUE_COLLECTION).document(email).get().get().getData()
                     .forEach((k, v) -> {
                         graphData.add(new GraphData(k, v.toString()));
                     });

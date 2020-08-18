@@ -1,5 +1,6 @@
 package com.ses3a.backend.controller;
 
+import com.ses3a.backend.Configs;
 import com.ses3a.backend.entity.object.CartProduct;
 import com.ses3a.backend.entity.object.SupplierProduct;
 import com.ses3a.backend.entity.object.UserInfo;
@@ -42,7 +43,7 @@ public class RestApiController {
         ResponseEntity<CreateNewUserResponse> responseEntity =
                 new ResponseEntity<>(new CreateNewUserResponse(), HttpStatus.OK);
         firebaseUserServices.createNewUser(createNewUserRequest);
-        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
         responseEntity.getBody().setMessage("Register successful. Please verify your email.");
         return responseEntity;
     }
@@ -69,7 +70,7 @@ public class RestApiController {
                 new ResponseEntity<>(new GetUserInfoResponse(), HttpStatus.OK);
         try {
             Map<String, Object> userInfo = firebaseUserServices.getUserInfo(request);
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
             responseEntity.getBody().setMessage("Returned user info");
             responseEntity.getBody().setUserInfo(
                     new UserInfo(
@@ -94,7 +95,7 @@ public class RestApiController {
         ResponseEntity<EditUserInfoResponse> responseEntity =
                 new ResponseEntity<>(new EditUserInfoResponse(), HttpStatus.OK);
         firebaseUserServices.editUserInfo(editUserInfoRequest);
-        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
         responseEntity.getBody().setMessage("User info has been updated");
         return responseEntity;
     }
@@ -113,7 +114,7 @@ public class RestApiController {
                 GetProductByCategoryRequest request = new GetProductByCategoryRequest(email, category[i]);
                 List<SupplierProduct> products = firebaseProductServices.getProductByCategory(request);
                 System.out.println(products);
-                Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+                Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
                 responseEntity.getBody().getProducts().addAll(products);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -141,7 +142,7 @@ public class RestApiController {
                 responseEntity.getBody().setOnlineProducts(userOnlineProducts);
             }
 
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
             Objects.requireNonNull(responseEntity.getBody()).setMessage("Returned all products belong to this user");
         } catch (Exception e) {
             e.printStackTrace();
@@ -159,7 +160,7 @@ public class RestApiController {
         ResponseEntity<AddProductResponse> responseEntity =
                 new ResponseEntity<>(new AddProductResponse(), HttpStatus.OK);
         boolean added = firebaseProductServices.addProduct(addProductRequest);
-        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
         if (added) {
             responseEntity.getBody().setMessage("Product has been added");
         } else {
@@ -178,7 +179,7 @@ public class RestApiController {
         ResponseEntity<EditProductResponse> responseEntity =
                 new ResponseEntity<>(new EditProductResponse(), HttpStatus.OK);
         firebaseProductServices.editProduct(editProductRequest);
-        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
         responseEntity.getBody().setMessage("Product info has been edited");
         return responseEntity;
     }
@@ -192,7 +193,7 @@ public class RestApiController {
         ResponseEntity<DeleteProductResponse> responseEntity =
                 new ResponseEntity<>(new DeleteProductResponse(), HttpStatus.OK);
         firebaseProductServices.deleteProduct(deleteProductRequest);
-        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
         responseEntity.getBody().setMessage("Product has been deleted");
         return responseEntity;
     }
@@ -206,7 +207,7 @@ public class RestApiController {
         ResponseEntity<AddToCartResponse> responseEntity =
                 new ResponseEntity<>(new AddToCartResponse(), HttpStatus.OK);
         firebaseCartServices.addToCart(addToCartRequest);
-        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
         responseEntity.getBody().setMessage("Product has been added to your cart");
         return responseEntity;
     }
@@ -222,7 +223,7 @@ public class RestApiController {
                 new ResponseEntity<>(new GetCartResponse(), HttpStatus.OK);
         try {
             List<CartProduct> cartProducts = firebaseCartServices.getCartProduct(request);
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
             responseEntity.getBody().setCartProducts(cartProducts);
         } catch (Exception e) {
             e.printStackTrace();
@@ -239,7 +240,7 @@ public class RestApiController {
         ResponseEntity<RemoveFromCartResponse> responseEntity =
                 new ResponseEntity<>(new RemoveFromCartResponse(), HttpStatus.OK);
         firebaseCartServices.removeFromCart(removeFromCartRequest);
-        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
         responseEntity.getBody().setMessage("Product has been removed from your cart");
         return responseEntity;
     }
@@ -252,7 +253,7 @@ public class RestApiController {
         ResponseEntity<PurchaseResponse> responseEntity =
                 new ResponseEntity<>(new PurchaseResponse(), HttpStatus.OK);
         if (firebaseCartServices.purchase(purchaseRequest)) {
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
             responseEntity.getBody().setMessage("Product has been successfully purchased");
         } else {
             Objects.requireNonNull(responseEntity.getBody()).setStatus("Fail");
@@ -273,7 +274,7 @@ public class RestApiController {
                 new ResponseEntity<>(new GetVendorPurchaseResponse(), HttpStatus.OK);
         try {
             List<Object> products = firebasePurchaseServices.getVendorPurchase(request);
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
             responseEntity.getBody().setPurchaseHistory(products);
         } catch (Exception e) {
             e.printStackTrace();
@@ -292,7 +293,7 @@ public class RestApiController {
                 new ResponseEntity<>(new GetSupplierPendingPurchaseResponse(), HttpStatus.OK);
         try {
             List<Object> products = firebasePurchaseServices.getSupplierPendingPurchase(request);
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
             responseEntity.getBody().setPendingPurchases(products);
         } catch (Exception e) {
             e.printStackTrace();
@@ -311,7 +312,7 @@ public class RestApiController {
                 new ResponseEntity<>(new GetSupplierDeliveredPurchaseResponse(), HttpStatus.OK);
         try {
             List<Object> products = firebasePurchaseServices.getSupplierDeliveredPurchase(request);
-            Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+            Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
             responseEntity.getBody().setDeliveredPurchases(products);
         } catch (Exception e) {
             e.printStackTrace();
@@ -329,7 +330,7 @@ public class RestApiController {
                 new ResponseEntity<>(new BaseResponse(), HttpStatus.OK);
         firebasePurchaseServices.pendingToDelivered(addDeliveredPurchaseRequest);
 
-        Objects.requireNonNull(responseEntity.getBody()).setStatus("Success");
+        Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
         responseEntity.getBody().setMessage("Purchase id " + addDeliveredPurchaseRequest.getId() + " moved to delivered");
         return responseEntity;
     }
@@ -342,7 +343,7 @@ public class RestApiController {
         ResponseEntity<GetGraphDataResponse> responseEntity =
                 new ResponseEntity<>(new GetGraphDataResponse(), HttpStatus.OK);
         responseEntity.getBody().setData(firebaseUserServices.getGraphData(email));
-        
+
         return responseEntity;
     }
 }

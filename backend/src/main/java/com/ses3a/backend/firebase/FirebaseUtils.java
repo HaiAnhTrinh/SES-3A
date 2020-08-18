@@ -2,6 +2,7 @@ package com.ses3a.backend.firebase;
 
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
+import com.ses3a.backend.Configs;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,7 +12,7 @@ public class FirebaseUtils {
 
     //convert roles on the app into dtb user type
     protected static String convertToUserType(String role) {
-        return role.equals("Business owner") ? "vendors" : "suppliers";
+        return role.equals(Configs.BUSINESS_OWNER) ? Configs.VENDOR_TYPE : Configs.SUPPLIER_TYPE;
     }
 
     //Generate current date in the format: "dd-MM-yyyy"
@@ -23,14 +24,14 @@ public class FirebaseUtils {
 
     //Get the collection of a user: node 'users'
     protected static CollectionReference getUserCollection(Firestore firestore, String userType, String email) {
-        return firestore.collection("users")
+        return firestore.collection(Configs.USERS_COLLECTION)
                 .document(userType)
                 .collection(email);
     }
 
     //Get the collection of a supplier product: node 'users'
     protected static CollectionReference getOneSupplierProduct(Firestore firestore, String email, String productName) {
-        return getUserCollection(firestore, "suppliers", email)
+        return getUserCollection(firestore, Configs.SUPPLIER_TYPE, email)
                 .document("products")
                 .collection(productName);
     }
@@ -41,12 +42,12 @@ public class FirebaseUtils {
                                                              String productName, String productSupplier) {
         if (productSupplier != null && productSupplier.length() > 0) {
             String productId = productSupplier.concat("-").concat(productName);
-            return getUserCollection(firestore, "vendors", email)
+            return getUserCollection(firestore, Configs.VENDOR_TYPE, email)
                     .document("onlineProducts")
                     .collection(productId);
         }
 
-        return getUserCollection(firestore, "vendors", email)
+        return getUserCollection(firestore, Configs.VENDOR_TYPE, email)
                 .document("products")
                 .collection(productName);
     }
@@ -68,7 +69,7 @@ public class FirebaseUtils {
 
         if (productSupplier != null && productSupplier.length() > 0) {
             String productId = productSupplier.concat("-").concat(productName);
-            CollectionReference userRef = getUserCollection(firestore, "vendors", email);
+            CollectionReference userRef = getUserCollection(firestore, Configs.VENDOR_TYPE, email);
             return !userRef.document("onlineProducts").collection(productId).get().get().isEmpty();
         }
 
