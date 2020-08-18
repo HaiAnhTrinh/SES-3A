@@ -1,15 +1,21 @@
 package com.ses3a.backend.firebase;
 
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.SetOptions;
 import com.google.firebase.cloud.FirestoreClient;
+import com.ses3a.backend.entity.object.CartProduct;
+import com.ses3a.backend.entity.object.GraphData;
 import com.ses3a.backend.entity.request.CreateNewUserRequest;
 import com.ses3a.backend.entity.request.EditUserInfoRequest;
 import com.ses3a.backend.entity.request.GetUserInfoRequest;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -79,6 +85,24 @@ public class FirebaseUserServices {
         FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
                 .document("userInfo")
                 .set(data, SetOptions.merge());
+    }
+
+    //Get supplier revenue data
+    public List<GraphData> getGraphData(String email) {
+        Firestore firestore = FirestoreClient.getFirestore();
+        List<GraphData> graphData = new ArrayList<>();
+
+        try{
+            firestore.collection("revenue").document(email).get().get().getData()
+                    .forEach((k, v) -> {
+                        graphData.add(new GraphData(k, v.toString()));
+                    });
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return graphData;
     }
 
 }

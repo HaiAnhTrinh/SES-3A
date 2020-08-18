@@ -37,6 +37,9 @@ public class FirestoreInitNewUser {
                 .collection(request.getEmail())
                 .document("products")
                 .create(emptyData);
+        firestore.collection("revenue")
+                .document(request.getEmail())
+                .create(emptyData);
         firestore.collection("supplierPurchases")
                 .document(request.getEmail())
                 .collection("pendingPurchases")

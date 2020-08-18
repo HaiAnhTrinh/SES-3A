@@ -333,4 +333,16 @@ public class RestApiController {
         responseEntity.getBody().setMessage("Purchase id " + addDeliveredPurchaseRequest.getId() + " moved to delivered");
         return responseEntity;
     }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/GetGraphData")
+    public ResponseEntity<GetGraphDataResponse>
+    getGraphData(@RequestHeader String email) {
+        System.out.println("RECEIVED GET GRAPH DATA REQUEST");
+        ResponseEntity<GetGraphDataResponse> responseEntity =
+                new ResponseEntity<>(new GetGraphDataResponse(), HttpStatus.OK);
+        responseEntity.getBody().setData(firebaseUserServices.getGraphData(email));
+        
+        return responseEntity;
+    }
 }

@@ -11,10 +11,7 @@ public class FirebaseUtils {
 
     //convert roles on the app into dtb user type
     protected static String convertToUserType(String role) {
-        if (role.equals("Business owner")) {
-            return "vendors";
-        }
-        return "suppliers";
+        return role.equals("Business owner") ? "vendors" : "suppliers";
     }
 
     //Generate current date in the format: "dd-MM-yyyy"
@@ -44,7 +41,6 @@ public class FirebaseUtils {
                                                              String productName, String productSupplier) {
         if (productSupplier != null && productSupplier.length() > 0) {
             String productId = productSupplier.concat("-").concat(productName);
-//            CollectionReference userRef = getUserCollection(firestore, "vendors", email);
             return getUserCollection(firestore, "vendors", email)
                     .document("onlineProducts")
                     .collection(productId);
@@ -64,10 +60,10 @@ public class FirebaseUtils {
         return !getOneSupplierProduct(firestore, email, productName).get().get().isEmpty();
     }
 
-    //Check if the vendor has an existing product: node 'users'
-    //return 'true' if the product already exists
-    protected static boolean vendorHasProduct(Firestore firestore, String email,
-                                              String productName, String productSupplier)
+    //Check if the vendor has an existing online product: node 'users'
+    //return 'true' if the online product already exists
+    protected static boolean vendorHasOnlineProduct(Firestore firestore, String email,
+                                                    String productName, String productSupplier)
             throws ExecutionException, InterruptedException {
 
         if (productSupplier != null && productSupplier.length() > 0) {

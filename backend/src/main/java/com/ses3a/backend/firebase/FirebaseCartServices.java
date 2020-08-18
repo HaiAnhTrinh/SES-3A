@@ -111,6 +111,7 @@ public class FirebaseCartServices {
     //Update the market stocks
     //Update vendor and supplier purchase record
     //Clear the cart
+    //TODO: add to supplier's revenue
     public boolean purchase(PurchaseRequest request) {
         Firestore firestore = FirestoreClient.getFirestore();
         AtomicBoolean flag = new AtomicBoolean(true);
@@ -143,14 +144,26 @@ public class FirebaseCartServices {
                                 .document(cartProduct.getSupplier())
                                 .collection("pendingPurchases");
 
+                //ref to the supplier revenue
+                DocumentReference revenueRef = firestore.collection("revenue").document(cartProduct.getSupplier());
+
                 int supplierQuantity = Integer.parseInt(Objects.requireNonNull(supplierProductSnapshot.get("quantity")).toString());
                 int requestQuantity = Integer.parseInt(cartProduct.getQuantity());
-                int result = supplierQuantity - requestQuantity;
+                int supplierRemainingStock = supplierQuantity - requestQuantity;
+                double cost = Double.parseDouble(Objects.requireNonNull(cartProduct.getCost()));
 
-                //if sufficient, update the supplier stock and the market
-                if (result >= 0) {
-                    transaction.update(supplierProductRef, "quantity", String.valueOf(result));
-                    transaction.update(productsProductRef, "quantity", String.valueOf(result));
+                //if sufficient, update the supplier stock, the market and supplier revenue
+                if (supplierRemainingStock >= 0) {
+                    transaction.update(supplierProductRef, "quantity", String.valueOf(supplierRemainingStock));
+                    transaction.update(productsProductRef, "quantity", String.valueOf(supplierRemainingStock));
+                    if(revenueRef.get().get().get(FirebaseUtils.getFormattedDate()) != null){
+                        double newRevenue = Double.parseDouble(revenueRef.get().get().get(FirebaseUtils.getFormattedDate()).toString())
+                                + cost;
+                        transaction.update(revenueRef, FirebaseUtils.getFormattedDate(), String.valueOf(newRevenue));
+                    }
+                    else{
+                        transaction.update(revenueRef, FirebaseUtils.getFormattedDate(), String.valueOf(cost));
+                    }
                 } else {
                     System.out.println("not sufficient");
                     flag.set(false);
@@ -165,7 +178,7 @@ public class FirebaseCartServices {
                 RemoveFromCartRequest removeRequest =
                         new RemoveFromCartRequest(request.getEmail(), cartProduct.getName(), cartProduct.getSupplier());
 
-                if (!FirebaseUtils.vendorHasProduct(firestore, request.getEmail(),
+                if (!FirebaseUtils.vendorHasOnlineProduct(firestore, request.getEmail(),
                         cartProduct.getName(), cartProduct.getSupplier())) {
                     AddProductRequest addRequest =
                             new AddProductRequest(request.getEmail(), "Business owner", cartProduct.getName(),
