@@ -3,7 +3,6 @@ package com.ses3a.backend.firebase;
 import com.google.cloud.firestore.Firestore;
 import com.ses3a.backend.Configs;
 import com.ses3a.backend.entity.request.CreateNewUserRequest;
-import sun.security.krb5.Config;
 
 import java.util.HashMap;
 import java.util.Map;
