@@ -14,6 +14,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import {DropzoneDialog} from "material-ui-dropzone";
 import ProductPlaceHolder from "../../image/Image-Coming-Soon-Placeholder.jpg";
+import Hidden from "@material-ui/core/Hidden";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -144,82 +145,356 @@ export default function MaterialTableDemo(props) {
 
     return (
         <div className={classes.root}>
-            <Dialog onClose={handleClickCloseImageDialog} aria-labelledby="simple-dialog-title" open={openImageDialog}>
-                <DialogTitle id="simple-dialog-title">Product Image</DialogTitle>
-                <img src={imageUrl}/>
-            </Dialog>
-            <AppBar position="static" color="default">
-                <Tabs
-                    value={value}
-                    onChange={handleChange}
-                    indicatorColor="primary"
-                    textColor="primary"
-                    variant="fullWidth"
-                    aria-label="full width tabs example"
+            <Hidden smUp implementation="css">
+                SMALL TABLE
+            </Hidden>
+
+            <Hidden xsDown implementation="css">
+                <Dialog onClose={handleClickCloseImageDialog} aria-labelledby="simple-dialog-title" open={openImageDialog}>
+                    <DialogTitle id="simple-dialog-title">Product Image</DialogTitle>
+                    <img src={imageUrl}/>
+                </Dialog>
+                <AppBar position="static" color="default">
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        indicatorColor="primary"
+                        textColor="primary"
+                        variant="fullWidth"
+                        aria-label="full width tabs example"
+                    >
+                        <Tab label="Non-Market Stock" {...a11yProps(0)} />
+                        <Tab label="Market Stock" {...a11yProps(1)} />
+                    </Tabs>
+                </AppBar>
+                <SwipeableViews
+                    axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                    index={value}
+                    onChangeIndex={handleChangeIndex}
                 >
-                    <Tab label="Non-Market Stock" {...a11yProps(0)} />
-                    <Tab label="Market Stock" {...a11yProps(1)} />
-                </Tabs>
-            </AppBar>
-            <SwipeableViews
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value}
-                onChangeIndex={handleChangeIndex}
-            >
-                <TabPanel value={value} index={0} dir={theme.direction}>
-                    <div ref={targetRef}>
+                    <TabPanel value={value} index={0} dir={theme.direction}>
+                        <div ref={targetRef}>
 
-                        <p hidden={true}> {dimensions.width}</p>
-                        <p hidden={true}>{dimensions.height}</p>
+                            <p hidden={true}> {dimensions.width}</p>
+                            <p hidden={true}>{dimensions.height}</p>
 
-                    </div>
-                    <MaterialTable
-                        title="Current Stock"
-                        columns={
-                            [
-                                { title: 'Name*', field: 'productName', editable: 'onAdd',
-                                    cellStyle: {
-                                        textAlign: 'left'
+                        </div>
+                        <MaterialTable
+                            title="Current Stock"
+                            columns={
+                                [
+                                    { title: 'Name*', field: 'productName', editable: 'onAdd',
+                                        cellStyle: {
+                                            textAlign: 'left'
 
-                                    },},
-                                { title: 'Quantity*', field: 'productQuantity', type:'numeric',
-                                    cellStyle: {
-                                        textAlign: 'left',
+                                        },},
+                                    { title: 'Quantity*', field: 'productQuantity', type:'numeric',
+                                        cellStyle: {
+                                            textAlign: 'left',
 
+                                        },
+                                        headerStyle:{
+                                            textAlign:'left',}
                                     },
-                                    headerStyle:{
-                                        textAlign:'left',}
-                                    },
-                                // { title: 'Unit', field: 'productUnit',hidden: isPhone(),},
-                                { title: 'Category*', field: 'productCategory',
-                                    cellStyle: {
-                                        textAlign: 'left',
-                                    },
-                                    headerStyle:{
-                                        textAlign:'left',
-                                    }},
-                                { title: 'Price*', field: 'productPrice', type: 'currency',hidden: isPhone(),
-                                    cellStyle: {
-                                        textAlign: 'left',
-                                    },
-                                    headerStyle:{
-                                        textAlign:'left'}},
-                                { title: 'Description', field: 'productDescription',hidden: isPhone(),
-                                    cellStyle: {
-                                        textAlign: 'left',
-                                    },
-                                    headerStyle:{
-                                        textAlign:'left'}},
-                            ]
-                        }
-                        data={
-                            (query) =>
+                                    // { title: 'Unit', field: 'productUnit',hidden: isPhone(),},
+                                    { title: 'Category*', field: 'productCategory',
+                                        cellStyle: {
+                                            textAlign: 'left',
+                                        },
+                                        headerStyle:{
+                                            textAlign:'left',
+                                        }},
+                                    { title: 'Price*', field: 'productPrice', type: 'currency',hidden: isPhone(),
+                                        cellStyle: {
+                                            textAlign: 'left',
+                                        },
+                                        headerStyle:{
+                                            textAlign:'left'}},
+                                    { title: 'Description', field: 'productDescription',hidden: isPhone(),
+                                        cellStyle: {
+                                            textAlign: 'left',
+                                        },
+                                        headerStyle:{
+                                            textAlign:'left'}},
+                                ]
+                            }
+                            data={
+                                (query) =>
+                                    new Promise((resolve) => {
+                                        setTimeout(() => {
+                                            Axios.interceptors.request.use(request => {
+                                                console.log('Data Receive Request', request)
+                                                return request
+                                            });
+
+                                            Axios.get("http://localhost:8080/GetUserProduct", {
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'email': email,
+                                                        'role': 'Business owner'
+                                                    }
+                                                }
+                                            )
+                                                .then(result => {
+                                                    console.log("Result: ", result)
+                                                    console.log("Result data", result.data.products)
+                                                    var data = [];
+                                                    for (var i = query.pageSize * (query.page+1) - query.pageSize;
+                                                         i <= query.pageSize * (query.page+1) - 1; i++)
+                                                    {
+                                                        if(i +1 > result.data.products.length){
+                                                            break;}
+                                                        else{
+                                                            data.push(result.data.products[i]);
+                                                        }
+                                                    }
+                                                    resolve({
+                                                        data: data,
+                                                        page: query.page,
+                                                        totalCount: result.data.products.length,
+                                                    })
+                                                })
+                                                .catch((err) => {
+                                                        console.log("Error", err);
+                                                    }
+                                                )
+                                        },3000)
+                                    })
+                            }
+
+                            detailPanel={[
+                                {
+                                    tooltip: 'Show Details',
+                                    disabled: !isPhone(),
+                                    render: rowData => {
+                                        return (
+                                            <div
+                                                style={{
+                                                    textAlign: 'center'
+                                                }}
+                                            >
+                                                <p>Description: {rowData.productDescription}</p>
+                                                <p>Total cost: {rowData.productPrice}</p>
+                                            </div>
+                                        )
+                                    }
+                                }
+
+                            ]}
+
+                            actions={[
+                                {
+                                    icon: 'addImageIcon',
+                                    tooltip: 'Add Image',
+                                    onClick: (event, rowData) => {
+                                        setChosen(rowData.productName);
+                                        handleDropZoneOpen();
+                                    }
+                                },
+                                {
+                                    icon: 'image',
+                                    tooltip: 'Show Image',
+                                    onClick:
+                                        (event, rowData) => {
+                                            console.log("ImageRowData", rowData)
+
+                                            setOpenImageDialog(true);
+                                            setImageUrl(rowData.productImageUrl);
+                                        },
+                                },
+                            ]}
+
+
+
+                            options={{
+                                actionsColumnIndex: -1,
+                                search: false,
+                            }}
+
+                            editable={{
+                                onRowAdd: (newData) =>
+                                    new Promise((resolve) =>{
+                                        /**********************************************************************************/
+                                        const photoRef = productPhotoRef.child(email.concat("-").concat(newData.productName));
+                                        if( newData.productName && newData.productName.trim().length > 0 &&
+                                            newData.productQuantity && newData.productQuantity.trim().length > 0 &&
+                                            newData.productQuantity >0 &&
+                                            newData.productCategory && newData.productCategory.trim().length > 0 &&
+                                            newData.productPrice && newData.productPrice.trim().length > 0 &&
+                                            newData.productPrice >0){
+                                            setTimeout(() => {
+                                                resolve();
+                                                let canvas = document.createElement('canvas');
+                                                let context = canvas.getContext('2d');
+                                                const img = new Image();
+                                                img.src = ProductPlaceHolder;
+                                                canvas.width = 600;
+                                                canvas.height = 600;
+                                                context.drawImage(img, 0, 0);
+
+                                                canvas.toBlob( (blob) => {
+                                                    console.log("inside toBlob");
+                                                    console.log("blob", blob);
+                                                    photoRef.put(blob).on('state_changed',
+                                                        (snapshot) =>
+                                                        {
+                                                            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                                            console.log('Upload is ' + progress + '% done');
+                                                        }, (error) => {
+                                                            console.log(error);
+                                                        },  () => {
+                                                            photoRef.getDownloadURL().then( (url) => {
+                                                                console.log("url: ", url);
+                                                                Axios.interceptors.request.use(request => {
+                                                                    console.log('Add Request', request)
+                                                                    return request
+                                                                });
+                                                                Axios.post("http://localhost:8080/AddProduct",
+                                                                    {
+                                                                        'email': email,
+                                                                        'name': newData.productName,
+                                                                        'price': newData.productPrice,
+                                                                        'supplier': "",
+                                                                        'quantity': newData.productQuantity,
+                                                                        'category': newData.productCategory,
+                                                                        'description':
+                                                                            newData.productDescription &&
+                                                                            newData.productDescription.trim().length > 0
+                                                                                ? newData.productDescription
+                                                                                : "",
+                                                                        'imageUrl': url,
+                                                                        'role': 'Business owner',
+                                                                    },
+                                                                    {
+                                                                        headers: {
+                                                                            'Content-Type': 'application/json',
+                                                                        }
+                                                                    })
+                                                                    .then(response => console.log(response))
+                                                                    .catch((err) => {
+                                                                            console.log("Error", err);
+                                                                        }
+                                                                    )
+                                                            });
+                                                        }
+                                                    )
+                                                }, 'image/jpg');
+                                                /******************************************************************************/
+                                            }, 600)
+                                        }
+                                        else if(newData.productName && newData.productName.trim().length <= 0){
+                                            resolve();
+                                            alert("Name is required");
+                                        }
+                                        else if(newData.productQuantity && newData.productQuantity.trim().length <= 0 ||
+                                            newData.productQuantity >0){
+                                            resolve();
+                                            alert("Quantity is required and must be a positive value");
+                                        }
+                                        else if(newData.productCategory && newData.productCategory.trim().length <= 0){
+                                            resolve();
+                                            alert("Category is required");
+                                        }
+                                        else if(newData.productPrice && newData.productPrice.trim().length <= 0 ||
+                                            newData.productPrice > 0) {
+                                            resolve();
+                                            alert("Price is required and must be a positive value");
+                                        }
+                                        else{
+                                            resolve();
+                                            alert("Name, Quantity, Category and Price are required")
+                                        }
+
+                                    }),
+                                onRowUpdate: (newData, oldData) =>
+                                    new Promise((resolve) =>{
+                                        console.log(newData);
+                                        setTimeout(() => {
+                                            resolve();
+                                            console.log("QUAN");
+                                            console.log("EMAIL: ", email);
+                                            Axios.interceptors.request.use(request => {
+                                                console.log('Edit Request', request)
+                                                return request
+                                            });
+                                            Axios.post("http://localhost:8080/EditProduct",
+                                                {
+                                                    'email': email,
+                                                    'role': 'Business owner',
+                                                    'name': newData.productName,
+                                                    'price': newData.productPrice,
+                                                    'quantity': newData.productQuantity,
+                                                    'category': newData.productCategory,
+                                                    'description': newData.productDescription,
+                                                    'supplier':""
+
+                                                },
+                                                {
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                    }
+                                                })
+                                                .then(response => console.log(response))
+                                                .catch((err) => {
+                                                        console.log("Error", err);
+                                                    }
+                                                )
+
+                                        }, 600)
+
+                                    }),
+                                onRowDelete: (oldData) =>
+                                    new Promise((resolve) =>{
+                                        setTimeout(() => {
+                                            resolve();
+                                            Axios.interceptors.request.use(request => {
+                                                console.log('Delete Request', request)
+                                                return request
+                                            });
+                                            Axios.post("http://localhost:8080/DeleteProduct",
+                                                {
+                                                    'email': email,
+                                                    'role': 'Business owner',
+                                                    'name': oldData.productName,
+                                                    'category': oldData.productCategory,
+
+                                                },
+                                                {
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                    }
+                                                })
+                                                .then(response => console.log("Delete Response", response))
+                                                .catch((err) => {
+                                                        console.log("Error", err);
+                                                    }
+                                                )
+
+                                        }, 600)
+
+                                    }),
+                            }}
+
+                        />
+                    </TabPanel>
+                    <TabPanel value={value} index={1} dir={theme.direction}>
+
+                        <MaterialTable
+                            title="Current Stock"
+                            columns={
+                                [
+                                    { title: 'Name', field: 'productName', editable: 'never',},
+                                    { title: 'Quantity', field: 'productQuantity', type: 'numeric', },
+                                    // { title: 'Unit', field: 'productUnit', editable: 'never'},
+                                    { title: 'Category', field: 'productCategory', editable: 'never'},
+                                    { title: 'Price', field: 'productPrice', initialEditValue: '$', editable: 'never', hidden: isPhone()},
+                                    { title: 'Supplier', field: 'supplierEmail', editable: 'never'},
+                                    { title: 'Description', field: 'productDescription', editable: 'never', hidden: isPhone()},
+                                ]
+                            }
+                            data={(query) =>
                                 new Promise((resolve) => {
                                     setTimeout(() => {
-                                        Axios.interceptors.request.use(request => {
-                                            console.log('Data Receive Request', request)
-                                            return request
-                                        });
 
                                         Axios.get("http://localhost:8080/GetUserProduct", {
                                                 headers: {
@@ -231,410 +506,143 @@ export default function MaterialTableDemo(props) {
                                         )
                                             .then(result => {
                                                 console.log("Result: ", result)
-                                                console.log("Result data", result.data.products)
+                                                console.log("Result data onlineProducts", result.data.onlineProducts)
+
                                                 var data = [];
                                                 for (var i = query.pageSize * (query.page+1) - query.pageSize;
                                                      i <= query.pageSize * (query.page+1) - 1; i++)
                                                 {
-                                                    if(i +1 > result.data.products.length){
+                                                    if(i +1 > result.data.onlineProducts.length){
                                                         break;}
                                                     else{
-                                                        data.push(result.data.products[i]);
+                                                        data.push(result.data.onlineProducts[i]);
                                                     }
                                                 }
                                                 resolve({
                                                     data: data,
                                                     page: query.page,
-                                                    totalCount: result.data.products.length,
+                                                    totalCount: result.data.onlineProducts.length,
                                                 })
                                             })
                                             .catch((err) => {
                                                     console.log("Error", err);
                                                 }
                                             )
-                                    },3000)
+                                    },600)
+
                                 })
-                        }
-
-                        detailPanel={[
-                            {
-                                tooltip: 'Show Details',
-                                disabled: !isPhone(),
-                                render: rowData => {
-                                    return (
-                                        <div
-                                            style={{
-                                                textAlign: 'center'
-                                            }}
-                                        >
-                                            <p>Description: {rowData.productDescription}</p>
-                                            <p>Total cost: {rowData.productPrice}</p>
-                                        </div>
-                                    )
-                                }
                             }
+                            detailPanel={[
+                                {
+                                    tooltip: 'Show Details',
+                                    disabled: !isPhone(),
+                                    render: rowData => {
+                                        return (
+                                            <div
+                                                style={{
+                                                    textAlign: 'center'
+                                                }}
+                                            >
 
-                        ]}
-
-                        actions={[
-                            {
-                                icon: 'addImageIcon',
-                                tooltip: 'Add Image',
-                                onClick: (event, rowData) => {
-                                    setChosen(rowData.productName);
-                                    handleDropZoneOpen();
+                                                <p>Description: {rowData.productDescription}</p>
+                                                <p>Total cost: {rowData.productPrice}</p>
+                                            </div>
+                                        )
+                                    }
                                 }
-                            },
-                            {
-                                icon: 'image',
-                                tooltip: 'Show Image',
-                                onClick:
-                                    (event, rowData) => {
-                                        console.log("ImageRowData", rowData)
+                            ]}
 
-                                        setOpenImageDialog(true);
-                                        setImageUrl(rowData.productImageUrl);
-                                    },
-                            },
-                        ]}
+                            options={{
+                                actionsColumnIndex: -1,
+                                search: false,
+                            }}
 
-
-
-                        options={{
-                            actionsColumnIndex: -1,
-                            search: false,
-                        }}
-
-                        editable={{
-                            onRowAdd: (newData) =>
-                                new Promise((resolve) =>{
-                                    /**********************************************************************************/
-                                    const photoRef = productPhotoRef.child(email.concat("-").concat(newData.productName));
-                                    if( newData.productName && newData.productName.trim().length > 0 &&
-                                        newData.productQuantity && newData.productQuantity.trim().length > 0 &&
-                                        newData.productQuantity >0 &&
-                                        newData.productCategory && newData.productCategory.trim().length > 0 &&
-                                        newData.productPrice && newData.productPrice.trim().length > 0 &&
-                                        newData.productPrice >0){
+                            editable={{
+                                onRowUpdate: (newData, oldData) =>
+                                    new Promise((resolve) =>{
+                                        console.log(newData);
                                         setTimeout(() => {
                                             resolve();
-                                            let canvas = document.createElement('canvas');
-                                            let context = canvas.getContext('2d');
-                                            const img = new Image();
-                                            img.src = ProductPlaceHolder;
-                                            canvas.width = 600;
-                                            canvas.height = 600;
-                                            context.drawImage(img, 0, 0);
+                                            console.log("QUAN");
+                                            console.log("EMAIL: ", email);
+                                            Axios.interceptors.request.use(request => {
+                                                console.log('Edit Request', request)
+                                                return request
+                                            });
+                                            Axios.post("http://localhost:8080/EditProduct",
+                                                {
+                                                    'email': email,
+                                                    'role': 'Business owner',
+                                                    'name': newData.productName,
+                                                    'price': newData.productPrice,
+                                                    'quantity': newData.productQuantity,
+                                                    'category': newData.productCategory,
+                                                    'description': newData.productDescription,
+                                                    'imageUrl': newData.productImageUrl,
+                                                    'supplier': newData.supplierEmail,
 
-                                            canvas.toBlob( (blob) => {
-                                                console.log("inside toBlob");
-                                                console.log("blob", blob);
-                                                photoRef.put(blob).on('state_changed',
-                                                    (snapshot) =>
-                                                    {
-                                                        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                                                        console.log('Upload is ' + progress + '% done');
-                                                    }, (error) => {
-                                                        console.log(error);
-                                                    },  () => {
-                                                        photoRef.getDownloadURL().then( (url) => {
-                                                            console.log("url: ", url);
-                                                            Axios.interceptors.request.use(request => {
-                                                                console.log('Add Request', request)
-                                                                return request
-                                                            });
-                                                            Axios.post("http://localhost:8080/AddProduct",
-                                                                {
-                                                                    'email': email,
-                                                                    'name': newData.productName,
-                                                                    'price': newData.productPrice,
-                                                                    'supplier': "",
-                                                                    'quantity': newData.productQuantity,
-                                                                    'category': newData.productCategory,
-                                                                    'description':
-                                                                                 newData.productDescription &&
-                                                                                 newData.productDescription.trim().length > 0
-                                                                                ? newData.productDescription
-                                                                                : "",
-                                                                    'imageUrl': url,
-                                                                    'role': 'Business owner',
-                                                                },
-                                                                {
-                                                                    headers: {
-                                                                        'Content-Type': 'application/json',
-                                                                    }
-                                                                })
-                                                                .then(response => console.log(response))
-                                                                .catch((err) => {
-                                                                        console.log("Error", err);
-                                                                    }
-                                                                )
-                                                        });
+                                                },
+                                                {
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                    }
+                                                })
+                                                .then(response => console.log(response))
+                                                .catch((err) => {
+                                                        console.log("Error", err);
                                                     }
                                                 )
-                                            }, 'image/jpg');
-                                            /******************************************************************************/
+
                                         }, 600)
-                                    }
-                                    else if(newData.productName && newData.productName.trim().length <= 0){
-                                        resolve();
-                                        alert("Name is required");
-                                    }
-                                    else if(newData.productQuantity && newData.productQuantity.trim().length <= 0 &&
-                                        newData.productQuantity >0){
-                                        resolve();
-                                        alert("Quantity is required and must be a positive value");
-                                    }
-                                    else if(newData.productCategory && newData.productCategory.trim().length <= 0){
-                                        resolve();
-                                        alert("Category is required");
-                                    }
-                                    else if(newData.productPrice && newData.productPrice.trim().length <= 0 &&
-                                        newData.productPrice > 0) {
-                                        resolve();
-                                        alert("Price is required and must be a positive value");
-                                    }
-                                    else{
-                                        resolve();
-                                        alert("Name, Quantity, Category and Price are required")
-                                    }
 
-                                }),
-                            onRowUpdate: (newData, oldData) =>
-                                new Promise((resolve) =>{
-                                    console.log(newData);
-                                    setTimeout(() => {
-                                        resolve();
-                                        console.log("QUAN");
-                                        console.log("EMAIL: ", email);
-                                        Axios.interceptors.request.use(request => {
-                                            console.log('Edit Request', request)
-                                            return request
-                                        });
-                                        Axios.post("http://localhost:8080/EditProduct",
-                                            {
-                                                'email': email,
-                                                'role': 'Business owner',
-                                                'name': newData.productName,
-                                                'price': newData.productPrice,
-                                                'quantity': newData.productQuantity,
-                                                'category': newData.productCategory,
-                                                'description': newData.productDescription,
-                                                'supplier':""
+                                    }),
+                                onRowDelete: (oldData) =>
+                                    new Promise((resolve) =>{
+                                        setTimeout(() => {
+                                            resolve();
+                                            Axios.interceptors.request.use(request => {
+                                                console.log('Delete Request', request)
+                                                return request
+                                            });
+                                            Axios.post("http://localhost:8080/DeleteProduct",
+                                                {
+                                                    'email': email,
+                                                    'role': 'Business owner',
+                                                    'name': oldData.productName,
+                                                    'category': oldData.productCategory,
 
-                                            },
-                                            {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                }
-                                            })
-                                            .then(response => console.log(response))
-                                            .catch((err) => {
-                                                    console.log("Error", err);
-                                                }
-                                            )
+                                                },
+                                                {
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                    }
+                                                })
+                                                .then(response => console.log("Delete Reponse", response))
+                                                .catch((err) => {
+                                                        console.log("Error", err);
+                                                    }
+                                                )
 
-                                    }, 600)
+                                        }, 600)
 
-                                }),
-                            onRowDelete: (oldData) =>
-                                new Promise((resolve) =>{
-                                    setTimeout(() => {
-                                        resolve();
-                                        Axios.interceptors.request.use(request => {
-                                            console.log('Delete Request', request)
-                                            return request
-                                        });
-                                        Axios.post("http://localhost:8080/DeleteProduct",
-                                            {
-                                                'email': email,
-                                                'role': 'Business owner',
-                                                'name': oldData.productName,
-                                                'category': oldData.productCategory,
+                                    }),
+                            }}
+                        />
+                    </TabPanel>
 
-                                            },
-                                            {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                }
-                                            })
-                                            .then(response => console.log("Delete Response", response))
-                                            .catch((err) => {
-                                                    console.log("Error", err);
-                                                }
-                                            )
+                </SwipeableViews>
+                <DropzoneDialog
+                    open={dropZoneOpen}
+                    onSave={handleDropZoneSave}
+                    acceptedFiles={['image/jpeg', 'image/png', 'image/bmp']}
+                    showPreviews={true}
+                    filesLimit={1}
+                    maxFileSize={5000000}
+                    // initialFiles={image}
+                    onClose={handleDropZoneClose}
+                />
+            </Hidden>
 
-                                    }, 600)
-
-                                }),
-                        }}
-
-                    />
-                </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
-
-                    <MaterialTable
-                        title="Current Stock"
-                        columns={
-                            [
-                                { title: 'Name', field: 'productName', editable: 'never',},
-                                { title: 'Quantity', field: 'productQuantity', type: 'numeric', },
-                                // { title: 'Unit', field: 'productUnit', editable: 'never'},
-                                { title: 'Category', field: 'productCategory', editable: 'never'},
-                                { title: 'Price', field: 'productPrice', initialEditValue: '$', editable: 'never', hidden: isPhone()},
-                                { title: 'Supplier', field: 'supplierEmail', editable: 'never'},
-                                { title: 'Description', field: 'productDescription', editable: 'never', hidden: isPhone()},
-                            ]
-                        }
-                        data={(query) =>
-                            new Promise((resolve) => {
-                                setTimeout(() => {
-
-                                    Axios.get("http://localhost:8080/GetUserProduct", {
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'email': email,
-                                                'role': 'Business owner'
-                                            }
-                                        }
-                                    )
-                                        .then(result => {
-                                            console.log("Result: ", result)
-                                            console.log("Result data onlineProducts", result.data.onlineProducts)
-
-                                            var data = [];
-                                            for (var i = query.pageSize * (query.page+1) - query.pageSize;
-                                                 i <= query.pageSize * (query.page+1) - 1; i++)
-                                            {
-                                                if(i +1 > result.data.onlineProducts.length){
-                                                    break;}
-                                                else{
-                                                    data.push(result.data.onlineProducts[i]);
-                                                }
-                                            }
-                                            resolve({
-                                                data: data,
-                                                page: query.page,
-                                                totalCount: result.data.onlineProducts.length,
-                                            })
-                                        })
-                                        .catch((err) => {
-                                                console.log("Error", err);
-                                            }
-                                        )
-                                },600)
-
-                            })
-                        }
-                        detailPanel={[
-                            {
-                                tooltip: 'Show Details',
-                                disabled: !isPhone(),
-                                render: rowData => {
-                                    return (
-                                        <div
-                                            style={{
-                                                textAlign: 'center'
-                                            }}
-                                        >
-
-                                            <p>Description: {rowData.productDescription}</p>
-                                            <p>Total cost: {rowData.productPrice}</p>
-                                        </div>
-                                    )
-                                }
-                            }
-                        ]}
-
-                        options={{
-                            actionsColumnIndex: -1,
-                            search: false,
-                        }}
-
-                        editable={{
-                            onRowUpdate: (newData, oldData) =>
-                                new Promise((resolve) =>{
-                                    console.log(newData);
-                                    setTimeout(() => {
-                                        resolve();
-                                        console.log("QUAN");
-                                        console.log("EMAIL: ", email);
-                                        Axios.interceptors.request.use(request => {
-                                            console.log('Edit Request', request)
-                                            return request
-                                        });
-                                        Axios.post("http://localhost:8080/EditProduct",
-                                            {
-                                                'email': email,
-                                                'role': 'Business owner',
-                                                'name': newData.productName,
-                                                'price': newData.productPrice,
-                                                'quantity': newData.productQuantity,
-                                                'category': newData.productCategory,
-                                                'description': newData.productDescription,
-                                                'imageUrl': newData.productImageUrl,
-                                                'supplier': newData.supplierEmail,
-
-                                            },
-                                            {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                }
-                                            })
-                                            .then(response => console.log(response))
-                                            .catch((err) => {
-                                                    console.log("Error", err);
-                                                }
-                                            )
-
-                                    }, 600)
-
-                                }),
-                            onRowDelete: (oldData) =>
-                                new Promise((resolve) =>{
-                                    setTimeout(() => {
-                                        resolve();
-                                        Axios.interceptors.request.use(request => {
-                                            console.log('Delete Request', request)
-                                            return request
-                                        });
-                                        Axios.post("http://localhost:8080/DeleteProduct",
-                                            {
-                                                'email': email,
-                                                'role': 'Business owner',
-                                                'name': oldData.productName,
-                                                'category': oldData.productCategory,
-
-                                            },
-                                            {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                }
-                                            })
-                                            .then(response => console.log("Delete Reponse", response))
-                                            .catch((err) => {
-                                                    console.log("Error", err);
-                                                }
-                                            )
-
-                                    }, 600)
-
-                                }),
-                        }}
-                    />
-                </TabPanel>
-
-            </SwipeableViews>
-            <DropzoneDialog
-                open={dropZoneOpen}
-                onSave={handleDropZoneSave}
-                acceptedFiles={['image/jpeg', 'image/png', 'image/bmp']}
-                showPreviews={true}
-                filesLimit={1}
-                maxFileSize={5000000}
-                // initialFiles={image}
-                onClose={handleDropZoneClose}
-            />
         </div>
 
 
