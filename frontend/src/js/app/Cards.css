@@ -1,0 +1,9 @@
+.header{
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 5px;
+}
+.btn{
+  text-align:center;
+  margin-top: 20px;
+}

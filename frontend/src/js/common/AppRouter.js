@@ -6,6 +6,7 @@ import SupplierLoginPage from "../supplier/SupplierLoginPage";
 import SupplierLayout from "../supplier/SupplierLayout";
 import VendorLayout from "../vendor/VendorLayout";
 import CreateNewUser from "./CreateNewUser";
+import Cards from '../app/Cards'
 import * as firebase from "firebase/app";
 
 export default function AppRouter() {
@@ -39,18 +40,19 @@ export default function AppRouter() {
     return (
         <BrowserRouter>
             <Switch>
-                <Route path="/" exact strict render={ (props) => <VendorLoginPage {...props} />} />
-                <Route path="/VendorLogin" exact strict render={ (props) => <VendorLoginPage {...props} />} />
-                <Route path="/SupplierLogin" exact strict render={ (props) => <SupplierLoginPage {...props} />} />
+                <Route path="/" exact strict render={(props) => <VendorLoginPage {...props} />}/>
+                <Route path="/VendorLogin" exact strict render={(props) => <VendorLoginPage {...props} />}/>
+                <Route path="/SupplierLogin" exact strict render={(props) => <SupplierLoginPage {...props} />}/>
                 <Route path="/Vendor/:email"
-                       render={ (props) =>
+                       render={(props) =>
                            isLoggedIn ? <VendorLayout {...props}/> : <Redirect to="/"/>}
                 />
                 <Route path="/Supplier/:email"
-                       render={ (props) =>
+                       render={(props) =>
                            isLoggedIn ? <SupplierLayout {...props}/> : <Redirect to="/"/>}
                 />
-                <Route path="/CreateNewUser" exact strict component={CreateNewUser} />
+                <Route path="/CreateNewUser" exact strict component={CreateNewUser}/>
+                <Route path="/App/cardList" exact strict component={Cards}/>
             </Switch>
         </BrowserRouter>
     );
