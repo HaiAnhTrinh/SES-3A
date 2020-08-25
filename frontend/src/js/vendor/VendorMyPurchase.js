@@ -49,6 +49,28 @@ export default function MyPurchase(props) {
     const targetRef = useRef();
     const [dimensions, setDimensions] = useState({ width:0, height: 0 });
 
+    function refreshPage() {
+        window.location.reload(false);
+    }
+
+    function useWindowSize() {
+        const [size, setSize] = useState([0, 0]);
+        useLayoutEffect(() => {
+            function updateSize() {
+                setSize([window.innerWidth, window.innerHeight]);
+            }
+            window.addEventListener('resize', updateSize);
+            updateSize();
+            return () => window.removeEventListener('resize', updateSize);
+        }, []);
+        return size;
+    }
+
+    function ShowWindowDimensions() {
+        const [width, height] = useWindowSize();
+        return <span>Window size: {width} x {height}</span>;
+    }
+
     //Get the current size
     useLayoutEffect(() => {
         if (targetRef.current) {
@@ -62,11 +84,20 @@ export default function MyPurchase(props) {
 
     //Compare the table size to the recommended size for phone and output true or false
     function isPhone() {
+        var resizeTimeout;
+        window.addEventListener('resize', function(event) {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function(){
+                window.location.reload();
+            }, 1500);
+        });
         if(dimensions.width < 541){
             return true;
+
         }else {
             return false;
         }
+
     }
 
     const currentUser = firebase.auth().currentUser;
@@ -82,6 +113,7 @@ export default function MyPurchase(props) {
 
         return (
             <div>
+
                 {/*Get the current size of the table*/}
                 <div ref={targetRef}>
 
@@ -151,10 +183,12 @@ export default function MyPurchase(props) {
 
                 detailPanel={[
                             {
+
                                 tooltip: 'Show Details',
                                 disabled: !isPhone(),
                                 render: rowData => {
                                     return (
+
                                         <div
                                             style={{
                                                 textAlign: 'center'
