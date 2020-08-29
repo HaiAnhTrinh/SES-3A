@@ -466,7 +466,7 @@ export default function MaterialTableDemo(props) {
                                                 'email': email,
                                                 'role': 'Business owner',
                                                 'name': oldData.productName,
-                                                'category': oldData.productCategory,
+                                                'category': oldData.productCategory
                                             },
                                             {
                                                 headers: {
@@ -619,7 +619,7 @@ export default function MaterialTableDemo(props) {
                                                 'role': 'Business owner',
                                                 'name': oldData.productName,
                                                 'category': oldData.productCategory,
-
+                                                'supplier': oldData.supplierEmail
                                             },
                                             {
                                                 headers: {
