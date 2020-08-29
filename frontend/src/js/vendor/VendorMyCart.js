@@ -73,7 +73,6 @@ export default function MyCart(props){
         Axios.get("http://localhost:8080/GetCart",
             { headers: {'Content-Type': 'application/json', 'email': email}})
             .then((response) => {
-                console.log(response)
                 setCartItemDetails(response.data.cartProducts);
                 var totalCost = 0;
                 response.data.cartProducts.map((item) => totalCost += parseFloat(item.cost));
@@ -84,7 +83,6 @@ export default function MyCart(props){
 
 
     const handlePaymentSubmit = () => {
-        console.log("cartItemsDetails", cartItemsDetails);
         const data = {
             "email": email,
             "cartProducts": cartItemsDetails
@@ -103,10 +101,35 @@ export default function MyCart(props){
             setOpen(true);
         }
         else{
-            setInfoOnPaymentSubmission("Payment Received. Thank You fvpor Payment");
+            setInfoOnPaymentSubmission("Payment Received. Thank You for Payment");
             setOpen(true);
         }
     };
+
+    const onPayWithCreditsButtonClick = () => {
+        const data = {
+            "email": email,
+            "cartProducts": cartItemsDetails,
+            "useCredit": true
+        }
+
+        if(props.credit > total){
+            Axios.interceptors.request.use(request => {
+                console.log('Pay Credit Request', request.data)
+                return request;
+            });
+            Axios.post("http://localhost:8080/Purchase", data,
+                { headers: {'Content-Type': 'application/json'}} )
+                .then((response) => {
+                    window.alert(response.data.message);
+                    window.location.reload();
+                } )
+                .catch((error) => console.log(error));
+        }
+        else {
+            window.alert("INSUFFICIENT CREDIT");
+        }
+    }
 
     const handleClose = () => {
         setOpen(false);
@@ -184,9 +207,6 @@ export default function MyCart(props){
         setProceedPayment(true);
     };
 
-    // const onAddItemButtonClick = (e) => {
-    //     props.history.push("/Vendor/" + email + "/Home");
-    // };
 
     const onClickRemoveItem = (event, productName, supplierEmail) => {
         const data = {
@@ -291,15 +311,15 @@ export default function MyCart(props){
                     </Table>
                 </TableContainer>
 
-                {/*<div class= "my-cart-additem-button-placement-div">*/}
-                {/*    <Button type="submit" variant="contained"   color="primary" size="large" onClick={onAddItemButtonClick}>*/}
-                {/*        Add item*/}
-                {/*    </Button>*/}
-                {/*</div>*/}
-
                 <div className= {proceedPayment ? "hide-class-payment-button": "my-cart-proceed-payment-div"}>
-                    <Button type="submit" variant="contained"   color="primary" size="large" onClick={onProceedToPaymentButtonClick}>
+                    <Button type="submit" variant="contained" color="primary" size="large" onClick={onProceedToPaymentButtonClick}>
                         PROCEED TO PAYMENT
+                    </Button>
+                </div>
+                <br/>
+                <div>
+                    <Button type="submit" variant="contained" color="primary" size="large" onClick={onPayWithCreditsButtonClick}>
+                        PAY WITH CREDITS
                     </Button>
                 </div>
 

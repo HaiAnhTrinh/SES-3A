@@ -39,6 +39,8 @@ export default function VendorLayout(props) {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const [selectedIndex, setSelectedIndex] = useState();
+    const [credit, setCredit] = useState();
+    const firestoreRef = firebase.firestore();
     const drawerListObject = [{
         'text': 'Home',
         'path': baseUrl + '/Home'
@@ -59,6 +61,16 @@ export default function VendorLayout(props) {
     useEffect(() => {
         firebase.auth().onAuthStateChanged( (user) => {
             setBaseUrl("/Vendor/" + user.email);
+        });
+        // firestoreRef.collection("users").doc("vendors")
+        //     .collection(currentUser.email).doc("creditInfo")
+        //     .get().then((doc) => {
+        //         setCredit(doc.data().credit);
+        // });
+        firestoreRef.collection("users").doc("vendors")
+            .collection("trinhhaianh37@gmail.com").doc("creditInfo")
+            .get().then((doc) => {
+            setCredit(doc.data().credit);
         });
     }, []);
 
@@ -119,6 +131,9 @@ export default function VendorLayout(props) {
                         </IconButton>
                         <Typography variant="h6" className={classes.title}>
                             { currentUser ? currentUser.displayName : ""}
+                        </Typography>
+                        <Typography variant="h6" className={classes.title}>
+                            Your credit: ${currentUser ? credit : "0"}
                         </Typography>
                         <div>
                             <IconButton
@@ -189,7 +204,9 @@ export default function VendorLayout(props) {
                         <Route path="/Vendor/:email/Home" exact strict component={Home}/>
                         <Route path="/Vendor/:email/MyStock" exact strict component={MyStock}/>
                         <Route path="/Vendor/:email/MyPurchase" exact strict component={MyPurchase}/>
-                        <Route path="/Vendor/:email/MyCart" exact strict component={MyCart}/>
+                        <Route path="/Vendor/:email/MyCart" exact strict>
+                            <MyCart {...props} credit={credit} />
+                        </Route>
                         <Route path="/Vendor/:email/Graph" exact strict component={Graph}/>
                         <Route path="/Vendor/:email/MyAccount" exact strict>
                             <Account {...props} role="Business owner" />

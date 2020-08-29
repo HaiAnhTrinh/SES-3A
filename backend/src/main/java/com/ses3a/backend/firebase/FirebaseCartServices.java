@@ -148,6 +148,10 @@ public class FirebaseCartServices {
                 //ref to the supplier revenue
                 DocumentReference revenueRef = firestore.collection(Configs.REVENUE_COLLECTION).document(cartProduct.getSupplier());
 
+                //ref to the BO's credit
+                DocumentReference creditRef = firestore.collection(Configs.USERS_COLLECTION).document(Configs.VENDOR_TYPE)
+                        .collection(request.getEmail()).document("creditInfo");
+
                 int supplierQuantity = Integer.parseInt(Objects.requireNonNull(supplierProductSnapshot.get("quantity")).toString());
                 int requestQuantity = Integer.parseInt(cartProduct.getQuantity());
                 int supplierRemainingStock = supplierQuantity - requestQuantity;
@@ -158,15 +162,21 @@ public class FirebaseCartServices {
                     transaction.update(supplierProductRef, "quantity", String.valueOf(supplierRemainingStock));
                     transaction.update(productsProductRef, "quantity", String.valueOf(supplierRemainingStock));
                     if(revenueRef.get().get().get(FirebaseUtils.getFormattedDate()) != null){
-                        double newRevenue = Double.parseDouble(revenueRef.get().get().get(FirebaseUtils.getFormattedDate()).toString())
+                        double newRevenue = Double.parseDouble(Objects.requireNonNull(revenueRef.get().get().get(FirebaseUtils.getFormattedDate())).toString())
                                 + cost;
                         transaction.update(revenueRef, FirebaseUtils.getFormattedDate(), String.valueOf(newRevenue));
                     }
                     else{
                         transaction.update(revenueRef, FirebaseUtils.getFormattedDate(), String.valueOf(cost));
                     }
+                    if(request.isUseCredit()){
+                        double credit = Double.parseDouble(Objects.requireNonNull(creditRef.get().get().get("credit")).toString());
+                        credit -= cost;
+                        System.out.println("Remaining credit: " + credit);
+                        transaction.update(creditRef, "credit", String.valueOf(credit));
+                    }
                 } else {
-                    System.out.println("not sufficient");
+                    System.out.println("not sufficient stock");
                     flag.set(false);
                     System.out.println("flag in case of insufficient: " + flag.toString());
                     return "Fail";
@@ -187,12 +197,12 @@ public class FirebaseCartServices {
                                     cartProduct.getImageUrl(), cartProduct.getCategory(), cartProduct.getSupplier());
                     firebaseProductServices.addProduct(addRequest);
                 } else {
-                    String currentQuantity = FirebaseUtils
+                    String currentQuantity = Objects.requireNonNull(FirebaseUtils
                             .getOneVendorProduct(firestore, request.getEmail(), cartProduct.getName(), cartProduct.getSupplier())
                             .document(Configs.INFO)
                             .get()
                             .get()
-                            .get("quantity").toString();
+                            .get("quantity")).toString();
                     String newQuantity = String.valueOf(Integer.parseInt(currentQuantity) + requestQuantity);
                     EditProductRequest editRequest =
                             new EditProductRequest(request.getEmail(), Configs.BUSINESS_OWNER, cartProduct.getName(),

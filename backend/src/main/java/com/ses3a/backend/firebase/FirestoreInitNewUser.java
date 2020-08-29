@@ -12,11 +12,20 @@ public class FirestoreInitNewUser {
     protected static void initVendor(Firestore firestore, CreateNewUserRequest request) {
         System.out.println("INIT VENDORS CALLED");
         Map<String, Object> emptyData = new HashMap<>();
+
+        Map<String, Object> creditData = new HashMap<>();
+        creditData.put("credit", "0");
+
         firestore.collection(Configs.USERS_COLLECTION)
                 .document(FirebaseUtils.convertToUserType(request.getRole()))
                 .collection(request.getEmail())
                 .document("products")
                 .create(emptyData);
+        firestore.collection(Configs.USERS_COLLECTION)
+                .document(FirebaseUtils.convertToUserType(request.getRole()))
+                .collection(request.getEmail())
+                .document("creditInfo")
+                .create(creditData);
         firestore.collection(Configs.USERS_COLLECTION)
                 .document(FirebaseUtils.convertToUserType(request.getRole()))
                 .collection(request.getEmail())
