@@ -15,6 +15,21 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import {DropzoneDialog} from "material-ui-dropzone";
 import ProductPlaceHolder from "../../image/Image-Coming-Soon-Placeholder.jpg";
 import Hidden from "@material-ui/core/Hidden";
+import MUIDataTable from "mui-datatables";
+import Collapse from '@material-ui/core/Collapse';
+import IconButton from '@material-ui/core/IconButton';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+
+
+
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -56,7 +71,99 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const useRowStyles = makeStyles({
+    root: {
+        '& > *': {
+            borderBottom: 'unset',
+        },
+    },
+});
 
+function createData(name) {
+    return {
+        name,
+        history: [
+            { quantity: 5, category: 'vege', description: 'carrot', price: 10 },
+            { quantity: 5, category: 'drink', description: 'pepsi', price: 10 },
+        ],
+    };
+}
+
+function Row(props) {
+    const { row } = props;
+    const [open, setOpen] = React.useState(false);
+    const classes = useRowStyles();
+
+    return (
+        <React.Fragment>
+            <TableRow className={classes.root}>
+                <TableCell>
+                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                </TableCell>
+                <TableCell component="th" scope="row">
+                    {row.name}
+                </TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Box margin={1}>
+                            <Typography variant="h6" gutterBottom component="div">
+                                History
+                            </Typography>
+                            <Table size="small" aria-label="purchases">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Quantity</TableCell>
+                                        <TableCell>Category</TableCell>
+                                        <TableCell align="right">Description</TableCell>
+                                        <TableCell align="right">Price ($)</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {row.history.map((historyRow) => (
+                                        <TableRow key={historyRow.quantity}>
+                                            <TableCell component="th" scope="row">
+                                                {historyRow.quantity}
+                                            </TableCell>
+                                            <TableCell>{historyRow.category}</TableCell>
+                                            <TableCell align="right">{historyRow.description}</TableCell>
+                                            <TableCell align="right">
+                                                {historyRow.price}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </Box>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+        </React.Fragment>
+    );
+}
+
+Row.propTypes = {
+    row: PropTypes.shape({
+        history: PropTypes.arrayOf(
+            PropTypes.shape({
+                quantity: PropTypes.number.isRequired,
+                category: PropTypes.string.isRequired,
+                description: PropTypes.string.isRequired,
+                price: PropTypes.number.isRequired,
+            }),
+        ).isRequired,
+        name: PropTypes.string.isRequired,
+    }).isRequired,
+};
+
+
+const rows = [
+    createData('Frozen yoghurt'),
+    createData('Ice cream sandwich'),
+];
 
 export default function MaterialTableDemo(props) {
     const email = props.match.params.email;
@@ -143,10 +250,24 @@ export default function MaterialTableDemo(props) {
         }
     }
 
-    return (
+    return(
         <div className={classes.root}>
             <Hidden smUp implementation="css">
-                SMALL TABLE
+                <TableContainer component={Paper}>
+                    <Table aria-label="collapsible table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell />
+                                <TableCell>Name</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {rows.map((row) => (
+                                <Row key={row.name} row={row} />
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Hidden>
 
             <Hidden xsDown implementation="css">
@@ -196,7 +317,7 @@ export default function MaterialTableDemo(props) {
                                         headerStyle:{
                                             textAlign:'left',}
                                     },
-                                    // { title: 'Unit', field: 'productUnit',hidden: isPhone(),},
+
                                     { title: 'Category*', field: 'productCategory',
                                         cellStyle: {
                                             textAlign: 'left',
@@ -204,13 +325,13 @@ export default function MaterialTableDemo(props) {
                                         headerStyle:{
                                             textAlign:'left',
                                         }},
-                                    { title: 'Price*', field: 'productPrice', type: 'currency',hidden: isPhone(),
+                                    { title: 'Price*', field: 'productPrice', type: 'currency',
                                         cellStyle: {
                                             textAlign: 'left',
                                         },
                                         headerStyle:{
                                             textAlign:'left'}},
-                                    { title: 'Description', field: 'productDescription',hidden: isPhone(),
+                                    { title: 'Description', field: 'productDescription',
                                         cellStyle: {
                                             textAlign: 'left',
                                         },
@@ -309,12 +430,13 @@ export default function MaterialTableDemo(props) {
                             options={{
                                 actionsColumnIndex: -1,
                                 search: false,
+
                             }}
 
                             editable={{
                                 onRowAdd: (newData) =>
                                     new Promise((resolve) =>{
-                                        /**********************************************************************************/
+
                                         const photoRef = productPhotoRef.child(email.concat("-").concat(newData.productName));
                                         if( newData.productName && newData.productName.trim().length > 0 &&
                                             newData.productQuantity && newData.productQuantity.trim().length > 0 &&
@@ -379,7 +501,7 @@ export default function MaterialTableDemo(props) {
                                                         }
                                                     )
                                                 }, 'image/jpg');
-                                                /******************************************************************************/
+
                                             }, 600)
                                         }
                                         else if(newData.productName && newData.productName.trim().length <= 0){
@@ -487,9 +609,9 @@ export default function MaterialTableDemo(props) {
                                     { title: 'Quantity', field: 'productQuantity', type: 'numeric', },
                                     // { title: 'Unit', field: 'productUnit', editable: 'never'},
                                     { title: 'Category', field: 'productCategory', editable: 'never'},
-                                    { title: 'Price', field: 'productPrice', initialEditValue: '$', editable: 'never', hidden: isPhone()},
+                                    { title: 'Price', field: 'productPrice', initialEditValue: '$', editable: 'never'},
                                     { title: 'Supplier', field: 'supplierEmail', editable: 'never'},
-                                    { title: 'Description', field: 'productDescription', editable: 'never', hidden: isPhone()},
+                                    { title: 'Description', field: 'productDescription', editable: 'never'},
                                 ]
                             }
                             data={(query) =>
@@ -643,11 +765,12 @@ export default function MaterialTableDemo(props) {
                 />
             </Hidden>
 
+
+
         </div>
-
-
 
 
 
     );
 }
+
