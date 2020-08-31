@@ -18,6 +18,8 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import Axios from "axios";
+import {height, style, width} from "@material-ui/system";
+import {UnfoldLess} from "@material-ui/icons";
 
 
 
@@ -91,7 +93,7 @@ export default function MyPurchase(props) {
                 window.location.reload();
             }, 1500);
         });
-        if(dimensions.width < 541){
+        if(dimensions.width <= 541){
             return true;
 
         }else {
@@ -100,6 +102,7 @@ export default function MyPurchase(props) {
 
     }
 
+
     const currentUser = firebase.auth().currentUser;
     const email = props.match.params.email;
     // const test = () =>setGet("Quan");
@@ -107,12 +110,14 @@ export default function MyPurchase(props) {
     console.log("Props: ", props);
     console.log("Email: ", email);
 
-
+    var divStyle = {
+        maxWidth: '541'
+    };
 
         /*const { isPhone } = this.state;*/
 
         return (
-            <div>
+            <div style={divStyle}>
 
                 {/*Get the current size of the table*/}
                 <div ref={targetRef}>
@@ -123,7 +128,8 @@ export default function MyPurchase(props) {
                 </div>
 
             <MaterialTable
-                tableLayout = 'auto'
+                maxWidth = "556"
+
                 icons={tableIcons}
                 title="Purchase History"
                 columns={[
@@ -131,7 +137,7 @@ export default function MyPurchase(props) {
                     /*Hidden attribute (boolean) will call the function isPhone
                     *If the size of table is small then hide the non required fields*/
                     { title: 'Amount', field: 'quantity', type: 'numeric', hidden: isPhone()},
-                    { title: 'Cost', field: 'cost' , initialEditValue: '$ ', hidden: isPhone()},
+                    { title: 'Cost', field: 'cost' , initialEditValue: '$ ', hidden: isPhone() },
                     { title: 'Category', field: 'category'},
                     { title: 'Date of Purchase', field: 'date', type: 'date'},
                     { title: 'Supplier', field: 'supplier'}
@@ -182,29 +188,28 @@ export default function MyPurchase(props) {
                 }
 
                 detailPanel={[
-                            {
 
+                            {
                                 tooltip: 'Show Details',
                                 disabled: !isPhone(),
+
                                 render: rowData => {
                                     return (
-
                                         <div
                                             style={{
                                                 textAlign: 'center'
-                                            }}
-                                        >
-
+                                            }}>
                                             <p>Total amount: {rowData.quantity}</p>
                                             <p>Total cost: {rowData.cost}</p>
                                         </div>
                                     )
                                 }
                             }
-                    ]}
-
+                ]}
+                onRowClick={(event, rowData, togglePanel) => togglePanel()}
 
             />
+
             </div>
         )
 
