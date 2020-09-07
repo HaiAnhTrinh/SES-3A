@@ -61,18 +61,13 @@ export default function VendorLayout(props) {
     useEffect(() => {
         firebase.auth().onAuthStateChanged( (user) => {
             setBaseUrl("/Vendor/" + user.email);
+            firestoreRef.collection("users").doc("vendors")
+                .collection(user.email).doc("creditInfo")
+                .get().then((doc) => {
+                setCredit(doc.data().credit);
+            });
         });
-        // firestoreRef.collection("users").doc("vendors")
-        //     .collection(currentUser.email).doc("creditInfo")
-        //     .get().then((doc) => {
-        //         setCredit(doc.data().credit);
-        // });
-        firestoreRef.collection("users").doc("vendors")
-            .collection("trinhhaianh37@gmail.com").doc("creditInfo")
-            .get().then((doc) => {
-            setCredit(doc.data().credit);
-        });
-    }, []);
+    });
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
