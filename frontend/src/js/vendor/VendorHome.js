@@ -463,8 +463,6 @@ export default function Home(props){
 
                                 <GridListTileBar
                                     height={4}
-                                    title={<span>{tile.productPrice} for {tile.productQuantity}</span>}
-
                                     title={tile.productPrice}
 
                                     subtitle={<span>By: {tile.supplierEmail} </span>}

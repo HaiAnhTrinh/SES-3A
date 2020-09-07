@@ -15,10 +15,10 @@ public class FirebaseUtils {
         return role.equals(Configs.BUSINESS_OWNER) ? Configs.VENDOR_TYPE : Configs.SUPPLIER_TYPE;
     }
 
-    //Generate current date in the format: "dd-MM-yyyy"
+    //Generate current date in the format: "yyyy-MM-dd"
     protected static String getFormattedDate() {
         LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter formatObject = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter formatObject = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return currentDate.format(formatObject);
     }
 
