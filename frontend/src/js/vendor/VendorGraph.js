@@ -1,6 +1,6 @@
 import React,{Component} from 'react'
 import {Card} from 'antd'
-//按需导入
+
 import echarts from 'echarts/lib/echarts'
 
 import 'echarts/lib/chart/line'
