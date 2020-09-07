@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 public class RestApiController {
@@ -248,7 +249,7 @@ public class RestApiController {
     @CrossOrigin(origins = "*")
     @PostMapping("/Purchase")
     public ResponseEntity<PurchaseResponse>
-    purchase(@RequestBody PurchaseRequest purchaseRequest) {
+    purchase(@RequestBody PurchaseRequest purchaseRequest) throws ExecutionException, InterruptedException {
         System.out.println("RECEIVED PURCHASE REQUEST");
         ResponseEntity<PurchaseResponse> responseEntity =
                 new ResponseEntity<>(new PurchaseResponse(), HttpStatus.OK);

@@ -113,11 +113,16 @@ public class FirebaseCartServices {
     //Update vendor and supplier purchase record
     //Clear the cart
     //TODO: add to supplier's revenue
-    public boolean purchase(PurchaseRequest request) {
+    public boolean purchase(PurchaseRequest request) throws ExecutionException, InterruptedException {
         Firestore firestore = FirestoreClient.getFirestore();
         AtomicBoolean flag = new AtomicBoolean(true);
+        //ref to the BO's credit
+        DocumentReference creditRef = firestore.collection(Configs.USERS_COLLECTION).document(Configs.VENDOR_TYPE)
+                .collection(request.getEmail()).document("creditInfo");
+        double totalCost = 0;
 
         for (CartProduct cartProduct : request.getCartProducts()) {
+            totalCost += Double.parseDouble(Objects.requireNonNull(cartProduct.getCost()));
             ApiFuture<String> futureTransaction = firestore.runTransaction(transaction -> {
 
                 //ref to the supplier product in node 'users'
@@ -148,10 +153,6 @@ public class FirebaseCartServices {
                 //ref to the supplier revenue
                 DocumentReference revenueRef = firestore.collection(Configs.REVENUE_COLLECTION).document(cartProduct.getSupplier());
 
-                //ref to the BO's credit
-                DocumentReference creditRef = firestore.collection(Configs.USERS_COLLECTION).document(Configs.VENDOR_TYPE)
-                        .collection(request.getEmail()).document("creditInfo");
-
                 int supplierQuantity = Integer.parseInt(Objects.requireNonNull(supplierProductSnapshot.get("quantity")).toString());
                 int requestQuantity = Integer.parseInt(cartProduct.getQuantity());
                 int supplierRemainingStock = supplierQuantity - requestQuantity;
@@ -168,12 +169,6 @@ public class FirebaseCartServices {
                     }
                     else{
                         transaction.update(revenueRef, FirebaseUtils.getFormattedDate(), String.valueOf(cost));
-                    }
-                    if(request.isUseCredit()){
-                        double credit = Double.parseDouble(Objects.requireNonNull(creditRef.get().get().get("credit")).toString());
-                        credit -= cost;
-                        System.out.println("Remaining credit: " + credit);
-                        transaction.update(creditRef, "credit", String.valueOf(credit));
                     }
                 } else {
                     System.out.println("not sufficient stock");
@@ -217,6 +212,13 @@ public class FirebaseCartServices {
 
                 return Configs.SUCCESS_MESSAGE;
             });
+        }
+        if(request.isUseCredit()){
+            double credit = Double.parseDouble(Objects.requireNonNull(creditRef.get().get().get("credit")).toString());
+            System.out.println("Current credit: " + credit);
+            credit -= totalCost;
+            System.out.println("Remaining credit: " + credit);
+            creditRef.update("credit", String.valueOf(credit));
         }
         System.out.println("flag in the end: " + flag.toString());
         return flag.get();
