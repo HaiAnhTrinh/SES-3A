@@ -1,4 +1,4 @@
-import React, {useState, useRef, useLayoutEffect} from 'react';
+import React, {useState, useRef, useLayoutEffect, useEffect} from 'react';
 import MaterialTable from 'material-table';
 import Axios from "axios";
 import * as firebase from "firebase";
@@ -15,7 +15,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import {DropzoneDialog} from "material-ui-dropzone";
 import ProductPlaceHolder from "../../image/Image-Coming-Soon-Placeholder.jpg";
 import Hidden from "@material-ui/core/Hidden";
-import MUIDataTable from "mui-datatables";
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import Table from '@material-ui/core/Table';
@@ -27,7 +26,10 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-
+import DeleteIcon from '@material-ui/icons/Delete';
+import AddBoxIcon from '@material-ui/icons/AddBox';
+import EditIcon from '@material-ui/icons/Edit';
+import Tooltip from "@material-ui/core/Tooltip";
 
 
 
@@ -79,15 +81,13 @@ const useRowStyles = makeStyles({
     },
 });
 
-function createData(name) {
+function createData(name, quantity, category, description, price) {
     return {
-        name,
-        history: [
-            { quantity: 5, category: 'vege', description: 'carrot', price: 10 },
-            { quantity: 5, category: 'drink', description: 'pepsi', price: 10 },
-        ],
+        name, quantity, category, description, price
     };
 }
+
+
 
 function Row(props) {
     const { row } = props;
@@ -103,38 +103,67 @@ function Row(props) {
                     </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                    {row.name}
+                    {row.productName}
                 </TableCell>
+
+
+                <TableCell>
+                    <Tooltip title="Delete Product">
+                    <IconButton aria-label="delete">
+                        <DeleteIcon />
+                    </IconButton>
+                    </Tooltip>
+                </TableCell>
+
+
             </TableRow>
             <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box margin={1}>
-                            <Typography variant="h6" gutterBottom component="div">
-                                History
-                            </Typography>
+                            <TableCell>
+                                <Typography variant="h6" gutterBottom component="div">
+                                    Product Detail
+                                </Typography>
+                            </TableCell>
+
+                            <TableCell>
+                                <Tooltip title="Edit Product Detail">
+                                <IconButton aria-label="edit">
+                                    <EditIcon />
+                                </IconButton>
+                                </Tooltip>
+                            </TableCell>
+
                             <Table size="small" aria-label="purchases">
-                                <TableHead>
+                                <TableBody>
                                     <TableRow>
                                         <TableCell>Quantity</TableCell>
-                                        <TableCell>Category</TableCell>
-                                        <TableCell align="right">Description</TableCell>
-                                        <TableCell align="right">Price ($)</TableCell>
+                                        <TableCell>
+                                            <TableCell>{row.productQuantity}</TableCell>
+                                        </TableCell>
                                     </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {row.history.map((historyRow) => (
-                                        <TableRow key={historyRow.quantity}>
-                                            <TableCell component="th" scope="row">
-                                                {historyRow.quantity}
-                                            </TableCell>
-                                            <TableCell>{historyRow.category}</TableCell>
-                                            <TableCell align="right">{historyRow.description}</TableCell>
-                                            <TableCell align="right">
-                                                {historyRow.price}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+
+                                    <TableRow>
+                                        <TableCell>Price</TableCell>
+                                        <TableCell>
+                                            <TableCell>{'$'}</TableCell><TableCell>{row.productPrice}</TableCell>
+                                        </TableCell>
+                                    </TableRow>
+
+                                    <TableRow>
+                                        <TableCell>Category</TableCell>
+                                        <TableCell>
+                                            <TableCell>{row.productCategory}</TableCell>
+                                        </TableCell>
+                                    </TableRow>
+
+                                    <TableRow>
+                                        <TableCell>Description</TableCell>
+                                        <TableCell>
+                                            <TableCell>{row.productDescription}</TableCell>
+                                        </TableCell>
+                                    </TableRow>
                                 </TableBody>
                             </Table>
                         </Box>
@@ -147,25 +176,64 @@ function Row(props) {
 
 Row.propTypes = {
     row: PropTypes.shape({
-        history: PropTypes.arrayOf(
-            PropTypes.shape({
-                quantity: PropTypes.number.isRequired,
-                category: PropTypes.string.isRequired,
-                description: PropTypes.string.isRequired,
-                price: PropTypes.number.isRequired,
-            }),
-        ).isRequired,
-        name: PropTypes.string.isRequired,
+        productName: PropTypes.string.isRequired,
+        productQuantity: PropTypes.number.isRequired,
+        productCategory: PropTypes.string.isRequired,
+        productDescription: PropTypes.string.isRequired,
+        productPrice: PropTypes.number.isRequired,
     }).isRequired,
 };
 
 
-const rows = [
-    createData('Frozen yoghurt'),
-    createData('Ice cream sandwich'),
-];
-
 export default function MaterialTableDemo(props) {
+
+    const smallTable = (rows) => {
+        return (
+            <TableContainer component={Paper}>
+                <Table aria-label="collapsible table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell />
+                            <TableCell>MY STOCK</TableCell>
+                            <TableCell>
+                                <Tooltip title="Add New Product">
+                                <IconButton aria-label="add">
+                                    <AddBoxIcon />
+                                </IconButton>
+                                </Tooltip>
+                            </TableCell>
+                        </TableRow>
+
+                    </TableHead>
+                    <TableBody>
+                        {rows.map((row) => (
+                            <Row key={row.productName} row={row} />
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
+    }
+
+    useEffect(() => {
+            Axios.get("http://localhost:8080/GetUserProduct", {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'email': email,
+                        'role': 'Business owner'
+                    }
+                }
+            )
+                .then(result => {
+                    setRows(result.data.products);
+                })
+                .catch((err) => {
+                        console.log("Error", err);
+                    }
+                )
+        }
+    )
+
     const email = props.match.params.email;
 
     const classes = useStyles();
@@ -173,6 +241,7 @@ export default function MaterialTableDemo(props) {
     const [value, setValue] = React.useState(0);
     const [chosen, setChosen] = useState("");
     const [dropZoneOpen, setDropZoneOpen] = useState(false);
+    const [rows, setRows] = useState([]);
 
     const handleDropZoneOpen = () => {
         setDropZoneOpen(true);
@@ -253,21 +322,7 @@ export default function MaterialTableDemo(props) {
     return(
         <div className={classes.root}>
             <Hidden smUp implementation="css">
-                <TableContainer component={Paper}>
-                    <Table aria-label="collapsible table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell />
-                                <TableCell>Name</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.map((row) => (
-                                <Row key={row.name} row={row} />
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                {smallTable(rows)}
             </Hidden>
 
             <Hidden xsDown implementation="css">
@@ -773,4 +828,5 @@ export default function MaterialTableDemo(props) {
 
     );
 }
+
 
