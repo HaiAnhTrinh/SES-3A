@@ -30,6 +30,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from "@material-ui/core/Tooltip";
+import TextField from "@material-ui/core/TextField";
+import OutlinedInput from "@material-ui/core/OutlinedInput";
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 
 
@@ -89,6 +92,7 @@ function createData(name, quantity, category, description, price) {
 
 
 
+
 function Row(props) {
     const { row } = props;
     const [open, setOpen] = React.useState(false);
@@ -96,80 +100,202 @@ function Row(props) {
 
     return (
         <React.Fragment>
-            <TableRow className={classes.root}>
-                <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                    </IconButton>
-                </TableCell>
-                <TableCell component="th" scope="row">
-                    {row.productName}
-                </TableCell>
-
-
-                <TableCell>
-                    <Tooltip title="Delete Product">
-                    <IconButton aria-label="delete">
-                        <DeleteIcon />
-                    </IconButton>
-                    </Tooltip>
-                </TableCell>
-
-
-            </TableRow>
-            <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box margin={1}>
-                            <TableCell>
-                                <Typography variant="h6" gutterBottom component="div">
-                                    Product Detail
-                                </Typography>
-                            </TableCell>
-
-                            <TableCell>
-                                <Tooltip title="Edit Product Detail">
-                                <IconButton aria-label="edit">
-                                    <EditIcon />
-                                </IconButton>
-                                </Tooltip>
-                            </TableCell>
-
-                            <Table size="small" aria-label="purchases">
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell>Quantity</TableCell>
-                                        <TableCell>
-                                            <TableCell>{row.productQuantity}</TableCell>
-                                        </TableCell>
-                                    </TableRow>
-
-                                    <TableRow>
-                                        <TableCell>Price</TableCell>
-                                        <TableCell>
-                                            <TableCell>{'$'}</TableCell><TableCell>{row.productPrice}</TableCell>
-                                        </TableCell>
-                                    </TableRow>
-
-                                    <TableRow>
-                                        <TableCell>Category</TableCell>
-                                        <TableCell>
-                                            <TableCell>{row.productCategory}</TableCell>
-                                        </TableCell>
-                                    </TableRow>
-
-                                    <TableRow>
-                                        <TableCell>Description</TableCell>
-                                        <TableCell>
-                                            <TableCell>{row.productDescription}</TableCell>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
+                <TableRow className={classes.root}>
+                    <TableCell>
+                        <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                        </IconButton>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                        <Box fontWeight="fontWeightBold" m={1} fontSize={16} m={1}>
+                            {row.productName}
                         </Box>
-                    </Collapse>
-                </TableCell>
-            </TableRow>
+                    </TableCell>
+
+
+                    <TableCell>
+                        <Tooltip title="Delete Product">
+                            <IconButton aria-label="delete" >
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </TableCell>
+
+
+                </TableRow>
+                <TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                            <Box margin={1}>
+                                <TableCell>
+                                    <Typography variant="h6" gutterBottom component="div">
+                                        Product Detail
+                                    </Typography>
+                                </TableCell>
+
+                                <TableCell>
+                                    <Tooltip title="Edit Product Detail">
+                                        <IconButton aria-label="edit">
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </TableCell>
+
+                                <Table size="small" aria-label="purchases">
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell>Quantity</TableCell>
+                                            <TableCell>
+                                                <OutlinedInput
+                                                    value={row.productQuantity}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell>Price ($)</TableCell>
+                                            <TableCell>
+                                                <OutlinedInput
+                                                    value={row.productPrice}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+
+
+                                        <TableRow>
+                                            <TableCell>Category</TableCell>
+                                            <TableCell>
+                                                <OutlinedInput
+                                                    value={row.productCategory}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell>Description</TableCell>
+                                            <TableCell>
+                                                <OutlinedInput
+                                                    value={row.productDescription}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </Box>
+                        </Collapse>
+                    </TableCell>
+                </TableRow>
+
+
+        </React.Fragment>
+    );
+}
+
+function Row1(props) {
+    const { row1 } = props;
+    const [open1, setOpen1] = React.useState(false);
+    const classes = useRowStyles();
+    console.log("Row1:", row1);
+    return (
+        <React.Fragment>
+                <TableRow className={classes.root}>
+                    <TableCell>
+                        <IconButton aria-label="expand row" size="small" onClick={() => setOpen1(!open1)}>
+                            {open1 ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                        </IconButton>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                        <div>
+                            <Box fontWeight="fontWeightBold" m={1} fontSize={16} m={1}>
+                                {row1.productName}
+                            </Box>
+                        </div>
+                        <div>
+                            <Box fontStyle="italic" m={1}>
+                                SUPPLIER:
+                            </Box>
+
+                            <Box fontWeight="fontWeightRegular" m={1}>
+                                {row1.supplierEmail}
+                            </Box>
+                        </div>
+
+
+                    </TableCell>
+
+
+                    <TableCell>
+                        <Tooltip title="Delete Product">
+                            <IconButton aria-label="delete">
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </TableCell>
+
+
+                </TableRow>
+                <TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                        <Collapse in={open1} timeout="auto" unmountOnExit>
+                            <Box margin={1}>
+                                <TableCell>
+                                    <Typography variant="h6" gutterBottom component="div">
+                                        Product Detail
+                                    </Typography>
+                                </TableCell>
+
+                                <TableCell>
+                                    <Tooltip title="Edit Product Detail">
+                                        <IconButton aria-label="edit">
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </TableCell>
+
+                                <Table size="small" aria-label="purchases">
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell>Quantity</TableCell>
+                                            <TableCell>
+                                                <OutlinedInput
+                                                    value={row1.productQuantity}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell>Price ($)</TableCell>
+                                            <TableCell>
+                                                <OutlinedInput
+                                                    value={row1.productPrice}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell>Category</TableCell>
+                                            <TableCell>
+                                                <OutlinedInput
+                                                    value={row1.productCategory}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell>Description</TableCell>
+                                            <TableCell>
+                                                <OutlinedInput
+                                                    value={row1.productDescription}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </Box>
+                        </Collapse>
+                    </TableCell>
+                </TableRow>
+
         </React.Fragment>
     );
 }
@@ -184,17 +310,32 @@ Row.propTypes = {
     }).isRequired,
 };
 
+Row1.propTypes = {
+    row: PropTypes.shape({
+        productName: PropTypes.string.isRequired,
+        supplierEmail: PropTypes.string.isRequired,
+        productQuantity: PropTypes.number.isRequired,
+        productCategory: PropTypes.string.isRequired,
+        productDescription: PropTypes.string.isRequired,
+        productPrice: PropTypes.number.isRequired,
+    }).isRequired,
+};
+
 
 export default function MaterialTableDemo(props) {
 
-    const smallTable = (rows) => {
+    const nonMarketTable = (rows) => {
         return (
             <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
                     <TableHead>
                         <TableRow>
                             <TableCell />
-                            <TableCell>MY STOCK</TableCell>
+                            <TableCell>
+                                <Box fontWeight="fontWeightBold" m={1} fontSize="h6.fontSize" m={1}>
+                                    MY STOCK
+                                </Box>
+                            </TableCell>
                             <TableCell>
                                 <Tooltip title="Add New Product">
                                 <IconButton aria-label="add">
@@ -215,6 +356,38 @@ export default function MaterialTableDemo(props) {
         );
     }
 
+    const marketTable = (rows1) => {
+        return (
+            <TableContainer component={Paper}>
+                <Table aria-label="collapsible table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell />
+                            <TableCell>
+                                <Box fontWeight="fontWeightBold" m={1} fontSize="h6.fontSize" m={1}>
+                                    MY STOCK
+                                </Box>
+                            </TableCell>
+                            <TableCell>
+                                <Tooltip title="Add New Product">
+                                    <IconButton aria-label="add">
+                                        <AddBoxIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </TableCell>
+                        </TableRow>
+
+                    </TableHead>
+                    <TableBody>
+                        {rows1.map((row1) => (
+                            <Row1 key={row1.productName} row1={row1} />
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
+    }
+
     useEffect(() => {
             Axios.get("http://localhost:8080/GetUserProduct", {
                     headers: {
@@ -226,13 +399,34 @@ export default function MaterialTableDemo(props) {
             )
                 .then(result => {
                     setRows(result.data.products);
+                    setRows1(result.data.onlineProducts);
                 })
                 .catch((err) => {
                         console.log("Error", err);
                     }
                 )
-        }
+        },[]
     )
+    // const handleDelete = () => {
+    //     Axios.post("http://localhost:8080/DeleteProduct",
+    //         {
+    //             'email': email,
+    //             'role': 'Business owner',
+    //             'name': oldData.productName,
+    //             'category': oldData.productCategory,
+    //
+    //         },
+    //         {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             }
+    //         })
+    //         .then(response => console.log("Delete Response", response))
+    //         .catch((err) => {
+    //                 console.log("Error", err);
+    //             }
+    //         )
+    // }
 
     const email = props.match.params.email;
 
@@ -242,6 +436,7 @@ export default function MaterialTableDemo(props) {
     const [chosen, setChosen] = useState("");
     const [dropZoneOpen, setDropZoneOpen] = useState(false);
     const [rows, setRows] = useState([]);
+    const [rows1, setRows1] = useState([]);
 
     const handleDropZoneOpen = () => {
         setDropZoneOpen(true);
@@ -322,7 +517,31 @@ export default function MaterialTableDemo(props) {
     return(
         <div className={classes.root}>
             <Hidden smUp implementation="css">
-                {smallTable(rows)}
+                <AppBar position="static" color="default">
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        indicatorColor="primary"
+                        textColor="primary"
+                        variant="fullWidth"
+                        aria-label="full width tabs example"
+                    >
+                        <Tab label="Non-Market Stock" {...a11yProps(0)} />
+                        <Tab label="Market Stock" {...a11yProps(1)} />
+                    </Tabs>
+                </AppBar>
+                <SwipeableViews
+                    axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                    index={value}
+                    onChangeIndex={handleChangeIndex}
+                >
+                    <TabPanel value={value} index={0} dir={theme.direction}>
+                        {nonMarketTable(rows)}
+                    </TabPanel>
+                    <TabPanel value={value} index={1} dir={theme.direction}>
+                        {marketTable(rows1)}
+                    </TabPanel>
+                </SwipeableViews>
             </Hidden>
 
             <Hidden xsDown implementation="css">
