@@ -30,6 +30,7 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
 
 const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030]
@@ -40,6 +41,7 @@ export default function MyCart(props){
     const [email] = useState(props.match.params.email);
     const [cartItemsDetails,setCartItemDetails] = React.useState([]);
     const [total, setTotal] = useState();
+    const [credit, setCredit] = useState();
 
     const [values, setValues] = React.useState({
         cardAccept: '',
@@ -81,8 +83,13 @@ export default function MyCart(props){
             .then((response) => {
                 setCartItemDetails(response.data.cartProducts);
                 let totalCost = 0;
-                response.data.cartProducts.map((item) => totalCost += parseFloat(item.cost));
+                let credit = 0;
+                response.data.cartProducts.map((item) => {
+                    totalCost += parseFloat(item.cost);
+                    credit += parseFloat(item.credit);
+                });
                 setTotal(totalCost);
+                setCredit(credit);
             })
             .catch((err) => console.log("Error: ", err));
     }, []);
@@ -119,10 +126,10 @@ export default function MyCart(props){
         }
 
         if(props.credit > total){
-            Axios.interceptors.request.use(request => {
-                console.log('Pay Credit Request', request.data.cartProducts)
-                return request;
-            });
+            // Axios.interceptors.request.use(request => {
+            //     console.log('Pay Credit Request', request.data.cartProducts)
+            //     return request;
+            // });
             Axios.post("http://localhost:8080/Purchase", data,
                 { headers: {'Content-Type': 'application/json'}} )
                 .then((response) => {
@@ -141,7 +148,10 @@ export default function MyCart(props){
     };
 
     const onItemQuantityChanged = (event, index, itemNew) => {
-        let totalCost = 0;
+        console.log("cost " + itemNew.cost)
+        console.log("credit " + itemNew.credit)
+        console.log("quantity " + event.target.value)
+        let totalCost = 0, credit = 0;
         const data = {
             category: itemNew.category,
             cost: event.target.value * itemNew.price,
@@ -149,6 +159,7 @@ export default function MyCart(props){
             imageUrl: itemNew.imageUrl,
             name: itemNew.name,
             price: itemNew.price,
+            credit: itemNew.credit,
             quantity: event.target.value,
             supplier: itemNew.supplier,
         }
@@ -163,8 +174,12 @@ export default function MyCart(props){
         });
 
         setCartItemDetails(list);
-        list.map((item) => totalCost += parseFloat(item.cost));
+        list.map((item) => {
+            totalCost += parseFloat(item.cost);
+            credit += parseFloat(item.credit) * item.quantity;
+        });
         setTotal(totalCost);
+        setCredit(credit);
     }
 
     const onClickRemoveItem = (event, productName, supplierEmail) => {
@@ -194,8 +209,13 @@ export default function MyCart(props){
         <div>
             <ListItem key={index}>
                 <ListItemText
-                    primary={item.name + " - " + "$" + item.price }
-                    secondary={item.supplier}
+                    primary={item.name + " - $" + item.price }
+                    secondary={
+                        <React.Fragment>
+                            <Typography variant="body2">{"Credit: $" + item.credit}</Typography>
+                            {item.supplier}
+                        </React.Fragment>
+                    }
                 />
                 <TextField
                     className={classes.quantity}
@@ -224,6 +244,7 @@ export default function MyCart(props){
             </TableCell>
             <TableCell>{item.name}</TableCell>
             <TableCell>{item.price}</TableCell>
+            <TableCell>{item.credit}</TableCell>
             <TableCell>{item.supplier}</TableCell>
             <TableCell>
                 <TextField
@@ -263,6 +284,9 @@ export default function MyCart(props){
                     <Typography variant="h6">
                         {"Total cost: " + total}
                     </Typography>
+                    <Typography variant="h6">
+                        {"Credit: " + credit}
+                    </Typography>
                 </Hidden>
                 <Hidden xsDown implementation="css">
                     <TableContainer component={Paper}>
@@ -272,6 +296,7 @@ export default function MyCart(props){
                                     <TableCell>Remove</TableCell>
                                     <TableCell>Item</TableCell>
                                     <TableCell>Price</TableCell>
+                                    <TableCell>Credit</TableCell>
                                     <TableCell>Supplier</TableCell>
                                     <TableCell>Quantity</TableCell>
                                     <TableCell>Cost</TableCell>
@@ -281,7 +306,11 @@ export default function MyCart(props){
                                 {cartItemsTable}
                                 <TableRow>
                                     <TableCell align="right" colSpan={5}>Total</TableCell>
-                                    <TableCell  align="left">{total}</TableCell>
+                                    <TableCell  align="left">{"$" + total}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell align="right" colSpan={5}>Credit</TableCell>
+                                    <TableCell  align="left">{"$" + credit}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
