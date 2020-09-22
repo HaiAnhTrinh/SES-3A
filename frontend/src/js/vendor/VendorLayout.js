@@ -1,10 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import AccountCircle from "@material-ui/icons/AccountCircle";
+import Avatar from '@material-ui/core/Avatar';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Divider from "@material-ui/core/Divider";
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 import Menu from "@material-ui/core/Menu";
 import MenuIcon from '@material-ui/icons/Menu';
 import MenuItem from "@material-ui/core/MenuItem";
@@ -12,14 +17,17 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { useTheme } from '@material-ui/core/styles';
 import * as firebase from "firebase";
-import { Route } from "react-router-dom";
-import {drawer, layoutStyles, logout} from "../common/Layout";
+import {Link, Route} from "react-router-dom";
+
+import {layoutStyles, logout} from "../common/Layout";
 import Home from "./VendorHome";
 import MyStock from "./VendorMyStock";
 import MyPurchase from "./VendorMyPurchase";
 import MyCart from "./VendorMyCart";
 import Graph from "./VendorGraph";
-import Account from "./VendorAccount";
+import Account from "../common/MyAccount";
+import Logo from "../../image/Logo.png";
+
 
 export default function VendorLayout(props) {
     const currentUser = firebase.auth().currentUser;
@@ -30,6 +38,7 @@ export default function VendorLayout(props) {
     const [baseUrl, setBaseUrl] = useState("");
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
+    const [selectedIndex, setSelectedIndex] = useState();
     const drawerListObject = [{
         'text': 'Home',
         'path': baseUrl + '/Home'
@@ -45,9 +54,6 @@ export default function VendorLayout(props) {
     }, {
         'text': 'Graph',
         'path': baseUrl + '/Graph'
-    }, {
-        'text': 'Account',
-        'path': baseUrl + '/MyAccount'
     }];
 
     useEffect(() => {
@@ -70,13 +76,31 @@ export default function VendorLayout(props) {
 
     const handleLogout = () => logout(props);
 
-    const onItemClick = (variant) => {
-        if(variant === "temporary"){
-            handleDrawerToggle();
-        }
+    const handleMyAccount = () => {
+        setSelectedIndex(null);
+        props.history.push(baseUrl + "/MyAccount");
+        handleClose();
     };
 
-    const vendorDrawer = () => drawer(classes, drawerListObject, onItemClick);
+    const vendorDrawer = () => {
+        return(
+            <div>
+                <div className={classes.toolbar}>
+                    <img src={Logo} alt="Logo" className={classes.logo}/>
+                </div>
+                <Divider/>
+                <List>
+                    {drawerListObject.map((object, index) => (
+                        <ListItem selected={index === selectedIndex} button key={object.text}
+                                  component={Link} to={object.path}
+                                  onClick={() => setSelectedIndex(index)}>
+                            <ListItemText primary={object.text}/>
+                        </ListItem>
+                    ))}
+                </List>
+            </div>
+        );
+    };
 
     return (
         <React.Fragment>
@@ -93,7 +117,7 @@ export default function VendorLayout(props) {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="h6" noWrap>
+                        <Typography variant="h6" className={classes.title}>
                             { currentUser ? currentUser.displayName : ""}
                         </Typography>
                         <div>
@@ -104,48 +128,48 @@ export default function VendorLayout(props) {
                                 onClick={handleMenu}
                                 color="inherit"
                             >
-                                <AccountCircle />
+                                { currentUser && currentUser.photoURL ?
+                                    <Avatar alt="avatar" src={currentUser.photoURL} />
+                                    :
+                                    <AccountCircle />
+                                }
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
                                 anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                anchorOrigin={classes.anchorOrigin}
                                 keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
+                                transformOrigin={classes.transformOrigin}
                                 open={open}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleMyAccount}>My account</MenuItem>
                                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
                             </Menu>
                         </div>
                     </Toolbar>
                 </AppBar>
-                <nav className={classes.drawer} aria-label="mailbox folders">
+
+                <nav className={classes.drawer}>
                     {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
                     <Hidden smUp implementation="css">
-                        <Drawer
-                            container={container}
-                            variant="temporary"
-                            anchor={theme.direction === 'rtl' ? 'right' : 'left'}
-                            open={mobileOpen}
-                            onClose={handleDrawerToggle}
-                            classes={{
-                                paper: classes.drawerPaper,
-                            }}
-                            ModalProps={{
-                                keepMounted: true, // Better open performance on mobile.
-                            }}
-                        >
-                            {vendorDrawer("temporary")}
-                        </Drawer>
+                        <div onClick={handleDrawerToggle}>
+                            <Drawer
+                                container={container}
+                                variant="temporary"
+                                anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+                                open={mobileOpen}
+                                onClose={handleDrawerToggle}
+                                classes={{
+                                    paper: classes.drawerPaper,
+                                }}
+                                ModalProps={{
+                                    keepMounted: true, // Better open performance on mobile.
+                                }}
+                            >
+                                {vendorDrawer()}
+                            </Drawer>
+                        </div>
                     </Hidden>
                     <Hidden xsDown implementation="css">
                         <Drawer
@@ -155,7 +179,7 @@ export default function VendorLayout(props) {
                             variant="permanent"
                             open
                         >
-                            {vendorDrawer("permanent")}
+                            {vendorDrawer()}
                         </Drawer>
                     </Hidden>
                 </nav>
@@ -167,7 +191,9 @@ export default function VendorLayout(props) {
                         <Route path="/Vendor/:email/MyPurchase" exact strict component={MyPurchase}/>
                         <Route path="/Vendor/:email/MyCart" exact strict component={MyCart}/>
                         <Route path="/Vendor/:email/Graph" exact strict component={Graph}/>
-                        <Route path="/Vendor/:email/MyAccount" exact strict component={Account}/>
+                        <Route path="/Vendor/:email/MyAccount" exact strict>
+                            <Account {...props} role="Business owner" />
+                        </Route>
                     </div>
 
                 </main>

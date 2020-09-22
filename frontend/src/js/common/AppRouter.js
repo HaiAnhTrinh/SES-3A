@@ -6,6 +6,7 @@ import SupplierLoginPage from "../supplier/SupplierLoginPage";
 import SupplierLayout from "../supplier/SupplierLayout";
 import VendorLayout from "../vendor/VendorLayout";
 import CreateNewUser from "./CreateNewUser";
+import MyAccount from "./MyAccount";
 import * as firebase from "firebase/app";
 
 export default function AppRouter() {
@@ -25,7 +26,7 @@ export default function AppRouter() {
         firebase.initializeApp(firebaseConfig);
     }
 
-    //TODO: configure this variable to false in the production stage
+    //TODO: configure this variable to false in the production stage to avoid login on every code change
     //initialize this variable as 'true' during development stage
     //really login to test firebase related functions
     const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -35,11 +36,13 @@ export default function AppRouter() {
         setIsLoggedIn(true);
     }, [currentUser]);
 
+
     return (
         <BrowserRouter>
             <Switch>
                 <Route path="/" exact strict render={ (props) => <VendorLoginPage {...props} />} />
                 <Route path="/VendorLogin" exact strict render={ (props) => <VendorLoginPage {...props} />} />
+                <Route path="/SupplierLogin" exact strict render={ (props) => <SupplierLoginPage {...props} />} />
                 <Route path="/SupplierLogin" exact strict render={ (props) => <SupplierLoginPage {...props} />} />
                 <Route path="/Vendor/:email"
                        render={ (props) =>
@@ -49,7 +52,7 @@ export default function AppRouter() {
                        render={ (props) =>
                            isLoggedIn ? <SupplierLayout {...props}/> : <Redirect to="/"/>}
                 />
-                <Route path="/CreateNewUser" exact strict component={CreateNewUser} />
+                <Route path="/MyAccount" exact strict render={ (props) => <MyAccount {...props} />} />
             </Switch>
         </BrowserRouter>
     );

@@ -1,13 +1,8 @@
-import React from "react";
+import React, {useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import * as firebase from "firebase";
-import Divider from "@material-ui/core/Divider";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import {Link} from "react-router-dom";
-import ListItemText from "@material-ui/core/ListItemText";
 
-const drawerWidth = 240;
+const drawerWidth = 210;
 
 export const layoutStyles = makeStyles((theme) => ({
     root: {
@@ -38,8 +33,23 @@ export const layoutStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3),
+        padding: theme.spacing(1),
     },
+    title: {
+        flexGrow: 1,
+    },
+    logo: {
+        width: drawerWidth,
+        height: 58,
+    },
+    anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'right',
+    },
+    transformOrigin: {
+        vertical: 'top',
+        horizontal: 'right',
+    }
 }));
 
 export const logout = (props) => {
@@ -48,20 +58,4 @@ export const logout = (props) => {
             props.history.push("/");
         })
         .catch( (error) => console.log(error));
-};
-
-export const drawer = (classes, drawerListObject, onItemClick) => {
-    return(
-        <div>
-            <div className={classes.toolbar}/>
-            <Divider/>
-            <List>
-                {drawerListObject.map((object, index) => (
-                    <ListItem button key={object.text} component={Link} to={object.path} onClick={onItemClick}>
-                        <ListItemText primary={object.text}/>
-                    </ListItem>
-                ))}
-            </List>
-        </div>
-    );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Axios from "axios";
 import Button from '@material-ui/core/Button';
 import TextField from "@material-ui/core/TextField";
 import { Link } from 'react-router-dom';
@@ -7,8 +8,8 @@ import '../../css/LoginPage.css';
 import * as firebase from "firebase";
 
 function SupplierLoginPage(props) {
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [loginMessage, setLoginMessage] = useState("");
     const onEmailChange = (event) => setEmail(event.target.value);
     const onPasswordChange = (event) => setPassword(event.target.value);
@@ -16,10 +17,38 @@ function SupplierLoginPage(props) {
     const onLoginButtonClick = (e) => {
         e.preventDefault();
 
-        if(email == null || password == null){
+        if(email === "" || password === ""){
             setLoginMessage("Require both email and password");
         }
         else{
+            //TODO: enable this code for authorization
+            //**************Authorization layer**************
+            // firebase.auth().signInWithEmailAndPassword(email, password)
+            //     .then((res) => {
+            //
+            //         if(res.user.emailVerified){
+            //             Axios.get("http://localhost:8080/Login",
+            //                 { headers: {'Content-Type': 'application/json', 'email': email, 'role': 'Supplier'}})
+            //                 .then( (res) => {
+            //                     console.log("Response: ",res);
+            //                     if(res.data.isAuthorized){
+            //                         props.history.push("/Supplier/" + email + "/Home");
+            //                     }
+            //                     else{
+            //                         setLoginMessage("This account is not a supplier account");
+            //                     }
+            //                 })
+            //                 .catch( (err) => {
+            //                     console.log("Error: ", err);
+            //                     setLoginMessage("CONNECTION ERROR");
+            //                 });
+            //
+            //         }
+            //         else{
+            //             setLoginMessage("Email not verified");
+            //         }
+            //     })
+            //     .catch((error) => setLoginMessage(error.message));
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then((res) => {
                     if(res.user.emailVerified){
@@ -30,23 +59,7 @@ function SupplierLoginPage(props) {
                     }
                 })
                 .catch((error) => setLoginMessage(error.message));
-            // Axios.get("http://localhost:8080/Login",
-            //     { headers: {'Content-Type': 'application/json', 'username': username, 'password': password}})
-            //     .then( (res) => {
-            //         console.log("Response: ",res);
-            //         const status = res.data.status;
-            //         if(status === "Success"){
-            //             props.handleLogin(status);
-            //             props.history.push("/SupplierLayout");
-            //         }
-            //         else{
-            //             setLoginMessage("Incorrect username or password");
-            //         }
-            //     })
-            //     .catch( (err) => {
-            //         console.log("Error: ", err);
-            //         setLoginMessage("CONNECTION ERROR.");
-            //     });
+
         }
     };
     return (

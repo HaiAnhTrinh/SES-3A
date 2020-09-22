@@ -5,10 +5,11 @@ import { Link } from 'react-router-dom';
 import LoginIcon from '../../image/LoginIcon.png';
 import '../../css/LoginPage.css';
 import * as firebase from "firebase";
+import Axios from "axios";
 
 function VendorLoginPage(props) {
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [loginMessage, setLoginMessage] = useState("");
     const onEmailChange = (event) => setEmail(event.target.value);
     const onPasswordChange = (event) => setPassword(event.target.value);
@@ -16,10 +17,38 @@ function VendorLoginPage(props) {
     const onLoginButtonClick = (e) => {
         e.preventDefault();
 
-        if(email == null || password == null){
+        if(email === "" || password === ""){
             setLoginMessage("Require both email and password");
         }
         else {
+            //TODO: enable this code for authorization
+            //**************Authorization layer**************
+            // firebase.auth().signInWithEmailAndPassword(email, password)
+            //     .then((res) => {
+            //
+            //         if(res.user.emailVerified){
+            //             Axios.get("http://localhost:8080/Login",
+            //                 { headers: {'Content-Type': 'application/json', 'email': email, 'role': 'Business owner'}})
+            //                 .then( (res) => {
+            //                     console.log("Response: ",res);
+            //                     if(res.data.isAuthorized){
+            //                         props.history.push("/Vendor/"+ email + "/Home");
+            //                     }
+            //                     else{
+            //                         setLoginMessage("This account is not a business owner account");
+            //                     }
+            //                 })
+            //                 .catch( (err) => {
+            //                     console.log("Error: ", err);
+            //                     setLoginMessage("CONNECTION ERROR");
+            //                 });
+            //
+            //         }
+            //         else{
+            //             setLoginMessage("Email not verified");
+            //         }
+            //     })
+            //     .catch((error) => setLoginMessage(error.message));
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then((res) => {
                     if(res.user.emailVerified){
