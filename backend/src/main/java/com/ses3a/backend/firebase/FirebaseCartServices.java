@@ -31,6 +31,7 @@ public class FirebaseCartServices {
         data.put("supplierEmail", request.getProduct().getSupplierEmail());
         data.put("productDescription", request.getProduct().getProductDescription());
         data.put("productImageUrl", request.getProduct().getProductImageUrl());
+        data.put("productCredit", request.getProduct().getProductCredit());
         data.put("quantity", request.getQuantity());
 
         //add to node 'carts'
@@ -72,6 +73,7 @@ public class FirebaseCartServices {
             product.setDescription(data.get("productDescription").toString());
             product.setImageUrl(data.get("productImageUrl").toString());
             product.setSupplier(data.get("supplierEmail").toString());
+            product.setCredit(data.get("productCredit").toString());
             product.setCost(String.valueOf(cost));
 
             cartProducts.add(product);
@@ -120,9 +122,11 @@ public class FirebaseCartServices {
         DocumentReference creditRef = firestore.collection(Configs.USERS_COLLECTION).document(Configs.VENDOR_TYPE)
                 .collection(request.getEmail()).document("creditInfo");
         double totalCost = 0;
+        double totalCredit = 0;
 
         for (CartProduct cartProduct : request.getCartProducts()) {
             totalCost += Double.parseDouble(Objects.requireNonNull(cartProduct.getCost()));
+            totalCredit += Double.parseDouble(Objects.requireNonNull(cartProduct.getCredit()));
             ApiFuture<String> futureTransaction = firestore.runTransaction(transaction -> {
 
                 //ref to the supplier product in node 'users'
@@ -188,7 +192,7 @@ public class FirebaseCartServices {
                         cartProduct.getName(), cartProduct.getSupplier())) {
                     AddProductRequest addRequest =
                             new AddProductRequest(request.getEmail(), Configs.BUSINESS_OWNER, cartProduct.getName(),
-                                    cartProduct.getPrice(), cartProduct.getQuantity(), cartProduct.getDescription(),
+                                    cartProduct.getPrice(), cartProduct.getQuantity(), cartProduct.getDescription(), null,
                                     cartProduct.getImageUrl(), cartProduct.getCategory(), cartProduct.getSupplier());
                     firebaseProductServices.addProduct(addRequest);
                 } else {
@@ -202,7 +206,7 @@ public class FirebaseCartServices {
                     EditProductRequest editRequest =
                             new EditProductRequest(request.getEmail(), Configs.BUSINESS_OWNER, cartProduct.getName(),
                                     cartProduct.getPrice(), newQuantity, cartProduct.getCategory(),
-                                    cartProduct.getDescription(), cartProduct.getSupplier());
+                                    cartProduct.getDescription(), null, cartProduct.getSupplier());
                     firebaseProductServices.editProduct(editRequest);
                 }
 
@@ -213,13 +217,15 @@ public class FirebaseCartServices {
                 return Configs.SUCCESS_MESSAGE;
             });
         }
+
+        //update the user's credit
+        double credit = Double.parseDouble(Objects.requireNonNull(creditRef.get().get().get("credit")).toString());
+        credit += totalCredit;
+
         if(request.isUseCredit()){
-            double credit = Double.parseDouble(Objects.requireNonNull(creditRef.get().get().get("credit")).toString());
-            System.out.println("Current credit: " + credit);
             credit -= totalCost;
-            System.out.println("Remaining credit: " + credit);
-            creditRef.update("credit", String.valueOf(credit));
         }
+        creditRef.update("credit", String.valueOf(credit));
         System.out.println("flag in the end: " + flag.toString());
         return flag.get();
     }

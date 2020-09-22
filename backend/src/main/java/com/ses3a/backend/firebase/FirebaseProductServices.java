@@ -44,6 +44,7 @@ public class FirebaseProductServices {
                 product.setProductDescription(document.getString("description"));
                 product.setProductImageUrl(document.getString("imageUrl"));
                 product.setProductCategory(document.getString("category"));
+                product.setProductCredit(document.getString("credit"));
                 products.add(product);
             }
         }
@@ -85,11 +86,12 @@ public class FirebaseProductServices {
     }
 
     //support getUserProducts and getUserOnlineProducts
-    private void initGetUserProductsResponse(Iterable<CollectionReference> onlineProductRefs, List<Object> products)
+    private void initGetUserProductsResponse(Iterable<CollectionReference> productRefs, List<Object> products)
             throws InterruptedException, ExecutionException {
-        for (CollectionReference ref : onlineProductRefs) {
+        for (CollectionReference ref : productRefs) {
             Map<String, Object> data = ref.document(Configs.INFO).get().get().getData();
             SupplierProduct product = new SupplierProduct();
+            assert data != null;
             product.setSupplierEmail(data.get("supplier").toString());
             product.setProductName(data.get("name").toString());
             product.setProductPrice(data.get("price").toString());
@@ -97,12 +99,12 @@ public class FirebaseProductServices {
             product.setProductDescription(data.get("description").toString());
             product.setProductCategory(data.get("category").toString());
             product.setProductImageUrl(data.get("imageUrl").toString());
+            product.setProductCredit(data.get("credit").toString());
             products.add(product);
         }
     }
 
 
-    //TODO: improve editProduct 2,3,4
     //Edit products in Firestore
     //1. Need to edit to 'products/categories/email' and 'users/suppliers/email/products' for supplier
     //2. Suppliers can change any info except for name and category
@@ -118,6 +120,7 @@ public class FirebaseProductServices {
         data.put("supplier", request.getSupplier());
         data.put("price", request.getPrice());
         data.put("category", request.getCategory());
+        data.put("credit", request.getCredit());
         data.put("description", request.getDescription());
 
         if (userType.equals(Configs.VENDOR_TYPE)) {
@@ -153,6 +156,7 @@ public class FirebaseProductServices {
         data.put("quantity", request.getQuantity());
         data.put("supplier", request.getSupplier());
         data.put("category", request.getCategory());
+        data.put("credit", request.getCredit());
         data.put("description", request.getDescription());
         data.put("imageUrl", request.getImageUrl());
 

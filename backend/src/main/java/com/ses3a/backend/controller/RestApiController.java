@@ -109,12 +109,10 @@ public class RestApiController {
         System.out.println("RECEIVED GET PRODUCT BY CATEGORY REQUEST");
         ResponseEntity<GetProductByCategoryResponse> responseEntity =
                 new ResponseEntity<>(new GetProductByCategoryResponse(), HttpStatus.OK);
-        for (int i = 0; i < category.length; i++) {
+        for (String s : category) {
             try {
-                System.out.println(category[i]);
-                GetProductByCategoryRequest request = new GetProductByCategoryRequest(email, category[i]);
+                GetProductByCategoryRequest request = new GetProductByCategoryRequest(email, s);
                 List<SupplierProduct> products = firebaseProductServices.getProductByCategory(request);
-                System.out.println(products);
                 Objects.requireNonNull(responseEntity.getBody()).setStatus(Configs.SUCCESS_MESSAGE);
                 responseEntity.getBody().getProducts().addAll(products);
             } catch (Exception e) {
@@ -136,7 +134,7 @@ public class RestApiController {
                 new ResponseEntity<>(new GetUserProductResponse(), HttpStatus.OK);
         try {
             List<Object> userProducts = firebaseProductServices.getUserProducts(request);
-            responseEntity.getBody().setProducts(userProducts);
+            Objects.requireNonNull(responseEntity.getBody()).setProducts(userProducts);
 
             if (role.equals("Business owner")) {
                 List<Object> userOnlineProducts = firebaseProductServices.getUserOnlineProducts(request);

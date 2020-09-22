@@ -649,6 +649,7 @@ export default function MaterialTableDemo(props) {
                                                                         'supplier': "",
                                                                         'quantity': newData.productQuantity,
                                                                         'category': newData.productCategory,
+                                                                        'credit': "",
                                                                         'description':
                                                                             newData.productDescription &&
                                                                             newData.productDescription.trim().length > 0
