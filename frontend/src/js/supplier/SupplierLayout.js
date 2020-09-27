@@ -37,7 +37,7 @@ export default function SupplierLayout(props) {
     const [baseUrl, setBaseUrl] = useState("");
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-    const [selectedIndex, setSelectedIndex] = useState();
+    const [selectedIndex, setSelectedIndex] = useState(0);
     const drawerListObject = [{
         'text': 'Home',
         'path': baseUrl + '/Home'
@@ -94,8 +94,9 @@ export default function SupplierLayout(props) {
                     ))}
                 </List>
             </div>
-        );
-    };
+        )
+    }
+
     return (
         <React.Fragment>
             <div className={classes.root}>

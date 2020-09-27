@@ -30,7 +30,6 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
 
 const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030]
@@ -92,7 +91,7 @@ export default function MyCart(props){
                 setCredit(credit);
             })
             .catch((err) => console.log("Error: ", err));
-    }, []);
+    }, [email]);
 
 
     const handlePaymentSubmit = () => {
@@ -126,10 +125,6 @@ export default function MyCart(props){
         }
 
         if(props.credit > total){
-            // Axios.interceptors.request.use(request => {
-            //     console.log('Pay Credit Request', request.data.cartProducts)
-            //     return request;
-            // });
             Axios.post("http://localhost:8080/Purchase", data,
                 { headers: {'Content-Type': 'application/json'}} )
                 .then((response) => {
@@ -148,9 +143,6 @@ export default function MyCart(props){
     };
 
     const onItemQuantityChanged = (event, index, itemNew) => {
-        console.log("cost " + itemNew.cost)
-        console.log("credit " + itemNew.credit)
-        console.log("quantity " + event.target.value)
         let totalCost = 0, credit = 0;
         const data = {
             category: itemNew.category,

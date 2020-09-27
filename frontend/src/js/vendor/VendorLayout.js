@@ -24,7 +24,6 @@ import Home from "./VendorHome";
 import MyStock from "./VendorMyStock";
 import MyPurchase from "./VendorMyPurchase";
 import MyCart from "./VendorMyCart";
-import Graph from "./VendorGraph";
 import Account from "../common/MyAccount";
 import Logo from "../../image/Logo.png";
 
@@ -53,9 +52,6 @@ export default function VendorLayout(props) {
     }, {
         'text': 'My Purchase',
         'path': baseUrl + '/MyPurchase'
-    }, {
-        'text': 'Graph',
-        'path': baseUrl + '/Graph'
     }];
 
     useEffect(() => {
@@ -202,7 +198,6 @@ export default function VendorLayout(props) {
                         <Route path="/Vendor/:email/MyCart" exact strict>
                             <MyCart {...props} credit={credit} />
                         </Route>
-                        <Route path="/Vendor/:email/Graph" exact strict component={Graph}/>
                         <Route path="/Vendor/:email/MyAccount" exact strict>
                             <Account {...props} role="Business owner" />
                         </Route>

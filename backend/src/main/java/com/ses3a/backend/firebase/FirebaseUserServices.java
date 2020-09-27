@@ -50,7 +50,6 @@ public class FirebaseUserServices {
         Firestore firestore = FirestoreClient.getFirestore();
         String userType = convertToUserType(role);
         try {
-            System.out.println("LOGIN: " + FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty());
             return !FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty();
         } catch (Exception e) {
             e.printStackTrace();

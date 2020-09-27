@@ -25,7 +25,6 @@ function VendorLoginPage(props) {
             //**************Authorization layer**************
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then((res) => {
-
                     if(res.user.emailVerified){
                         Axios.get("http://localhost:8080/Login",
                             { headers: {'Content-Type': 'application/json', 'email': email, 'role': 'Business owner'}})
@@ -42,23 +41,12 @@ function VendorLoginPage(props) {
                                 console.log("Error: ", err);
                                 setLoginMessage("CONNECTION ERROR");
                             });
-
                     }
                     else{
                         setLoginMessage("Email not verified");
                     }
                 })
                 .catch((error) => setLoginMessage(error.message));
-            // firebase.auth().signInWithEmailAndPassword(email, password)
-            //     .then((res) => {
-            //         if(res.user.emailVerified){
-            //             props.history.push("/Vendor/"+ email + "/Home");
-            //         }
-            //         else{
-            //             setLoginMessage("Email not verified");
-            //         }
-            //     })
-            //     .catch((error) => setLoginMessage(error.message));
         }
     };
 

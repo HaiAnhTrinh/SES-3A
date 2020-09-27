@@ -1,4 +1,4 @@
-import React, {useState, useRef, useLayoutEffect, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import MaterialTable from 'material-table';
 import Axios from "axios";
 import * as firebase from "firebase";
@@ -31,7 +31,7 @@ import AddBoxIcon from '@material-ui/icons/AddBox';
 import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from "@material-ui/core/Tooltip";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
-
+import {handleAddWithPlaceHolderImage} from "../common/AxiosTasks";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -88,55 +88,19 @@ const axiosInterceptor = (type) => {
     });
 }
 
-const handleGet = (query, email) => {
-    new Promise((resolve) => {
-        setTimeout(() => {
-            axiosInterceptor("get request")
-            Axios.get("http://localhost:8080/GetUserProduct",
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'email': email,
-                        'role': 'Business owner'
-                    }
-                }
-            )
-                .then(result => {
-                    var data = [];
-                    for (var i = query.pageSize * (query.page+1) - query.pageSize;
-                         i <= query.pageSize * (query.page+1) - 1; i++)
-                    {
-                        if(i +1 > result.data.onlineProducts.length){
-                            break;}
-                        else{
-                            data.push(result.data.onlineProducts[i]);
-                        }
-                    }
-                    resolve({
-                        data: data,
-                        page: query.page,
-                        totalCount: result.data.onlineProducts.length,
-                    })
-                })
-                .catch((err) => console.log("Error", err))
-        },600)
-    })
-}
-
-const handleEdit = (email, productName, productPrice, productQuantity,
-                    productCategory, productDescription, productImageUrl, supplierEmail) => {
-    axiosInterceptor("edit request")
+const handleEdit = (email, newData) => {
+    axiosInterceptor("edit product")
     Axios.post("http://localhost:8080/EditProduct",
         {
             'email': email,
             'role': 'Business owner',
-            'name': productName,
-            'price': productPrice,
-            'quantity': productQuantity,
-            'category': productCategory,
-            'description': productDescription,
-            'imageUrl': productImageUrl,
-            'supplier': supplierEmail,
+            'name': newData.productName,
+            'price': newData.productPrice,
+            'quantity': newData.productQuantity,
+            'category': newData.productCategory,
+            'description': newData.productDescription,
+            'supplier': newData.supplierEmail ? newData.supplierEmail : "",
+            "credit": ""
         },
         {
             headers: {'Content-Type': 'application/json'}
@@ -146,7 +110,6 @@ const handleEdit = (email, productName, productPrice, productQuantity,
 }
 
 const handleDelete = (email, productName, supplierEmail) => {
-    axiosInterceptor("delete request")
     Axios.post("http://localhost:8080/DeleteProduct",
         {
             'email': email,
@@ -162,10 +125,14 @@ const handleDelete = (email, productName, supplierEmail) => {
 }
 
 const Row = (props) => {
-    const row = props.row;
+    const [row, setRow] = useState(props.row);
     const email = props.email;
     const [open, setOpen] = React.useState(false);
     const classes = useRowStyles();
+
+    const handleChange = (prop) => e => {
+        setRow( {...row, [prop]: e.target.value} )
+    }
 
     return (
         <React.Fragment>
@@ -209,25 +176,29 @@ const Row = (props) => {
                                     <TableRow>
                                         <TableCell>Quantity</TableCell>
                                         <TableCell>
-                                            <OutlinedInput value={row.productQuantity}/>
+                                            <OutlinedInput defaultValue={row.productQuantity}
+                                                           onChange={handleChange("productQuantity")}/>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>Price ($)</TableCell>
                                         <TableCell>
-                                            <OutlinedInput value={row.productPrice}/>
+                                            <OutlinedInput defaultValue={row.productPrice}
+                                                           onChange={handleChange("productPrice")}/>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>Category</TableCell>
                                         <TableCell>
-                                            <OutlinedInput value={row.productCategory}/>
+                                            <OutlinedInput defaultValue={row.productCategory}
+                                                           onChange={handleChange("productCategory")}/>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>Description</TableCell>
                                         <TableCell>
-                                            <OutlinedInput value={row.productDescription}/>
+                                            <OutlinedInput defaultValue={row.productDescription}
+                                                           onChange={handleChange("productDescription")}/>
                                         </TableCell>
                                     </TableRow>
                                 </TableBody>
@@ -242,10 +213,15 @@ const Row = (props) => {
 }
 
 const Row1 = (props) => {
-    const row1 = props.row1;
+    const [row1, setRow1] = useState(props.row1);
     const email = props.email;
     const [open1, setOpen1] = React.useState(false);
     const classes = useRowStyles();
+
+    const handleChange = (prop) => e => {
+        setRow1( {...row1, [prop]: e.target.value} )
+    }
+
     return (
         <React.Fragment>
             <TableRow className={classes.root}>
@@ -288,7 +264,7 @@ const Row1 = (props) => {
                             </TableCell>
                             <TableCell>
                                 <Tooltip title="Edit Product Detail">
-                                    <IconButton aria-label="edit">
+                                    <IconButton aria-label="edit" onClick={() => handleEdit(email, row1)}>
                                         <EditIcon />
                                     </IconButton>
                                 </Tooltip>
@@ -298,25 +274,26 @@ const Row1 = (props) => {
                                     <TableRow>
                                         <TableCell>Quantity</TableCell>
                                         <TableCell>
-                                            <OutlinedInput value={row1.productQuantity}/>
+                                            <OutlinedInput defaultValue={row1.productQuantity}
+                                                           onChange={handleChange("productQuantity")}/>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>Price ($)</TableCell>
                                         <TableCell>
-                                            <OutlinedInput value={row1.productPrice}/>
+                                            <OutlinedInput value={row1.productPrice} readOnly={true}/>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>Category</TableCell>
                                         <TableCell>
-                                            <OutlinedInput value={row1.productCategory}/>
+                                            <OutlinedInput value={row1.productCategory} readOnly={true}/>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>Description</TableCell>
                                         <TableCell>
-                                            <OutlinedInput value={row1.productDescription}/>
+                                            <OutlinedInput value={row1.productDescription} readOnly={true}/>
                                         </TableCell>
                                     </TableRow>
                                 </TableBody>
@@ -526,6 +503,7 @@ export default function MaterialTableDemo(props) {
 
     return(
         <div className={classes.root}>
+            <img id="myImage" src={ProductPlaceHolder} width={0} height={0} alt="placeHolder"/>
             <Hidden smUp implementation="css">
                 {appBar()}
                 <SwipeableViews
@@ -543,10 +521,6 @@ export default function MaterialTableDemo(props) {
             </Hidden>
 
             <Hidden xsDown implementation="css">
-                <Dialog onClose={handleClickCloseImageDialog} aria-labelledby="simple-dialog-title" open={openImageDialog}>
-                    <DialogTitle id="simple-dialog-title">Product Image</DialogTitle>
-                    <img src={imageUrl} alt="image"/>
-                </Dialog>
                 {appBar()}
                 <SwipeableViews
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
@@ -569,17 +543,17 @@ export default function MaterialTableDemo(props) {
                                 {
                                     title: 'Category*', field: 'productCategory',
                                     cellStyle: {textAlign: 'left'},
-                                    headerStyle:{textAlign:'left'}
+                                    headerStyle: {textAlign:'left'}
                                 },
                                 {
                                     title: 'Price*', field: 'productPrice', type: 'currency',
                                     cellStyle: {textAlign: 'left'},
-                                    headerStyle:{textAlign:'left'}
+                                    headerStyle: {textAlign:'left'}
                                 },
                                 {
                                     title: 'Description', field: 'productDescription',
                                     cellStyle: {textAlign: 'left'},
-                                    headerStyle:{textAlign:'left'}
+                                    headerStyle: {textAlign:'left'}
                                 },
                             ]}
 
@@ -612,8 +586,6 @@ export default function MaterialTableDemo(props) {
                             editable={{
                                 onRowAdd: (newData) =>
                                     new Promise((resolve) =>{
-
-                                        const photoRef = productPhotoRef.child(email.concat("-").concat(newData.productName));
                                         if( newData.productName && newData.productName.trim().length > 0 &&
                                             newData.productQuantity && newData.productQuantity.trim().length > 0 &&
                                             newData.productQuantity >0 &&
@@ -621,61 +593,17 @@ export default function MaterialTableDemo(props) {
                                             newData.productPrice && newData.productPrice.trim().length > 0 &&
                                             newData.productPrice >0){
                                             setTimeout(() => {
-                                                resolve();
-                                                let canvas = document.createElement('canvas');
-                                                let context = canvas.getContext('2d');
-                                                const img = new Image();
-                                                img.src = ProductPlaceHolder;
-                                                canvas.width = 600;
-                                                canvas.height = 600;
-                                                context.drawImage(img, 0, 0);
-
-                                                canvas.toBlob( (blob) => {
-                                                    photoRef.put(blob).on('state_changed',
-                                                        (snapshot) =>
-                                                        {
-                                                            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                                                            console.log('Upload is ' + progress + '% done');
-                                                        }, (error) => {
-                                                            console.log(error);
-                                                        },  () => {
-                                                            photoRef.getDownloadURL().then( (url) => {
-                                                                axiosInterceptor('Add product request');
-                                                                Axios.post("http://localhost:8080/AddProduct",
-                                                                    {
-                                                                        'email': email,
-                                                                        'name': newData.productName,
-                                                                        'price': newData.productPrice,
-                                                                        'supplier': "",
-                                                                        'quantity': newData.productQuantity,
-                                                                        'category': newData.productCategory,
-                                                                        'credit': "",
-                                                                        'description':
-                                                                            newData.productDescription &&
-                                                                            newData.productDescription.trim().length > 0
-                                                                                ? newData.productDescription
-                                                                                : "",
-                                                                        'imageUrl': url,
-                                                                        'role': 'Business owner',
-                                                                    },
-                                                                    {
-                                                                        headers: {'Content-Type': 'application/json'}
-                                                                    })
-                                                                    .then(response => console.log(response))
-                                                                    .catch((err) => console.log("Error", err))
-                                                            });
-                                                        }
-                                                    )
-                                                }, 'image/jpg');
-
-                                            }, 600)
+                                                setNonMarketData([...nonMarketData, newData])
+                                                handleAddWithPlaceHolderImage(email, newData, "defaultImageUrl", "Business owner")
+                                                resolve()
+                                            }, 1000)
                                         }
                                         else if(newData.productName && newData.productName.trim().length <= 0){
                                             resolve();
                                             alert("Name is required");
                                         }
-                                        else if(newData.productQuantity && newData.productQuantity.trim().length <= 0 ||
-                                            newData.productQuantity >0){
+                                        else if(newData.productQuantity && (newData.productQuantity.trim().length <= 0 ||
+                                            newData.productQuantity < 0)){
                                             resolve();
                                             alert("Quantity is required and must be a positive value");
                                         }
@@ -683,8 +611,8 @@ export default function MaterialTableDemo(props) {
                                             resolve();
                                             alert("Category is required");
                                         }
-                                        else if(newData.productPrice && newData.productPrice.trim().length <= 0 ||
-                                            newData.productPrice > 0) {
+                                        else if(newData.productPrice && (newData.productPrice.trim().length <= 0 ||
+                                            newData.productPrice < 0)) {
                                             resolve();
                                             alert("Price is required and must be a positive value");
                                         }
@@ -697,15 +625,12 @@ export default function MaterialTableDemo(props) {
                                 onRowUpdate: (newData, oldData) =>
                                     new Promise((resolve) =>{
                                         setTimeout(() => {
-                                            handleEdit(email, newData.productName,
-                                                newData.productPrice, newData.productQuantity,
-                                                newData.productCategory, newData.productDescription,
-                                                null, null)
+                                            handleEdit(email, newData)
                                             const dataUpdate = [...nonMarketData]
                                             dataUpdate[oldData.tableData.id] = newData
                                             setNonMarketData([...dataUpdate])
                                             resolve()
-                                        }, 1000)
+                                        }, 500)
                                     }),
                                 onRowDelete: (oldData) =>
                                     new Promise((resolve) =>{
@@ -715,8 +640,8 @@ export default function MaterialTableDemo(props) {
                                             dataDelete.splice(oldData.tableData.id, 1)
                                             setNonMarketData([...dataDelete])
                                             resolve()
-                                        }, 1000)
-                                    }),
+                                        }, 500)
+                                    })
                             }}
                         />
                     </TabPanel>
@@ -742,15 +667,12 @@ export default function MaterialTableDemo(props) {
                                 onRowUpdate: (newData, oldData) =>
                                     new Promise((resolve) =>{
                                         setTimeout(() => {
-                                            handleEdit(email, newData.productName,
-                                                newData.productPrice, newData.productQuantity,
-                                                newData.productCategory, newData.productDescription,
-                                                newData.productImageUrl, newData.supplierEmail)
+                                            handleEdit(email, newData)
                                             const dataUpdate = [...marketData]
                                             dataUpdate[oldData.tableData.id] = newData
                                             setMarketData([...dataUpdate])
                                             resolve()
-                                        }, 1000)
+                                        }, 500)
                                     }),
                                 onRowDelete: (oldData) =>
                                     new Promise((resolve) =>{
@@ -760,22 +682,28 @@ export default function MaterialTableDemo(props) {
                                             dataDelete.splice(oldData.tableData.id, 1)
                                             setMarketData([...dataDelete])
                                             resolve()
-                                        }, 1000)
+                                        }, 500)
                                     }),
                             }}
                         />
                     </TabPanel>
                 </SwipeableViews>
-                <DropzoneDialog
-                    open={dropZoneOpen}
-                    onSave={handleDropZoneSave}
-                    acceptedFiles={['image/jpeg', 'image/png', 'image/bmp']}
-                    showPreviews={true}
-                    filesLimit={1}
-                    maxFileSize={5000000} //5MB
-                    onClose={handleDropZoneClose}
-                />
             </Hidden>
+
+            <DropzoneDialog
+                open={dropZoneOpen}
+                onSave={handleDropZoneSave}
+                acceptedFiles={['image/jpeg', 'image/png', 'image/bmp']}
+                showPreviews={true}
+                filesLimit={1}
+                maxFileSize={5000000} //5MB
+                onClose={handleDropZoneClose}
+            />
+
+            <Dialog onClose={handleClickCloseImageDialog} aria-labelledby="simple-dialog-title" open={openImageDialog}>
+                <DialogTitle id="simple-dialog-title">Product Image</DialogTitle>
+                <img src={imageUrl} alt="image"/>
+            </Dialog>
 
         </div>
     );
