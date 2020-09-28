@@ -1,0 +1,60 @@
+.my-cart-container .table-container {
+  margin-bottom: 20px;
+}
+
+.my-cart-container .page-title{
+  margin-bottom: 20px;
+  font-size: 26px;
+}
+
+
+.my-cart-container .record-to-payment {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.title-tip {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.form-wrapper .payment-information {
+  font-size: 20px;
+  text-align: center;
+  color: #3f51b5;
+  margin-bottom: 12px;
+}
+
+.form-wrapper .form-item {
+  margin-top: 12px;
+}
+
+.form-wrapper .form-item .label {
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.form-wrapper .form-item .credit-label {
+  font-weight: bold;
+}
+
+.form-wrapper .form-item .input-item {
+  margin-left: 8px;
+}
+
+.form-wrapper .form-item .radio-item {
+  font-size: 14px;
+}
+
+.form-wrapper .form-item .input-full {
+  width: 100%;
+}
+
+.form-wrapper .submit {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.form-wrapper .MuiTypography-root {
+  font-size: 14px;
+}
