@@ -3,13 +3,17 @@ package com.ses3a.backend.firebase;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.SetOptions;
 import com.google.firebase.cloud.FirestoreClient;
+import com.ses3a.backend.Configs;
+import com.ses3a.backend.entity.object.GraphData;
 import com.ses3a.backend.entity.request.CreateNewUserRequest;
 import com.ses3a.backend.entity.request.EditUserInfoRequest;
 import com.ses3a.backend.entity.request.GetUserInfoRequest;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -28,14 +32,14 @@ public class FirebaseUserServices {
         data.put("phone", "");
         String userType = convertToUserType(request.getRole());
 
-        if (userType.equals("vendors")) {
+        if (userType.equals(Configs.VENDOR_TYPE)) {
             FirestoreInitNewUser.initVendor(firestore, request);
         } else {
             FirestoreInitNewUser.initSupplier(firestore, request);
         }
 
         FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                .document("userInfo")
+                .document(Configs.USER_INFO)
                 .set(data);
     }
 
@@ -46,7 +50,6 @@ public class FirebaseUserServices {
         Firestore firestore = FirestoreClient.getFirestore();
         String userType = convertToUserType(role);
         try {
-            System.out.println("LOGIN: " + FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty());
             return !FirebaseUtils.getUserCollection(firestore, userType, email).get().get().isEmpty();
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,7 +64,7 @@ public class FirebaseUserServices {
         String userType = convertToUserType(request.getRole());
 
         return FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                .document("userInfo")
+                .document(Configs.USER_INFO)
                 .get()
                 .get()
                 .getData();
@@ -77,8 +80,26 @@ public class FirebaseUserServices {
         String userType = convertToUserType(request.getRole());
 
         FirebaseUtils.getUserCollection(firestore, userType, request.getEmail())
-                .document("userInfo")
+                .document(Configs.USER_INFO)
                 .set(data, SetOptions.merge());
+    }
+
+    //Get supplier revenue data
+    public List<GraphData> getGraphData(String email) {
+        Firestore firestore = FirestoreClient.getFirestore();
+        List<GraphData> graphData = new ArrayList<>();
+
+        try{
+            firestore.collection(Configs.REVENUE_COLLECTION).document(email).get().get().getData()
+                    .forEach((k, v) -> {
+                        graphData.add(new GraphData(k, v.toString()));
+                    });
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return graphData;
     }
 
 }

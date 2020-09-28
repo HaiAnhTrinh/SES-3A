@@ -196,7 +196,7 @@ export default function Account(props) {
             <br/><br/>
             <div id="info">
                 <Grid container spacing={3} alignItems="flex-end">
-                    <Grid item xs={2}>
+                    <Grid item xs={3} sm={2}>
                         <Typography color="primary">Email</Typography>
                     </Grid>
                     <Grid item>
@@ -206,7 +206,7 @@ export default function Account(props) {
                     </Grid>
                 </Grid>
                 <Grid container spacing={3} alignItems="flex-end">
-                    <Grid item xs={2}>
+                    <Grid item xs={3} sm={2}>
                         <Typography color="primary">Username</Typography>
                     </Grid>
                     <Grid item>
@@ -216,7 +216,7 @@ export default function Account(props) {
                     </Grid>
                 </Grid>
                 <Grid container spacing={3} alignItems="flex-end">
-                    <Grid item xs={2}>
+                    <Grid item xs={3} sm={2}>
                         <Typography color="primary">Address</Typography>
                     </Grid>
                     <Grid item>
@@ -226,7 +226,7 @@ export default function Account(props) {
                     </Grid>
                 </Grid>
                 <Grid container spacing={3} alignItems="flex-end">
-                    <Grid item xs={2}>
+                    <Grid item xs={3} sm={2}>
                         <Typography color="primary">Phone</Typography>
                     </Grid>
                     <Grid item>
@@ -236,7 +236,7 @@ export default function Account(props) {
                     </Grid>
                 </Grid>
                 <Grid container spacing={3} alignItems="center">
-                    <Grid item xs={2}>
+                    <Grid item xs={3} sm={2}>
                         <Typography color="primary">Profile image</Typography>
                         <br/>
                         {currentUser && currentUser.photoURL ?

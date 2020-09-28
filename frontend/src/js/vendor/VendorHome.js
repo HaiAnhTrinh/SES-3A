@@ -238,6 +238,7 @@ export default function Home(props){
         "productQuantity" : "",
         "productPrice" : "",
         "productCategory": "",
+        "productCredit": ""
     });
     const [tileData, setTileData] = React.useState([]);
 
@@ -247,7 +248,7 @@ export default function Home(props){
     };
 
     const handleClickOpenProduct = (event, productName, productSupplier, productImageUrl, productDescription,
-                                    productQuantity, productPrice, productCategory) => {
+                                    productQuantity, productPrice, productCategory, productCredit) => {
         console.log("handleClickOpenProduct event: ", event);
 
         setOpenProduct(true);
@@ -259,6 +260,7 @@ export default function Home(props){
             "productQuantity" : productQuantity,
             "productPrice" : productPrice,
             "productCategory": productCategory,
+            "productCredit": productCredit
         });
     };
 
@@ -442,30 +444,29 @@ export default function Home(props){
                         </Toolbar>
                     </Tabs>
                 </AppBar>
-                <div align="center" fontsize="24px">
+                <div align="center">
                     ~~WELCOME! SELECT <strong>CHANGE BUSINESS OPTIONS</strong> TO SHOW DIFFERENT PRODUCTS~~
                 </div>
                 <div className={classes.rootGrid} style={{width: 'auto', height: 'auto'}}>
                     <GridList cellHeight={200} spacing={1} className={classes.gridList} cols={4}>
-                        {tileData.map(tile => (
-                            <GridListTile key={tile.imageURL} >
+                        {tileData.map((tile, index) => (
+                            <GridListTile key={index} >
                                 <img src={tile.productImageUrl}
-                                     alt={tile.productName} onClick={(event)=>handleClickOpenProduct(event, tile.productName, tile.supplierEmail, tile.productImageUrl,
-                                    tile.productDescription, tile.productQuantity,  tile.productPrice, tile.productCategory,
+                                     alt={tile.productName}
+                                     onClick={(event)=>handleClickOpenProduct(event, tile.productName, tile.supplierEmail, tile.productImageUrl,
+                                    tile.productDescription, tile.productQuantity,  tile.productPrice, tile.productCategory, tile.productCredit
                                 )}
-                                    //to sort add: sortDirection={orderBy === tile.productName ? order : false}
                                 />
                                 <GridListTileBar
                                     title={tile.productName}
+                                    subtitle={"credit $" + tile.productCredit}
                                     titlePosition="top"
                                     className={classes.titleBar}
                                 />
 
                                 <GridListTileBar
                                     height={4}
-                                    title={<span>{tile.productPrice} for {tile.productQuantity}</span>}
-
-                                    title={tile.productPrice}
+                                    title={"$" + tile.productPrice}
 
                                     subtitle={<span>By: {tile.supplierEmail} </span>}
                                     actionIcon={
@@ -504,14 +505,15 @@ export default function Home(props){
                                     <CardContent>
                                         <Typography variant="body2" color="textSecondary" component="p"> Description: {openProductDetails.productDescription}</Typography>
                                         <Typography variant="body2" color="textSecondary" component="p">Remaining stock: {openProductDetails.productQuantity}</Typography>
-                                        {/*<Typography variant="body2" color="textSecondary" component="p">Rating: {openProductDetails.productRating}</Typography>*/}
-                                        <Typography variant="body12" color="textSecondary" component="p">Price: {openProductDetails.productPrice}</Typography>
+                                        <Typography variant="body12" color="textSecondary" component="p">Price: ${openProductDetails.productPrice}</Typography>
+                                        <Typography variant="body12" color="error" component="p">Credit: ${openProductDetails.productCredit}</Typography>
                                     </CardContent>
                                     <CardActions disableSpacing>
                                         <IconButton aria-label="add to favorites">
                                             <FavoriteIcon />
                                         </IconButton>
-                                        <Button variant="outlined" onClick={handleAddToCart}>Add to Cart</Button><br></br>
+                                        <Button variant="outlined" onClick={handleAddToCart}>Add to Cart</Button>
+                                        <br/>
                                     </CardActions>
                                 </Card>
 
@@ -523,7 +525,7 @@ export default function Home(props){
                                         color="primary"
                                 >Close
                                 </Button>
-                                <br></br>
+                                <br/>
                             </div>
                         </DialogContentText>
                     </DialogContent>

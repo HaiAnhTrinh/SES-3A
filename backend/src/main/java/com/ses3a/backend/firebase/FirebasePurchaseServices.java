@@ -5,6 +5,7 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.firebase.cloud.FirestoreClient;
+import com.ses3a.backend.Configs;
 import com.ses3a.backend.entity.object.CartProduct;
 import com.ses3a.backend.entity.request.AddDeliveredPurchaseRequest;
 import com.ses3a.backend.entity.request.GetSupplierDeliveredPurchaseRequest;
@@ -42,7 +43,7 @@ public class FirebasePurchaseServices {
 
         try {
             List<QueryDocumentSnapshot> purchasesDocuments =
-                    firestore.collection("vendorPurchases")
+                    firestore.collection(Configs.VENDOR_PURCHASES_COLLECTION)
                             .document(request.getEmail())
                             .collection("purchaseHistory")
                             .get()
@@ -64,7 +65,7 @@ public class FirebasePurchaseServices {
 
         try {
             List<QueryDocumentSnapshot> purchasesDocuments =
-                    firestore.collection("supplierPurchases")
+                    firestore.collection(Configs.SUPPLIER_PURCHASES_COLLECTION)
                             .document(request.getEmail())
                             .collection("pendingPurchases")
                             .get()
@@ -89,7 +90,7 @@ public class FirebasePurchaseServices {
 
         try {
             List<QueryDocumentSnapshot> purchasesDocuments =
-                    firestore.collection("supplierPurchases")
+                    firestore.collection(Configs.SUPPLIER_PURCHASES_COLLECTION)
                             .document(request.getEmail())
                             .collection("deliveredPurchases")
                             .get()
@@ -109,13 +110,13 @@ public class FirebasePurchaseServices {
     public void pendingToDelivered(@NotNull AddDeliveredPurchaseRequest request) {
         Firestore firestore = FirestoreClient.getFirestore();
         try {
-            DocumentReference purchaseRef = firestore.collection("supplierPurchases")
+            DocumentReference purchaseRef = firestore.collection(Configs.SUPPLIER_PURCHASES_COLLECTION)
                     .document(request.getEmail())
                     .collection("pendingPurchases")
                     .document(request.getId());
 
             //add to delivered purchases
-            firestore.collection("supplierPurchases")
+            firestore.collection(Configs.SUPPLIER_PURCHASES_COLLECTION)
                     .document(request.getEmail())
                     .collection("deliveredPurchases")
                     .document(request.getId())

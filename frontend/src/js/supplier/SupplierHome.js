@@ -19,8 +19,6 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
 import Axios from "axios";
 
 
-
-
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
