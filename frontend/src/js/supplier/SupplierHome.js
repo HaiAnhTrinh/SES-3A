@@ -1,6 +1,6 @@
-import React, {useRef, useLayoutEffect, useEffect, useState} from 'react';
+import React, {useState, useRef, useLayoutEffect, useEffect} from 'react';
+import MaterialTable from 'material-table';
 import { forwardRef } from 'react';
-import MaterialTable from "material-table";
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import Check from '@material-ui/icons/Check';
@@ -17,7 +17,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import Axios from "axios";
-
+import {axiosInterceptor} from "../common/AxiosTasks";
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -39,12 +39,29 @@ const tableIcons = {
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
+export default function MyPurchase(props) {
 
-export default function MaterialTableDemo(props) {
+    console.log(props)
 
     //Create state for the current size of the table
+    const email = props.match.params.email;
     const targetRef = useRef();
     const [dimensions, setDimensions] = useState({ width:0, height: 0 });
+    const [tableData, setTableData] = useState([]);
+
+
+    function useWindowSize() {
+        const [size, setSize] = useState([0, 0]);
+        useLayoutEffect(() => {
+            function updateSize() {
+                setSize([window.innerWidth, window.innerHeight]);
+            }
+            window.addEventListener('resize', updateSize);
+            updateSize();
+            return () => window.removeEventListener('resize', updateSize);
+        }, []);
+        return size;
+    }
 
     //Get the current size
     useLayoutEffect(() => {
@@ -59,101 +76,68 @@ export default function MaterialTableDemo(props) {
 
     //Compare the table size to the recommended size for phone and output true or false
     function isPhone() {
-        return dimensions.width < 541
+        var resizeTimeout;
+        window.addEventListener('resize', function(event) {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function(){
+                window.location.reload();
+            }, 1500);
+        });
+        return dimensions.width <= 541;
     }
 
-    const email = props.match.params.email;
-    console.log("Props: ", props);
-    console.log("Email: ", email);
+    var divStyle = {
+        maxWidth: '5'
+    };
 
-
-
-    /*const { isPhone } = this.state;*/
+    useEffect(() => {
+        axiosInterceptor("GetSupplierPendingPurchase")
+        Axios.get("http://localhost:8080/GetSupplierPendingPurchase", {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'email': email
+                }
+            }
+        ).then( result => setTableData(result.data.pendingPurchases)
+        ).catch( error => console.log(error));
+    }, [])
 
     return (
-        <div>
+        <div style={divStyle}>
+
             {/*Get the current size of the table*/}
             <div ref={targetRef}>
-
                 <p hidden={true}>{dimensions.width}</p>
                 <p hidden={true}>{dimensions.height}</p>
-
             </div>
 
             <MaterialTable
-                tableLayout = 'auto'
+                maxWidth = "541"
                 icons={tableIcons}
-                title="Supplier's Homepage"
+                title= {isPhone() ? "History" : "Purchase History"}
                 columns={[
                     {title: 'Product', field: 'name'},
                     /*Hidden attribute (boolean) will call the function isPhone
                     *If the size of table is small then hide the non required fields*/
                     { title: 'Amount', field: 'quantity', type: 'numeric', hidden: isPhone()},
-                    { title: 'Price', field: 'cost' , hidden: isPhone()},
+                    { title: 'Cost', field: 'cost' , initialEditValue: '$ ', hidden: isPhone() },
                     { title: 'Category', field: 'category'},
                     { title: 'Date of Purchase', field: 'date', type: 'date'},
-
+                    // { title: 'Supplier', field: 'supplier' }
                 ]}
 
-                data={(query) =>
-                    new Promise((resolve) => {
-                        setTimeout(() => {
-                            Axios.interceptors.request.use(request => {
-                                console.log('Starting Request', request)
-                                return request
-                            });
-
-                            Axios.get("http://localhost:8080/GetSupplierPendingPurchase", {
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'email': email
-                                    }
-                                }
-                            )
-                                .then(result => {
-                                    console.log("Result: ", result)
-                                    console.log("Result data", result.data.pendingPurchases)
-                                    var data = [];
-                                    for (let i = query.pageSize * (query.page+1) - query.pageSize;
-                                         i <= query.pageSize * (query.page+1) - 1; i++)
-                                    {
-                                        if(i +1 > result.data.pendingPurchases.length){
-                                            break;}
-                                        else{
-                                            data.push(result.data.pendingPurchases[i]);
-                                        }
-                                    }
-                                    resolve({
-                                        data: data,
-                                        page: query.page,
-                                        totalCount: result.data.pendingPurchases.length,
-                                    })
-                                })
-                                .catch((err) => {
-                                        console.log("Error", err);
-
-                                    }
-                                )
-                        },600)
-
-                    })
-                }
-                options={{
-                    search: false
-                }}
+                data={tableData}
 
                 detailPanel={[
+
                     {
                         tooltip: 'Show Details',
                         disabled: !isPhone(),
+
+
                         render: rowData => {
                             return (
-                                <div
-                                    style={{
-                                        textAlign: 'center'
-                                    }}
-                                >
-
+                                <div style={{ textAlign: 'center' }}>
                                     <p>Total amount: {rowData.quantity}</p>
                                     <p>Total cost: {rowData.cost}</p>
                                 </div>
@@ -161,13 +145,10 @@ export default function MaterialTableDemo(props) {
                         }
                     }
                 ]}
-
+                onRowClick={(event, rowData, togglePanel) => isPhone() ? togglePanel() : ''}
             />
+
         </div>
     )
 
-
-
 }
-
-

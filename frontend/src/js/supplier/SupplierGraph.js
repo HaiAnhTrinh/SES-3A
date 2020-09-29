@@ -33,8 +33,23 @@ export default function Graph(props){
                 textStyle: {color: 'black'}
             },
             tooltip: {trigger: 'axis'},
+            // dataZoom: [
+            //     {
+            //         type: 'inside',
+            //         throttle:'50',
+            //         minValueSpan:4,
+            //         start: 0,
+            //         end: 15
+            //     }
+            // ],
             xAxis: {
                 name: 'date',
+                nameLocation: 'middle',
+                nameGap: 50,
+                axisLabel: {
+                    interval: 0,
+                    rotate: 20
+                },
                 data: data.map((d) => { return d.date })
             },
             yAxis: {type: 'value'},

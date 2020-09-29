@@ -181,7 +181,7 @@ export default function Account(props) {
                 </DialogContent>
                 <DialogActions>
                     { password.length >= 6 && password === confirmPassword ?
-                        <Button onClick={saveNewPassword} color="primary">
+                        <Button onClick={() => saveNewPassword()} color="primary">
                             Update
                         </Button>
                         :
