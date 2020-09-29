@@ -1,6 +1,13 @@
 import React from "react";
 import Axios from "axios";
 
+export const axiosInterceptor = (type) => {
+    Axios.interceptors.request.use(request => {
+        console.log(type, request)
+        return request
+    });
+}
+
 const handleAdd = (email, newData, url, role) => {
     Axios.post("http://localhost:8080/AddProduct",
         {

@@ -27,10 +27,7 @@ import Typography from "@material-ui/core/Typography";
 import EditIcon from "@material-ui/icons/Edit";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import {makeStyles} from "@material-ui/core/styles";
-import {Image} from "@material-ui/icons";
-import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
-import GraphView from "echarts/src/chart/graph/GraphView";
 import Button from "@material-ui/core/Button";
 import {handleAddWithPlaceHolderImage} from "../common/AxiosTasks";
 
@@ -152,13 +149,6 @@ Row.propTypes = {
     }).isRequired,
     email: PropTypes.string.isRequired
 };
-
-const axiosInterceptor = (type) => {
-    Axios.interceptors.request.use(request => {
-        console.log(type, request)
-        return request
-    });
-}
 
 const handleDelete = (email, productName, productCategory) => {
     Axios.post("http://localhost:8080/DeleteProduct",

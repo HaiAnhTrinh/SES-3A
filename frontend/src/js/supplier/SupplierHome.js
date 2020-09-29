@@ -17,6 +17,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import Axios from "axios";
+import {axiosInterceptor} from "../common/AxiosTasks";
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -40,14 +41,14 @@ const tableIcons = {
 
 export default function MyPurchase(props) {
 
+    console.log(props)
+
     //Create state for the current size of the table
+    const email = props.match.params.email;
     const targetRef = useRef();
     const [dimensions, setDimensions] = useState({ width:0, height: 0 });
     const [tableData, setTableData] = useState([]);
 
-    function refreshPage() {
-        window.location.reload(false);
-    }
 
     function useWindowSize() {
         const [size, setSize] = useState([0, 0]);
@@ -60,11 +61,6 @@ export default function MyPurchase(props) {
             return () => window.removeEventListener('resize', updateSize);
         }, []);
         return size;
-    }
-
-    function ShowWindowDimensions() {
-        const [width, height] = useWindowSize();
-        return <span>Window size: {width} x {height}</span>;
     }
 
     //Get the current size
@@ -87,31 +83,23 @@ export default function MyPurchase(props) {
                 window.location.reload();
             }, 1500);
         });
-        if(dimensions.width <= 541){
-            return true;
-
-        }else {
-            return false;
-        }
-
+        return dimensions.width <= 541;
     }
-
-    const email = props.match.params.email;
 
     var divStyle = {
         maxWidth: '5'
     };
 
     useEffect(() => {
-        Axios.get("http://localhost:8080/GetVendorPurchase", {
+        axiosInterceptor("GetSupplierPendingPurchase")
+        Axios.get("http://localhost:8080/GetSupplierPendingPurchase", {
                 headers: {
                     'Content-Type': 'application/json',
                     'email': email
                 }
             }
-        ).then( result => {
-            setTableData(result.data.purchaseHistory)
-        }).catch( error => console.log(error));
+        ).then( result => setTableData(result.data.pendingPurchases)
+        ).catch( error => console.log(error));
     }, [])
 
     return (
@@ -119,14 +107,11 @@ export default function MyPurchase(props) {
 
             {/*Get the current size of the table*/}
             <div ref={targetRef}>
-
                 <p hidden={true}>{dimensions.width}</p>
                 <p hidden={true}>{dimensions.height}</p>
-
             </div>
 
             <MaterialTable
-
                 maxWidth = "541"
                 icons={tableIcons}
                 title= {isPhone() ? "History" : "Purchase History"}
@@ -136,9 +121,9 @@ export default function MyPurchase(props) {
                     *If the size of table is small then hide the non required fields*/
                     { title: 'Amount', field: 'quantity', type: 'numeric', hidden: isPhone()},
                     { title: 'Cost', field: 'cost' , initialEditValue: '$ ', hidden: isPhone() },
-                    { title: 'Category', field: 'category', hidden: isPhone()},
+                    { title: 'Category', field: 'category'},
                     { title: 'Date of Purchase', field: 'date', type: 'date'},
-                    { title: 'Supplier', field: 'supplier' }
+                    // { title: 'Supplier', field: 'supplier' }
                 ]}
 
                 data={tableData}
@@ -152,11 +137,7 @@ export default function MyPurchase(props) {
 
                         render: rowData => {
                             return (
-                                <div
-                                    style={{
-                                        textAlign: 'center'
-                                    }}>
-                                    <p>Category: {rowData.category}</p>
+                                <div style={{ textAlign: 'center' }}>
                                     <p>Total amount: {rowData.quantity}</p>
                                     <p>Total cost: {rowData.cost}</p>
                                 </div>
