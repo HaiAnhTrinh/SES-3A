@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Button from '@material-ui/core/Button'
+import Axios from 'axios'
 import TextField from '@material-ui/core/TextField'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
@@ -14,34 +15,56 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Paper from '@material-ui/core/Paper'
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogContentText from '@material-ui/core/DialogContentText'
 import '../../css/AppMyCart.css'
 
-export default function MyCart() {
+export default function MyCart(props) {
+  const [email] = useState(props.match.params.email)
+  const [total, setTotal] = useState(0)
   const [values, setValues] = React.useState({
     cardAccept: '',
     cardNumber: 0,
     expiryMonth: '',
     expiryYear: '',
     cvv: 0,
+    name: '',
     country: '',
     address1: '',
     address2: '',
     city: '',
     state: '',
     postalCode: '',
-    contactPhoneNumber: ''
+    contactPhoneNumber: '',
+    emailAddress: ''
   })
   const [isShowPayment, setIsShowPayment] = useState(false)
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      item: 'test',
-      price: 11,
-      supplier: 'test@gmail.com',
-      quantity: 6,
-      cost: 66
-    }
-  ])
+  const [rows, setRows] = useState([])
+  const [paymentTip, setPaymentTip] = useState('')
+  const [isShowPaymentDialog, setIsShowPaymentDialog] = useState(false)
+
+  useEffect(() => {
+    ;(() => {
+      Axios.get('http://localhost:8080/GetCart', {
+        headers: { 'Content-Type': 'application/json', email: email }
+      })
+          .then(response => {
+            console.log(response)
+            const { cartProducts } = response.data
+            cartProducts.map((c, index) => {
+              c.id = index
+            })
+            let totalCost = 0
+            cartProducts.map(item => (totalCost += parseFloat(item.cost)))
+            setRows(cartProducts)
+            setTotal(totalCost)
+          })
+          .catch(err => console.log('Error: ', err))
+    })()
+  }, [])
 
   const handleChange = prop => e => {
     const { value } = e.target
@@ -49,25 +72,71 @@ export default function MyCart() {
   }
 
   const handleSubmit = () => {
-    // TODO: request
-    console.log('submit', values)
+    console.log('values',values)
+    Axios.post(
+        'http://localhost:8080/Purchase',
+        { email, cartProducts: rows },
+        {
+          headers: { 'Content-Type': 'application/json' }
+        }
+    )
+        .then(response => console.log(response))
+        .catch(error => console.log(error))
+    if (
+        values.cardAccept &&
+        values.cardNumber.length === 16 &&
+        values.expiryMonth &&
+        values.expiryYear &&
+        values.country &&
+        values.cvv.length === 3 &&
+        values.name &&
+        values.address1 &&
+        values.address2 &&
+        values.city &&
+        values.state &&
+        values.postalCode &&
+        values.contactPhoneNumber &&
+        values.emailAddress &&
+        values.emailAddress.includes('@') &&
+        values.emailAddress.includes('.')
+    ) {
+      setPaymentTip('Payment Received. Thank You fvpor Payment')
+    } else {
+      setPaymentTip('Some Information is Missing or Incorrect')
+    }
+    setIsShowPaymentDialog(true)
   }
 
-  const handleTableInputChange = (prop, key) => e => {
+  const handleTableInputChange = (e, product) => {
     const { value } = e.target
-    console.log(value)
-    const realRows = [...rows]
-    realRows.forEach(r => {
-      if (r.id === prop.id) {
-        r[key] = value
+    let totalCost = 0
+    const newRows = [...rows]
+    newRows.forEach(r => {
+      if (r.id === product.id) {
+        r.quantity = value
+        r.cost = value * r.price
       }
     })
-
-    setRows(realRows)
+    newRows.map(r => (totalCost += parseFloat(r.cost)))
+    setRows(newRows)
+    setTotal(totalCost)
   }
 
   const handleDelete = record => {
-    setRows(rows.filter(row => row.id !== record.id))
+    const params = {
+      email,
+      productName: record.name,
+      supplierEmail: record.supplier
+    }
+    Axios.post('http://localhost:8080/RemoveFromCart', params, {
+      headers: { 'Content-Type': 'application/json' }
+    })
+        .then(() => {
+          window.location.reload()
+        })
+        .catch(err => {
+          console.log('Error: ', err)
+        })
   }
 
   return (
@@ -92,38 +161,39 @@ export default function MyCart() {
                   <TableCell component='th'>
                     <DeleteOutlinedIcon onClick={() => handleDelete(row)} />
                   </TableCell>
-                  <TableCell component='th'>{row.item}</TableCell>
+                  <TableCell component='th'>{row.name}</TableCell>
                   <TableCell component='th'>{row.price}</TableCell>
                   <TableCell component='th'>{row.supplier}</TableCell>
                   <TableCell component='th'>
                     <TextField
-                      onChange={handleTableInputChange(row, 'quantity')}
-                      size='small'
-                      type='number'
-                      value={row.quantity}
+                        onChange={e => handleTableInputChange(e, row)}
+                        size='small'
+                        type='number'
+                        inputProps={{
+                          min: 1
+                        }}
+                        defaultValue={row.quantity}
                     />
                   </TableCell>
                   <TableCell component='th'>
                     <TextField
-                      onChange={handleTableInputChange(row, 'cost')}
-                      size='small'
-                      type='number'
-                      value={parseInt(row.quantity) * parseInt(row.price)}
+                        InputProps={{
+                          readOnly: true
+                        }}
+                        size='small'
+                        type='number'
+                        value={row.cost}
                     />
                   </TableCell>
                 </TableRow>
               ))}
 
-              {rows.map(row => (
-                <TableRow key={row.id}>
-                  <TableCell colSpan={6} component='th'>
-                    total:
-                    {!isNaN(parseInt(row.quantity) * parseInt(row.price))
-                      ? parseInt(row.quantity) * parseInt(row.price)
-                      : null}
-                  </TableCell>
-                </TableRow>
-              ))}
+              <TableRow>
+                <TableCell align='right' colSpan={5}>
+                  Total
+                </TableCell>
+                <TableCell align='left'>{total}</TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
@@ -309,6 +379,24 @@ export default function MyCart() {
           </div>
         </div>
       ) : null}
+
+      <Dialog open={isShowPaymentDialog} onClose={() => setIsShowPaymentDialog(false)}>
+        <DialogTitle id='alert-dialog-title'>{'Alert'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>{paymentTip}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+              variant='contained'
+              size='large'
+              onClick={() => setIsShowPaymentDialog(false)}
+              color='primary'
+              autoFocus
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }
