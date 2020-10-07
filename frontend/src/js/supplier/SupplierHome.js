@@ -76,7 +76,7 @@ export default function MyPurchase(props) {
 
     //Compare the table size to the recommended size for phone and output true or false
     function isPhone() {
-        var resizeTimeout;
+        let resizeTimeout;
         window.addEventListener('resize', function(event) {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(function(){
@@ -86,7 +86,7 @@ export default function MyPurchase(props) {
         return dimensions.width <= 541;
     }
 
-    var divStyle = {
+    const divStyle = {
         maxWidth: '5'
     };
 

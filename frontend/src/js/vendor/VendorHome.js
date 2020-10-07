@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Button from '@material-ui/core/Button';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
@@ -37,15 +37,16 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Avatar from '@material-ui/core/Avatar';
 import { red } from '@material-ui/core/colors';
+import '../../css/VendorHome.css'
+import useTheme from "@material-ui/core/styles/useTheme";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const useStyles = makeStyles((theme) => ({
-
     root_product: {
-        maxWidth: 600,
+        maxWidth: 320,
     },
     media: {
         height: 0,
-        paddingTop: '56.25%', // 16:9
     },
     avatar: {
         backgroundColor: red[500],
@@ -70,32 +71,39 @@ const useStyles = makeStyles((theme) => ({
         height: "auto",
         transform: 'translateZ(0)',
     },
+    gridListTileCredit: {
+        top: 50,
+        right: 10,
+        fontSize: "large",
+        fontWeight: "bolder",
+        background: "red",
+        position: "absolute",
+        borderRadius: "60%",
+    },
     titleBar: {
+        width: "100%",
+        position: "absolute",
         background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' + 'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
     },
     icon: {
         color: '#CACACB', // Was white
     },
-
     root1: {
         flexGrow: 1,
     },
     menuButton: {
         marginRight: theme.spacing(2),
-
     },
     title: {
         flexGrow: 1,
         display: 'none',
         [theme.breakpoints.up('sm')]: {
             display: 'block',
-
         },
     },
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120,
-
     },
     selectEmpty: {
         marginTop: theme.spacing(1),
@@ -205,6 +213,9 @@ const useStyles = makeStyles((theme) => ({
         left: 'calc(50% - 9px)',
         transition: theme.transitions.create('opacity'),
     },
+    saveOptionButton: {
+        top: 10
+    }
 }));
 
 const images = [
@@ -227,10 +238,13 @@ const images = [
 
 export default function Home(props){
     console.log("VENDOR HOME");
+    const theme = useTheme();
+    const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
+    const classes = useStyles();
     const email = props.match.params.email;
-    const [openOptions, setOpenOptions] = React.useState(false);
-    const [openProduct, setOpenProduct] = React.useState(false);
-    const [openProductDetails, setOpenProductDetails] = React.useState({
+    const [openOptions, setOpenOptions] = useState(false);
+    const [openProduct, setOpenProduct] = useState(false);
+    const [openProductDetails, setOpenProductDetails] = useState({
         "productName": "",
         "productImageUrl": "",
         "productDescription" : "",
@@ -240,146 +254,63 @@ export default function Home(props){
         "productCategory": "",
         "productCredit": ""
     });
-    const [tileData, setTileData] = React.useState([]);
+    const [dataList, setDataList] = useState([]);
+    const [checkList, setCheckList] = useState({
+        fastfood: false,
+        hairdressing: false,
+        clothing: false,
+        bakery: false,
+        makeup: false,
+        pharmacy: false
+    })
 
-    const handleClickOpenOptions = () => {
-        setOpenOptions(true);
+    const handleClickOpenOptions = () => setOpenOptions(true)
 
-    };
-
-    const handleClickOpenProduct = (event, productName, productSupplier, productImageUrl, productDescription,
-                                    productQuantity, productPrice, productCategory, productCredit) => {
-        console.log("handleClickOpenProduct event: ", event);
-
+    const handleClickOpenProduct = (event, tile) => {
         setOpenProduct(true);
         setOpenProductDetails({
-            "productName": productName,
-            "productImageUrl": productImageUrl,
-            "productDescription" : productDescription,
-            "supplierEmail" : productSupplier,
-            "productQuantity" : productQuantity,
-            "productPrice" : productPrice,
-            "productCategory": productCategory,
-            "productCredit": productCredit
+            "productName": tile.productName,
+            "productImageUrl": tile.productImageUrl,
+            "productDescription" : tile.productDescription,
+            "supplierEmail" : tile.supplierEmail,
+            "productQuantity" : tile.productQuantity,
+            "productPrice" : tile.productPrice,
+            "productCategory": tile.productCategory,
+            "productCredit": tile.productCredit
         });
     };
 
     const handleCloseOptions = () => {
-        console.log("Category: ", category);
-        Axios.get("http://localhost:8080/GetProductByCategory",
-            { headers: {'Content-Type': 'application/json', 'email': email, 'category': category}})
-            .then( (res) => {
-                console.log("Response: ",res);
-                setTileData(res.data.products);
-            })
-            .catch( (err) => {
-                console.log("Error: ", err);
-            });
         setOpenOptions(false);
     };
-    const handleCloseProduct = () => {
-        setOpenProduct(false);
-    };
 
-    const [checkedff, setCheckedff] = React.useState(false);
-    const [checkedc, setCheckedc] = React.useState(false);
-    const [checkedb, setCheckedb] = React.useState(false);
-    const [checkedh, setCheckedh] = React.useState(false);
-    const [checkedcl, setCheckedcl] = React.useState(false);
-    const [checkeds, setCheckeds] = React.useState(false);
-    const [checkeda, setCheckeda] = React.useState(false);
-    const [checkedm, setCheckedm] = React.useState(false);
-    const [checkedp, setCheckedp] = React.useState(false);
-    const [checkedj, setCheckedj] = React.useState(false);
-    const [checkedg, setCheckedg] = React.useState(false);
-    const [checkedr, setCheckedr] = React.useState(false);
-    const [checkedt, setCheckedt] = React.useState(false);
-    const [checkedd, setCheckedd] = React.useState(false);
-    const [checkedfit, setCheckedfit] = React.useState(false);
+    const handleCloseProduct = () => setOpenProduct(false)
 
-    const [category, setCategory] = React.useState("");
+    const handleChangeOption = event => {
+        setCheckList({ ...checkList, [event.target.value]: event.target.checked })
+    }
 
-    const handleChangeFastFood = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedff(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeCafe = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedc(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeBakery = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedb(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeHair = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedh(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeClothing = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedcl(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeSkin = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckeds(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeAccessories = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckeda(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeMakeup = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedm(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangePharmacy = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedp(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeJuice = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedj(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeGrocery = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedg(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeRestaurant = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedr(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeTechStore = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedt(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeDepStore = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedd(event.target.checked);
-        setCategory(event.target.value);
-    };
-    const handleChangeFitnessGym = (event) => {
-        console.log("Event:", event.target.value);
-        setCheckedfit(event.target.checked);
-        setCategory(event.target.value);
-    };
+    const handleSaveOptions = () => {
+        let checkedList = ""
+        for (let key in checkList) {
+            if (checkList[key]) {
+                checkedList += (key + ",")
+            }
+        }
+        checkedList = checkedList.substring(0, checkedList.length-1)
 
-    const [sortBy, setSortBy] = React.useState('min');
-
-    const handleChange = (event) => {
-        setSortBy(event.target.value);
-    };
+        Axios.get('http://localhost:8080/GetProductByCategory', {
+            headers: { 'Content-Type': 'application/json', 'email': props.match.params.email, 'category': checkedList }
+        })
+            .then(res => {
+                setDataList(res.data.products);
+                console.log('Response: ', res)
+            })
+            .catch(err => {
+                console.log('Error: ', err)
+            })
+        setOpenOptions(false);
+    }
 
     const handleAddToCart = () => {
         const cartData = {
@@ -397,83 +328,44 @@ export default function Home(props){
             .catch((error) => console.log(error));
     }
 
-    const classes = useStyles();
+
     return(
         <div >
             <div >
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
                 <AppBar position="static" >
-                    <Tabs
-                        color="primary"
-                    >Change Business Options
+                    <Tabs color="primary">
                         <Tab label="Change Business Options" onClick={handleClickOpenOptions}/>
                         <Tab label="" />
                         <IconButton className={classes.icon}>
                             <FavoriteIcon />
                         </IconButton>
                         <Tab label="" />
-                        <div>
-                            <FormControl className={classes.formControl} >
-                                <InputLabel  >Sort By</InputLabel>
-                                <Select
-                                    value={sortBy}
-                                    onChange={handleChange}
-                                >
-                                    <MenuItem value={"min"}>Price Low ($AUD) </MenuItem>
-
-                                    <MenuItem value={"max"}>Price High ($AUD) </MenuItem>
-                                </Select>
-
-                            </FormControl>
-                        </div>
-                        <Toolbar>
-                            <div className={classes.search}>
-                                <div className={classes.searchIcon}>
-                                    <SearchIcon />
-                                </div>
-                                <InputBase
-                                    placeholder="Search"
-                                    classes={{
-                                        root: classes.inputRoot,
-                                        input: classes.inputInput,
-                                    }}
-                                    inputProps={{ 'aria-label': 'search' }}
-                                />
-                            </div>
-                        </Toolbar>
                     </Tabs>
                 </AppBar>
                 <div align="center">
                     ~~WELCOME! SELECT <strong>CHANGE BUSINESS OPTIONS</strong> TO SHOW DIFFERENT PRODUCTS~~
                 </div>
-                <div className={classes.rootGrid} style={{width: 'auto', height: 'auto'}}>
-                    <GridList cellHeight={200} spacing={1} className={classes.gridList} cols={4}>
-                        {tileData.map((tile, index) => (
+                <div className={classes.rootGrid} style={{width: 'auto', height: 'auto'}} >
+                    <GridList spacing={4} className={classes.gridList} cols={ isSmUp ? 3 : 1}>
+                        {dataList.map((tile, index) => (
                             <GridListTile key={index} >
                                 <img src={tile.productImageUrl}
                                      alt={tile.productName}
-                                     onClick={(event)=>handleClickOpenProduct(event, tile.productName, tile.supplierEmail, tile.productImageUrl,
-                                    tile.productDescription, tile.productQuantity,  tile.productPrice, tile.productCategory, tile.productCredit
-                                )}
-                                />
+                                     onClick={(event)=>handleClickOpenProduct(event, tile)}/>
+                                <div className={classes.gridListTileCredit}>
+                                    {"-$" + tile.productCredit}
+                                </div>
                                 <GridListTileBar
                                     title={tile.productName}
-                                    subtitle={"credit $" + tile.productCredit}
                                     titlePosition="top"
                                     className={classes.titleBar}
                                 />
-
                                 <GridListTileBar
                                     height={4}
                                     title={"$" + tile.productPrice}
-
-                                    subtitle={<span>By: {tile.supplierEmail} </span>}
-                                    actionIcon={
-                                        <IconButton aria-label={`info about ${tile.productName}`} className={classes.icon}>
-                                            <FavoriteIcon />
-                                        </IconButton>
-                                    }
+                                    subtitle={<p>By: {tile.supplierEmail} </p>}
                                 />
                             </GridListTile>
                         ))}
@@ -489,20 +381,22 @@ export default function Home(props){
                                     <CardHeader
                                         //this avatar serves no purpose
                                         avatar={
-                                            <Avatar aria-label="recipe" className={classes.avatar}>
-                                                S
+                                            <Avatar className={classes.avatar}>
+                                                {openProductDetails.productName.charAt(0)}
                                             </Avatar>
                                         }
-
                                         title={openProductDetails.productName}
                                         subheader={<span>By: {openProductDetails.supplierEmail}</span>}
                                     />
                                     <CardMedia
                                         className={classes.media}
-                                        image={openProductDetails.productImageUrl}
                                         title={openProductDetails.productName}
                                     />
                                     <CardContent>
+                                        <img
+                                            className='product-detail-img'
+                                            src={openProductDetails.productImageUrl}
+                                        />
                                         <Typography variant="body2" color="textSecondary" component="p"> Description: {openProductDetails.productDescription}</Typography>
                                         <Typography variant="body2" color="textSecondary" component="p">Remaining stock: {openProductDetails.productQuantity}</Typography>
                                         <Typography variant="body12" color="textSecondary" component="p">Price: ${openProductDetails.productPrice}</Typography>
@@ -519,11 +413,11 @@ export default function Home(props){
 
                             </div>
                             <div className={classes.root}>
-
                                 <Button onClick={handleCloseProduct}
                                         variant="contained"
                                         color="primary"
-                                >Close
+                                >
+                                    Close
                                 </Button>
                                 <br/>
                             </div>
@@ -544,28 +438,26 @@ export default function Home(props){
                                         key={image.title}
                                         className={classes.image}
                                         focusVisibleClassName={classes.focusVisible}
-                                        style={{
-                                            width: image.width,
-                                        }}
+                                        style={{width: image.width}}
                                     >
-          <span
-              className={classes.imageSrc}
-              style={{
-                  backgroundImage: `url(${image.url})`,
-              }}
-          />
-                                        <span className={classes.imageBackdrop} />
-                                        <span className={classes.imageButton}>
-            <Typography
-                component="span"
-                variant="subtitle1"
-                color="inherit"
-                className={classes.imageTitle}
-            >
-              {image.title}
-                <span className={classes.imageMarked} />
-            </Typography>
-          </span>
+                                    <span
+                                      className={classes.imageSrc}
+                                      style={{
+                                          backgroundImage: `url(${image.url})`,
+                                      }}
+                                    />
+                                    <span className={classes.imageBackdrop} />
+                                    <span className={classes.imageButton}>
+                                    <Typography
+                                        component="span"
+                                        variant="subtitle1"
+                                        color="inherit"
+                                        className={classes.imageTitle}
+                                    >
+                                        {image.title}
+                                        <span className={classes.imageMarked} />
+                                    </Typography>
+                                  </span>
                                     </ButtonBase>
                                 ))}
                             </div>
@@ -583,142 +475,60 @@ export default function Home(props){
                                             <TableRow >
                                                 <TableCell >
                                                     <Checkbox
-                                                        checked={checkedff}
-                                                        onChange={handleChangeFastFood}
+                                                        checked={checkList.fastfood}
+                                                        onChange={handleChangeOption}
                                                         value="fastfood"
-                                                        inputProps={{ 'aria-label': 'fastFood' }}/>Fast Food
+                                                    />Fast Food
                                                 </TableCell>
                                                 <TableCell >
                                                     <Checkbox
-                                                        checked={checkedh}
-                                                        onChange={handleChangeHair}
-                                                        value="hair dressing"
-                                                        inputProps={{ 'aria-label': 'hair' }}/>Hairdressing
+                                                        checked={checkList.hairdressing}
+                                                        onChange={handleChangeOption}
+                                                        value="hairdressing"
+                                                    />Hairdressing
                                                 </TableCell>
                                                 <TableCell >
                                                     <Checkbox
-                                                        checked={checkedcl}
+                                                        checked={checkList.clothing}
                                                         value="clothing"
-                                                        onChange={handleChangeClothing}
-                                                        inputProps={{ 'aria-label': 'clothing' }}/>Clothing/ Shoes
+                                                        onChange={handleChangeOption}
+                                                    />Clothing
                                                 </TableCell>
                                             </TableRow>
                                             <TableRow >
                                                 <TableCell >
                                                     <Checkbox
-                                                        checked={checkedc}
-                                                        value="cafe"
-                                                        onChange={handleChangeCafe}
-                                                        inputProps={{ 'aria-label': 'cafe' }}/>CafÃ©
-                                                </TableCell>
-                                                <TableCell >
-                                                    <Checkbox
-                                                        checked={checkeds}
-                                                        value="skin"
-                                                        onChange={handleChangeSkin}
-                                                        inputProps={{ 'aria-label': 'skin' }}/>Dermatology
-                                                </TableCell>
-                                                <TableCell >
-                                                    <Checkbox
-                                                        checked={checkeda}
-                                                        value="accessories"
-                                                        onChange={handleChangeAccessories}
-                                                        inputProps={{ 'aria-label': 'accessories' }}/>Accessories
-                                                </TableCell>
-                                            </TableRow>
-                                            <TableRow >
-                                                <TableCell >
-                                                    <Checkbox
-                                                        checked={checkedb}
+                                                        checked={checkList.bakery}
                                                         value="bakery"
-                                                        onChange={handleChangeBakery}
-                                                        inputProps={{ 'aria-label': 'bakery' }}/>Bakery
+                                                        onChange={handleChangeOption}
+                                                    />Bakery
                                                 </TableCell>
                                                 <TableCell >
                                                     <Checkbox
-                                                        checked={checkedm}
+                                                        checked={checkList.makeup}
                                                         value="makeup"
-                                                        onChange={handleChangeMakeup}
-                                                        inputProps={{ 'aria-label': 'makeup' }}/>Makeup
+                                                        onChange={handleChangeOption}
+                                                    />Makeup
                                                 </TableCell>
                                                 <TableCell >
                                                     <Checkbox
-                                                        checked={checkedp}
+                                                        checked={checkList.pharmacy}
                                                         value="pharmacy"
-                                                        onChange={handleChangePharmacy}
-                                                        inputProps={{ 'aria-label': 'pharmacy' }}/>Pharmacy
-                                                </TableCell>
-
-                                            </TableRow>
-                                            <TableRow >
-                                                <TableCell >
-                                                    <Checkbox
-                                                        checked={checkedj}
-                                                        value="juice"
-                                                        onChange={handleChangeJuice}
-                                                        inputProps={{ 'aria-label': 'juice' }}/>Drinks/ Juice
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Checkbox
-                                                        checked={checkedfit}
-                                                        value="fitnessgym"
-                                                        onChange={handleChangeFitnessGym}
-                                                        inputProps={{ 'aria-label': 'fitnessGym' }}/>Fitness Gym
-                                                </TableCell>
-                                                <TableCell >
-                                                    <Checkbox
-                                                        checked={checkedg}
-                                                        value="grocery"
-                                                        onChange={handleChangeGrocery}
-                                                        inputProps={{ 'aria-label': 'grocery' }}/>Grocery Store
-                                                </TableCell>
-                                            </TableRow>
-
-                                            <TableCell >
-                                                <Checkbox
-                                                    checked={checkedr}
-                                                    value="restaurant"
-                                                    onChange={handleChangeRestaurant}
-                                                    inputProps={{ 'aria-label': 'restaurant' }}/>Restaurant
-                                            </TableCell>
-
-                                            <TableCell>
-
-                                            </TableCell>
-                                            <TableCell >
-                                                <Checkbox
-                                                    checked={checkedt}
-                                                    value="techstore"
-                                                    onChange={handleChangeTechStore}
-                                                    inputProps={{ 'aria-label': 'techstore' }}/>Tech Store
-                                            </TableCell>
-                                            <TableRow>
-                                                <TableCell >
-
-                                                </TableCell>
-                                                <TableCell>
-                                                </TableCell>
-                                                <TableCell >
-                                                    <Checkbox
-                                                        checked={checkedd}
-                                                        value="department"
-                                                        onChange={handleChangeDepStore}
-                                                        inputProps={{ 'aria-label': 'department' }}/>Department Store
+                                                        onChange={handleChangeOption}
+                                                    />Pharmacy
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
                             </div>
-                            <div align={'center'}>
-
-                                {'\n'}<br></br>
-                                <Button onClick={handleCloseOptions}
+                            <div align="center">
+                                <Button onClick={handleSaveOptions}
                                         variant="contained"
                                         color="primary"
+                                        className={classes.saveOptionButton}
                                 >Save Options
                                 </Button>
-                                <br></br>
                             </div>
                         </DialogContentText>
                     </DialogContent>
