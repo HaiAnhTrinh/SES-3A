@@ -32,6 +32,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from "@material-ui/core/Tooltip";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import {handleAddWithPlaceHolderImage} from "../common/AxiosTasks";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -330,6 +332,69 @@ Row1.propTypes = {
     email: PropTypes.string.isRequired
 };
 
+const AddDialog = (props) => {
+    const [addDialogData, setAddDialogData] = useState({
+        'productName': "",
+        'productPrice': "",
+        'productQuantity': "",
+        'productCategory': "",
+        'productDescription': "",
+    });
+    const onAddDialogChange = (prop) => e => {
+        setAddDialogData( {...addDialogData, [prop]: e.target.value} )
+    }
+
+    return (
+        <div>
+            <Table>
+                <TableRow>
+                    <TableCell>
+                        <Typography color="primary">Name</Typography>
+                    </TableCell>
+                    <TableCell>
+                        <TextField onChange={onAddDialogChange('productName')}/>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>
+                        <Typography color="primary">Price</Typography>
+                    </TableCell>
+                    <TableCell>
+                        <TextField onChange={onAddDialogChange('productPrice')}/>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>
+                        <Typography color="primary">Quantity</Typography>
+                    </TableCell>
+                    <TableCell>
+                        <TextField onChange={onAddDialogChange('productQuantity')}/>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>
+                        <Typography color="primary">Category</Typography>
+                    </TableCell>
+                    <TableCell>
+                        <TextField onChange={onAddDialogChange('productCategory')}/>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>
+                        <Typography color="primary">Description</Typography>
+                    </TableCell>
+                    <TableCell>
+                        <TextField onChange={onAddDialogChange('productDescription')}/>
+                    </TableCell>
+                </TableRow>
+            </Table>
+            <Button onClick={()=> handleAddWithPlaceHolderImage(props.email, addDialogData, props.productPhotoRef, "Business owner")}>
+                ADD
+            </Button>
+        </div>
+    )
+}
+
 
 export default function MaterialTableDemo(props) {
 
@@ -347,6 +412,7 @@ export default function MaterialTableDemo(props) {
     const [imageUrl, setImageUrl] = useState("");
     const productPhotoRef = firebase.storage().ref().child("product photos");
     const firestoreRef = firebase.firestore();
+    const [openAddDialog, setOpenAddDialog] = useState(false);
 
     const nonMarketTable = (rows) => {
         return (
@@ -362,7 +428,7 @@ export default function MaterialTableDemo(props) {
                             </TableCell>
                             <TableCell>
                                 <Tooltip title="Add New Product">
-                                    <IconButton aria-label="add">
+                                    <IconButton aria-label="add" onClick={() => setOpenAddDialog(true)}>
                                         <AddBoxIcon />
                                     </IconButton>
                                 </Tooltip>
@@ -468,6 +534,10 @@ export default function MaterialTableDemo(props) {
             }
         )
         handleDropZoneClose();
+    }
+
+    const handleCloseAddDialog = () => {
+        setOpenAddDialog(false)
     }
 
     const handleChange = (event, newValue) => {
@@ -703,6 +773,10 @@ export default function MaterialTableDemo(props) {
             <Dialog onClose={handleClickCloseImageDialog} aria-labelledby="simple-dialog-title" open={openImageDialog}>
                 <DialogTitle id="simple-dialog-title">Product Image</DialogTitle>
                 <img src={imageUrl} alt="image"/>
+            </Dialog>
+
+            <Dialog open={openAddDialog} onClose={handleCloseAddDialog}>
+                <AddDialog email={email} productPhotoRef={productPhotoRef}/>
             </Dialog>
 
         </div>

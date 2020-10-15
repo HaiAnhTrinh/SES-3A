@@ -22,13 +22,6 @@ import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import SearchIcon from '@material-ui/icons/Search';
-import Toolbar from '@material-ui/core/Toolbar';
-import InputBase from '@material-ui/core/InputBase';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import Axios from "axios";
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -70,13 +63,15 @@ const useStyles = makeStyles((theme) => ({
         width: "auto",
         height: "auto",
         transform: 'translateZ(0)',
+        paddingLeft: 20,
+        paddingRight: 20
     },
     gridListTileCredit: {
         top: 50,
         right: 10,
         fontSize: "large",
         fontWeight: "bolder",
-        background: "red",
+        background: "black",
         position: "absolute",
         borderRadius: "60%",
     },
@@ -337,25 +332,20 @@ export default function Home(props){
                 <AppBar position="static" >
                     <Tabs color="primary">
                         <Tab label="Change Business Options" onClick={handleClickOpenOptions}/>
-                        <Tab label="" />
-                        <IconButton className={classes.icon}>
-                            <FavoriteIcon />
-                        </IconButton>
-                        <Tab label="" />
                     </Tabs>
                 </AppBar>
                 <div align="center">
                     ~~WELCOME! SELECT <strong>CHANGE BUSINESS OPTIONS</strong> TO SHOW DIFFERENT PRODUCTS~~
                 </div>
                 <div className={classes.rootGrid} style={{width: 'auto', height: 'auto'}} >
-                    <GridList spacing={4} className={classes.gridList} cols={ isSmUp ? 3 : 1}>
+                    <GridList spacing={4} className={classes.gridList} cols={ isSmUp ? 4 : 1}>
                         {dataList.map((tile, index) => (
                             <GridListTile key={index} >
                                 <img src={tile.productImageUrl}
                                      alt={tile.productName}
                                      onClick={(event)=>handleClickOpenProduct(event, tile)}/>
                                 <div className={classes.gridListTileCredit}>
-                                    {"-$" + tile.productCredit}
+                                    <Typography color="error" variant="h4">{"-$" + tile.productCredit}</Typography>
                                 </div>
                                 <GridListTileBar
                                     title={tile.productName}
