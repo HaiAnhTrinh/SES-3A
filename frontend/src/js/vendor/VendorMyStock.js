@@ -168,7 +168,7 @@ const Row = (props) => {
                             </TableCell>
                             <TableCell>
                                 <Tooltip title="Edit Product Detail">
-                                    <IconButton aria-label="edit">
+                                    <IconButton aria-label="edit" onClick={() => handleEdit(email, row)}>
                                         <EditIcon />
                                     </IconButton>
                                 </Tooltip>
