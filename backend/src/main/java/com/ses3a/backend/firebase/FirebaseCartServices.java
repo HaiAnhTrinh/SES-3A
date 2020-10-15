@@ -192,7 +192,7 @@ public class FirebaseCartServices {
                         cartProduct.getName(), cartProduct.getSupplier())) {
                     AddProductRequest addRequest =
                             new AddProductRequest(request.getEmail(), Configs.BUSINESS_OWNER, cartProduct.getName(),
-                                    cartProduct.getPrice(), cartProduct.getQuantity(), cartProduct.getDescription(), null,
+                                    cartProduct.getPrice(), cartProduct.getQuantity(), cartProduct.getDescription(), cartProduct.getCredit(),
                                     cartProduct.getImageUrl(), cartProduct.getCategory(), cartProduct.getSupplier());
                     firebaseProductServices.addProduct(addRequest);
                 } else {
