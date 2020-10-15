@@ -206,7 +206,7 @@ public class FirebaseCartServices {
                     EditProductRequest editRequest =
                             new EditProductRequest(request.getEmail(), Configs.BUSINESS_OWNER, cartProduct.getName(),
                                     cartProduct.getPrice(), newQuantity, cartProduct.getCategory(),
-                                    cartProduct.getDescription(), null, cartProduct.getSupplier());
+                                    cartProduct.getDescription(), cartProduct.getCredit(), cartProduct.getSupplier());
                     firebaseProductServices.editProduct(editRequest);
                 }
 
