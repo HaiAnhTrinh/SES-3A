@@ -39,7 +39,7 @@ const tableIcons = {
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
-export default function MyPurchase(props) {
+export default function Home(props) {
 
     console.log(props)
 

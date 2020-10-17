@@ -473,7 +473,7 @@ export default function MyProduct(props){
 
             <Dialog onClose={handleCloseImageDialog} open={openImageDialog}>
                 <DialogTitle id="simple-dialog-title">Product Image</DialogTitle>
-                <img src={imageUrl} alt="product"/>
+                <img src={imageUrl} alt="product" width={300} height={300}/>
             </Dialog>
 
             <Dialog open={openAddDialog} onClose={handleCloseAddDialog}>

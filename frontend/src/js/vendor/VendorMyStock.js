@@ -168,7 +168,7 @@ const Row = (props) => {
                             </TableCell>
                             <TableCell>
                                 <Tooltip title="Edit Product Detail">
-                                    <IconButton aria-label="edit">
+                                    <IconButton aria-label="edit" onClick={() => handleEdit(email, row)}>
                                         <EditIcon />
                                     </IconButton>
                                 </Tooltip>
@@ -457,13 +457,6 @@ export default function MaterialTableDemo(props) {
                                     MY STOCK
                                 </Box>
                             </TableCell>
-                            <TableCell>
-                                <Tooltip title="Add New Product">
-                                    <IconButton aria-label="add">
-                                        <AddBoxIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -603,11 +596,12 @@ export default function MaterialTableDemo(props) {
                             columns={[
                                 {
                                     title: 'Name*', field: 'productName', editable: 'onAdd',
-                                    cellStyle: {textAlign: 'left'}
+                                    headerStyle:{textAlign:'left'},
+                                    cellStyle: { textAlign: 'left'}
                                 },
                                 {
                                     title: 'Quantity*', field: 'productQuantity', type:'numeric',
-                                    cellStyle: {textAlign: 'left'},
+                                    cellStyle: {textAlign: 'left', paddingLeft: '50px'},
                                     headerStyle:{textAlign:'left'}
                                 },
                                 {
@@ -664,7 +658,7 @@ export default function MaterialTableDemo(props) {
                                             newData.productPrice >0){
                                             setTimeout(() => {
                                                 setNonMarketData([...nonMarketData, newData])
-                                                handleAddWithPlaceHolderImage(email, newData, "defaultImageUrl", "Business owner")
+                                                handleAddWithPlaceHolderImage(email, newData, productPhotoRef, "Business owner")
                                                 resolve()
                                             }, 1000)
                                         }
@@ -772,7 +766,7 @@ export default function MaterialTableDemo(props) {
 
             <Dialog onClose={handleClickCloseImageDialog} aria-labelledby="simple-dialog-title" open={openImageDialog}>
                 <DialogTitle id="simple-dialog-title">Product Image</DialogTitle>
-                <img src={imageUrl} alt="image"/>
+                <img src={imageUrl} alt="image" width={300} height={300}/>
             </Dialog>
 
             <Dialog open={openAddDialog} onClose={handleCloseAddDialog}>

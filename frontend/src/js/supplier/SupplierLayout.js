@@ -44,10 +44,12 @@ export default function SupplierLayout(props) {
     }, {
         'text': 'My Product',
         'path': baseUrl + '/MyProduct'
-    }, {
-        'text': 'Delivered Product',
-        'path': baseUrl + '/DeliveredProduct'
-    }, {
+    },
+    //     {
+    //     'text': 'Delivered Product',
+    //     'path': baseUrl + '/DeliveredProduct'
+    // },
+        {
         'text': 'Graph',
         'path': baseUrl + '/Graph'
     }];

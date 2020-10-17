@@ -30,6 +30,7 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
+import {axiosInterceptor} from "../common/AxiosTasks";
 
 const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030]
@@ -99,22 +100,28 @@ export default function MyCart(props){
             "email": email,
             "cartProducts": cartItemsDetails
         }
+        axiosInterceptor("purchase request")
         Axios.post("http://localhost:8080/Purchase", data,
             { headers: {'Content-Type': 'application/json'}} )
-            .then((response) => console.log(response))
+            .then((response) => {
+                    console.log(response)
+            })
             .catch((error) => console.log(error));
-        if(values.cardAccept === '' || values.cardNumber.length !== 16 || values.expiryMonth === '' || values.expiryYear === ''
-            || values.country === '' || values.cvv.length !== 3 || values.address1.length === 0
-            || values.address2.length === 0 || values.city.length === 0 || values.state.length === 0
-            || values.postalCode.length === 0 || values.contactPhoneNumber.length === 0
-            || values.emailAddress.length === 0){
-            setInfoOnPaymentSubmission("Some Information is Missing or Incorrect");
-            setOpenDialog(true);
-        }
-        else{
-            setInfoOnPaymentSubmission("Payment Received. Thank You for Payment");
-            setOpenDialog(true);
-        }
+        setInfoOnPaymentSubmission("Payment Received. Thank You for Payment");
+        setOpenDialog(true);
+
+        // if(values.cardAccept === '' || values.cardNumber.length !== 16 || values.expiryMonth === '' || values.expiryYear === ''
+        //     || values.country === '' || values.cvv.length !== 3 || values.address1.length === 0
+        //     || values.address2.length === 0 || values.city.length === 0 || values.state.length === 0
+        //     || values.postalCode.length === 0 || values.contactPhoneNumber.length === 0
+        //     || values.emailAddress.length === 0){
+        //     setInfoOnPaymentSubmission("Some Information is Missing or Incorrect");
+        //     setOpenDialog(true);
+        // }
+        // else{
+        //     setInfoOnPaymentSubmission("Payment Received. Thank You for Payment");
+        //     setOpenDialog(true);
+        // }
     };
 
     const onPayWithCreditsButtonClick = () => {
@@ -140,6 +147,7 @@ export default function MyCart(props){
 
     const handleClose = () => {
         setOpenDialog(false);
+        window.location.reload()
     };
 
     const onItemQuantityChanged = (event, index, itemNew) => {
@@ -164,6 +172,8 @@ export default function MyCart(props){
                 return item;
             }
         });
+
+        console.log("list", list)
 
         setCartItemDetails(list);
         list.map((item) => {
