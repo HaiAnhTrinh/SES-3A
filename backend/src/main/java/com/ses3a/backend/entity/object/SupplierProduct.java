@@ -7,9 +7,10 @@ public class SupplierProduct {
     private String productQuantity;
     private String productCategory;
     private String productDescription;
+    private String productCredit;
     private String productImageUrl;
 
-    public SupplierProduct(){
+    public SupplierProduct() {
     }
 
     public SupplierProduct(String supplierEmail,
@@ -17,6 +18,7 @@ public class SupplierProduct {
                            String productPrice,
                            String productQuantity,
                            String productDescription,
+                           String productCredit,
                            String productImageUrl,
                            String productCategory) {
         this.supplierEmail = supplierEmail;
@@ -26,6 +28,7 @@ public class SupplierProduct {
         this.productCategory = productCategory;
         this.productImageUrl = productImageUrl;
         this.productDescription = productDescription;
+        this.productCredit = productCredit;
     }
 
     public String getSupplierEmail() {
@@ -82,5 +85,13 @@ public class SupplierProduct {
 
     public void setProductImageUrl(String productImageUrl) {
         this.productImageUrl = productImageUrl;
+    }
+
+    public String getProductCredit() {
+        return productCredit;
+    }
+
+    public void setProductCredit(String productCredit) {
+        this.productCredit = productCredit;
     }
 }

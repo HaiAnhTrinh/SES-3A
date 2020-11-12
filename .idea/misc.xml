@@ -10,5 +10,8 @@
       </list>
     </option>
   </component>
+  <component name="ProjectPlainTextFileTypeManager">
+    <file url="file://$PROJECT_DIR$/backend/backend.iml" />
+  </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="12" project-jdk-type="JavaSDK" />
 </project>

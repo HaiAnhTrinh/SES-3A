@@ -27,7 +27,6 @@ export default function AppRouter() {
 
     //TODO: configure this variable to false in the production stage
     //initialize this variable as 'true' during development stage
-    //really login to test firebase related functions
     const [isLoggedIn, setIsLoggedIn] = useState(true);
     const currentUser = firebase.auth().currentUser;
 
@@ -42,12 +41,10 @@ export default function AppRouter() {
                 <Route path="/VendorLogin" exact strict render={ (props) => <VendorLoginPage {...props} />} />
                 <Route path="/SupplierLogin" exact strict render={ (props) => <SupplierLoginPage {...props} />} />
                 <Route path="/Vendor/:email"
-                       render={ (props) =>
-                           isLoggedIn ? <VendorLayout {...props}/> : <Redirect to="/"/>}
+                       render={ (props) => isLoggedIn ? <VendorLayout {...props}/> : <Redirect to="/"/>}
                 />
                 <Route path="/Supplier/:email"
-                       render={ (props) =>
-                           isLoggedIn ? <SupplierLayout {...props}/> : <Redirect to="/"/>}
+                       render={ (props) => isLoggedIn ? <SupplierLayout {...props}/> : <Redirect to="/"/>}
                 />
                 <Route path="/CreateNewUser" exact strict component={CreateNewUser} />
             </Switch>

@@ -21,44 +21,34 @@ function SupplierLoginPage(props) {
             setLoginMessage("Require both email and password");
         }
         else{
-            //**************Authorization layer**************
-            // firebase.auth().signInWithEmailAndPassword(email, password)
-            //     .then((res) => {
-            //
-            //         if(res.user.emailVerified){
-            //             Axios.get("http://localhost:8080/Login",
-            //                 { headers: {'Content-Type': 'application/json', 'email': email, 'role': 'Supplier'}})
-            //                 .then( (res) => {
-            //                     console.log("Response: ",res);
-            //                     if(res.data.isAuthorized){
-            //                         props.history.push("/Supplier/" + email + "/Home");
-            //                     }
-            //                     else{
-            //                         setLoginMessage("This account is not a supplier account");
-            //                     }
-            //                 })
-            //                 .catch( (err) => {
-            //                     console.log("Error: ", err);
-            //                     setLoginMessage("CONNECTION ERROR");
-            //                 });
-            //
-            //         }
-            //         else{
-            //             setLoginMessage("Email not verified");
-            //         }
-            //     })
-            //     .catch((error) => setLoginMessage(error.message));
+            //TODO: enable this code for authorization
+            // **************Authorization layer**************
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then((res) => {
+
                     if(res.user.emailVerified){
-                        props.history.push("/Supplier/" + email + "/Home");
+                        Axios.get("http://localhost:8080/Login",
+                            { headers: {'Content-Type': 'application/json', 'email': email, 'role': 'Supplier'}})
+                            .then( (res) => {
+                                console.log("Response: ",res);
+                                if(res.data.isAuthorized){
+                                    props.history.push("/Supplier/" + email + "/Home");
+                                }
+                                else{
+                                    setLoginMessage("This account is not a supplier account");
+                                }
+                            })
+                            .catch( (err) => {
+                                console.log("Error: ", err);
+                                setLoginMessage("CONNECTION ERROR");
+                            });
+
                     }
                     else{
                         setLoginMessage("Email not verified");
                     }
                 })
                 .catch((error) => setLoginMessage(error.message));
-
         }
     };
     return (

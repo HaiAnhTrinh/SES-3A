@@ -1,8 +1,8 @@
 package com.ses3a.backend.entity.request;
 
-public class GetSupplierPendingPurchaseRequest extends BaseRequest{
+public class GetSupplierPendingPurchaseRequest extends BaseRequest {
 
-    public GetSupplierPendingPurchaseRequest(String email){
+    public GetSupplierPendingPurchaseRequest(String email) {
         this.setEmail(email);
     }
 

@@ -1,12 +1,13 @@
 package com.ses3a.backend.entity.request;
 
-public class AddProductRequest extends BaseRequest{
+public class AddProductRequest extends BaseRequest {
 
     private String name;
     private String price;
     private String quantity;
     private String description;
     private String category;
+    private String credit;
     private String imageUrl;
     private String supplier;
 
@@ -16,6 +17,7 @@ public class AddProductRequest extends BaseRequest{
                              String price,
                              String quantity,
                              String description,
+                             String credit,
                              String imageUrl,
                              String category,
                              String supplier) {
@@ -25,6 +27,7 @@ public class AddProductRequest extends BaseRequest{
         this.setPrice(price);
         this.setQuantity(quantity);
         this.setDescription(description);
+        this.setCredit(credit);
         this.setImageUrl(imageUrl);
         this.setCategory(category);
         this.setSupplier(supplier);
@@ -76,6 +79,14 @@ public class AddProductRequest extends BaseRequest{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCredit() {
+        return credit;
+    }
+
+    public void setCredit(String credit) {
+        this.credit = credit;
     }
 
     public String getImageUrl() {

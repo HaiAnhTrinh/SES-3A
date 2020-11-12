@@ -1,10 +1,10 @@
 package com.ses3a.backend.entity.request;
 
-public class GetProductByCategoryRequest extends BaseRequest{
+public class GetProductByCategoryRequest extends BaseRequest {
 
     private String category;
 
-    public GetProductByCategoryRequest(String email, String category){
+    public GetProductByCategoryRequest(String email, String category) {
         this.setEmail(email);
         this.setCategory(category);
     }

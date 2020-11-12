@@ -9,22 +9,11 @@ public class CartProduct {
     private String cost;
     private String category;
     private String description;
+    private String credit;
     private String imageUrl;
 
-    public CartProduct(){
+    public CartProduct() {
     }
-
-//    public CartProduct(String name,
-//                       String supplier,
-//                       String price,
-//                       String quantity,
-//                       String cost) {
-//        this.name = name;
-//        this.supplier = supplier;
-//        this.price = price;
-//        this.quantity = quantity;
-//        this.cost = cost;
-//    }
 
     public String getName() {
         return name;
@@ -80,6 +69,14 @@ public class CartProduct {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCredit() {
+        return credit;
+    }
+
+    public void setCredit(String credit) {
+        this.credit = credit;
     }
 
     public String getImageUrl() {

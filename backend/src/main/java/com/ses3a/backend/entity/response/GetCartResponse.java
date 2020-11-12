@@ -4,11 +4,11 @@ import com.ses3a.backend.entity.object.CartProduct;
 
 import java.util.List;
 
-public class GetCartResponse extends BaseResponse{
+public class GetCartResponse extends BaseResponse {
 
     List<CartProduct> cartProducts;
 
-    public GetCartResponse(){
+    public GetCartResponse() {
     }
 
     public List<CartProduct> getCartProducts() {
