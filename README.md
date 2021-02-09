@@ -6,4 +6,4 @@ A website that allows users to perform online purchases. Tech stack: ReactJS, Ja
 https://www.youtube.com/watch?v=DsL5cYtg7MQ
 
 # Test for trial task
-https://github.com/HoangNguyen5897
+https://github.com/fakeUserName-ehwuihuiw
